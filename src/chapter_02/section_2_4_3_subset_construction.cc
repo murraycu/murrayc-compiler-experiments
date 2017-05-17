@@ -104,6 +104,13 @@ delta(const States& q, State::char_t c) {
 
 /** Get any states reachable from the @a states via ε,
  * including the input @a states themselves.
+ *
+ * TODO: The "Computing ε-closure Offline" section has
+ * pseudo-code to compute all the ε-closures at once,
+ * but the "it places n's predecessors along ε-transitions
+ * on the worklist" part is unclear. How are we supposed
+ * to find the predecessors? Is it enough to use only
+ * the predecessors discovered so far?
  */
 static States
 e_closure(const States& states) {
