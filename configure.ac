@@ -14,7 +14,7 @@ AC_PROG_CC
 AM_PROG_CC_C_O
 AC_PROG_CXX
 
-AX_CXX_COMPILE_STDCXX([14], [noext], [mandatory])
+AX_CXX_COMPILE_STDCXX([17], [noext], [mandatory])
 
 # See http://www.gnu.org/software/autoconf-archive/ax_boost_base.html
 # Boost System is needed by Boost Timer
