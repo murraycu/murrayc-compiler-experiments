@@ -1,33 +1,61 @@
-# http://www.gnu.org/software/automake
+*.o
+*.lo
+*.a
+*.la
+*~
+*.gcno
+*.gcda
+*.gcov
+/gcov-report.txt
 
-Makefile.in
-/ar-lib
-/mdate-sh
-/py-compile
-/test-driver
-/ylwrap
+*.swp
 
-# http://www.gnu.org/software/autoconf
-
-/autom4te.cache
-/autoscan.log
-/autoscan-*.log
-/aclocal.m4
+.deps
+.dirstamp
+.libs
+stamp-h1
+stamp-h2
+/INSTALL
 /compile
-/config.guess
-/config.h.in
-/config.sub
-/configure
-/configure.scan
+/configure.lineno
 /depcomp
-/install-sh
+/ABOUT-NLS
+/config.rpath
+
+Makefile
+Makefile.in
+/configure
+/config.sub
+/config.status
+/config.log
+/config.h
+/config.h.in
+/config.guess
+/autom4te.cache
+/aclocal.m4
+/mkinstalldirs
 /missing
-/stamp-h1
-
-# https://www.gnu.org/software/libtool/
-
 /ltmain.sh
+/libtool
+/install-sh
+/intltool-extract.in
+/intltool-merge.in
+/intltool-update.in
+/compile-binding.am
+/dist-changelog.am
+/doc-reference.am
+/generate-binding.am
+/messages.mo
+/omf.make
+/xmldocs.make
 
-# http://www.gnu.org/software/texinfo
+/test-driver
+/test-suite.log
 
-/texinfo.tex
+/section_2_4_3_subset_construction
+
+*.log
+*.trs
+
+
+
