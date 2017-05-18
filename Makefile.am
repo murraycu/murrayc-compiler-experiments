@@ -28,6 +28,7 @@ TESTS = $(check_PROGRAMS)
 
 #List of source files needed to build the executable:
 section_2_4_3_subset_construction_SOURCES = \
+	src/chapter_02/state.h \
 	src/chapter_02/section_2_4_3_subset_construction.cc
 section_2_4_3_subset_construction_CXXFLAGS = \
 	$(COMMON_CXXFLAGS)

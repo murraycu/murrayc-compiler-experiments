@@ -1,87 +1,14 @@
 #include <algorithm>
 #include <iterator>
 #include <map>
-#include <memory>
 #include <queue>
-#include <string>
-#include <unordered_map>
 #include <set>
 #include <vector>
 #include <iostream>
 #include <cassert>
 
-class State {
-public:
-  using char_t = char;
-  static constexpr char_t E = '#'; // Because no simple C++ char type an represent a multi-character literal for ε.
+#include "state.h"
 
-  explicit State(const std::string& id, bool accepting = false)
-  : id_(id), accepting_(accepting) {
-    assert(!id.empty());
-  }
-
-  /** Add a state from this state, via the character @a ch,
-   * to a next @a state with the @a id.
-   */
-  std::shared_ptr<State> add(char_t ch, const std::shared_ptr<State>& state) {
-    states_[ch].emplace(state);
-    return state;
-  }
-
-  /** Add a state from this state, via the character @a ch,
-   * to a new next state with the @a id.
-   */
-  std::shared_ptr<State>
-  add(char_t ch, const std::string& id, bool accepting = false) {
-    auto s = std::make_shared<State>(id, accepting);
-    return add(ch, s);
-  }
-
-  /*
-  std::vector<char_t>
-  transitions() {
-    std::vector<char_t> result;
-
-    std::transform(std::begin(states_), std::end(states_),
-      std::inserter(result, std::end(result)),
-        [](const auto& pair){
-          return pair.first;
-        });
-
-    return result;
-  }
-  */
-
-  using States = std::set<std::shared_ptr<State>>;
-
-  decltype(auto)
-  next_states(char_t ch) {
-    auto iter = states_.find(ch);
-    if (iter == std::end(states_)) {
-      return States();
-    }
-
-    return iter->second;
-  }
-
-  decltype(auto)
-  next_states_via_e() {
-    return next_states(State::E);
-  }
-
-  std::string id() const {
-    return id_;
-  }
-
-  bool is_accepting() const {
-    return accepting_;
-  }
-
-private:
-  std::string id_;
-  bool accepting_ = false;
-  std::unordered_map<char_t, States> states_;
-};
 
 using States = State::States;
 
