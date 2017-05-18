@@ -75,7 +75,9 @@ public:
 
   using States = std::set<std::shared_ptr<State>>;
 
-  decltype(auto)
+  /** Get all states reachable via transitions on character @c.
+   */
+  auto
   next_states(char_t ch) {
     auto iter = states_.find(ch);
     if (iter == std::end(states_)) {
@@ -85,9 +87,40 @@ public:
     return iter->second;
   }
 
-  decltype(auto)
+  /** Get all states reachable via transitions on any character.
+   */
+  std::pair<std::set<char_t>, States>
+  next_states() {
+    States result_states;
+    std::set<char_t> result_chars;
+    for (const auto& p : states_) {
+      result_chars.emplace(p.first);
+
+      const States& next_states = p.second;
+      //TODO: This should work instead: result_states.emplace(std::begin(next_states), std::end(next_states));
+      for (const auto& s : next_states) {
+        result_states.emplace(s);
+      }
+    }
+
+    return {result_chars, result_states};
+  }
+
+  auto
   next_states_via_e() {
     return next_states(State::E);
+  }
+
+  /** Warning: Inefficient.
+   */
+  int
+  count_transitions() const {
+    int result = 0;
+    for (const auto& p : states_) {
+      result += p.second.size();
+    }
+
+    return result;
   }
 
   std::string id() const {

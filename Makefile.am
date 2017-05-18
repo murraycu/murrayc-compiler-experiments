@@ -22,7 +22,8 @@ COMMON_LIBS = $(PROJECT_LIBS) \
   $(BOOST_TIMER_LIB)
 
 check_PROGRAMS = \
-  section_2_4_3_subset_construction
+  section_2_4_3_subset_construction \
+  section_2_4_4_minimal_dfa_with_hopcrofts_algorithm
 
 TESTS = $(check_PROGRAMS)
 
@@ -35,3 +36,9 @@ section_2_4_3_subset_construction_CXXFLAGS = \
 section_2_4_3_subset_construction_LDADD = \
 	$(COMMON_LIBS)
 
+section_2_4_4_minimal_dfa_with_hopcrofts_algorithm_SOURCES = \
+	src/chapter_02/section_2_4_4_minimal_dfa_with_hopcrofts_algorithm.cc
+section_2_4_4_minimal_dfa_with_hopcrofts_algorithm_CXXFLAGS = \
+	$(COMMON_CXXFLAGS)
+section_2_4_4_minimal_dfa_with_hopcrofts_algorithm_LDADD = \
+	$(COMMON_LIBS)
