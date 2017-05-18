@@ -24,7 +24,8 @@ COMMON_LIBS = $(PROJECT_LIBS) \
 check_PROGRAMS = \
   section_2_4_3_subset_construction \
   section_2_4_4_minimal_dfa_with_hopcrofts_algorithm \
-  section_2_5_1_table_driven_scanner
+  section_2_5_1_table_driven_scanner \
+  section_2_5_1_table_driven_scanner_avoiding_excess_rollback
 
 TESTS = $(check_PROGRAMS)
 
@@ -49,4 +50,11 @@ section_2_5_1_table_driven_scanner_SOURCES = \
 section_2_5_1_table_driven_scanner_CXXFLAGS = \
 	$(COMMON_CXXFLAGS)
 section_2_5_1_table_driven_scanner_LDADD = \
+	$(COMMON_LIBS)
+
+section_2_5_1_table_driven_scanner_avoiding_excess_rollback_SOURCES = \
+	src/chapter_02/section_2_5_1_table_driven_scanner_avoiding_excess_rollback.cc
+section_2_5_1_table_driven_scanner_avoiding_excess_rollback_CXXFLAGS = \
+	$(COMMON_CXXFLAGS)
+section_2_5_1_table_driven_scanner_avoiding_excess_rollback_LDADD = \
 	$(COMMON_LIBS)

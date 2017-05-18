@@ -55,6 +55,7 @@ Makefile.in
 /section_2_4_3_subset_construction
 /section_2_4_4_minimal_dfa_with_hopcrofts_algorithm
 /section_2_5_1_table_driven_scanner
+/section_2_5_1_table_driven_scanner_avoiding_excess_rollback
 
 *.log
 *.trs
