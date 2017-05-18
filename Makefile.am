@@ -25,7 +25,8 @@ check_PROGRAMS = \
   section_2_4_3_subset_construction \
   section_2_4_4_minimal_dfa_with_hopcrofts_algorithm \
   section_2_5_1_table_driven_scanner \
-  section_2_5_1_table_driven_scanner_avoiding_excess_rollback
+  section_2_5_1_table_driven_scanner_avoiding_excess_rollback \
+  section_3_3_1_top_down_parser_leftmost
 
 TESTS = $(check_PROGRAMS)
 
@@ -57,4 +58,12 @@ section_2_5_1_table_driven_scanner_avoiding_excess_rollback_SOURCES = \
 section_2_5_1_table_driven_scanner_avoiding_excess_rollback_CXXFLAGS = \
 	$(COMMON_CXXFLAGS)
 section_2_5_1_table_driven_scanner_avoiding_excess_rollback_LDADD = \
+	$(COMMON_LIBS)
+
+section_3_3_1_top_down_parser_leftmost_SOURCES = \
+	src/chapter_03/tree.h \
+	src/chapter_03/section_3_3_1_top_down_parser_leftmost.cc
+section_3_3_1_top_down_parser_leftmost_CXXFLAGS = \
+	$(COMMON_CXXFLAGS)
+section_3_3_1_top_down_parser_leftmost_LDADD = \
 	$(COMMON_LIBS)
