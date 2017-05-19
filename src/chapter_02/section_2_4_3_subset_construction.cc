@@ -100,7 +100,7 @@ print_set(const States& states) {
 /** Subset construction.
  * Based on the pseudocode in Figure 2.6 on page 49.
  */
-static decltype(auto)
+static auto
 subset_construction(const std::shared_ptr<State>& n0) {
   // Q begins with q0, which contains n0
   // and any states reachable via ε-only paths.
@@ -170,7 +170,7 @@ contains_accepting_state(const States& states) {
  * Based on the description (without pseudocode) in the
  * "From Q to D" section on page 50.
  */
-static decltype(auto)
+static auto
 from_q_to_d(const std::set<States>& Q, const std::map<std::pair<States, char>, States>& T) {
   // TODO: Performance: Using the set as a key is very inefficient.
   std::unordered_map<int, std::shared_ptr<State>> D;
