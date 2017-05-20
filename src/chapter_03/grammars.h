@@ -38,9 +38,11 @@ using WordsMap = std::map<std::string, Symbol>;
 
 // The "concept" for grammar classes:
 // Grammar {
+//  static const Symbols symbols;
 //  static const GrammarRules rules;
 //
 //  static const Symbol SYMBOL_GOAL;
+//  static const Symbol SYMBOL_EOF;
 //  static const Symbol SYMBOL_EMPTY;
 //
 //  static Symbol
@@ -72,6 +74,9 @@ public:
   static const Symbol SYMBOL_NAME;
 
   static const Symbol SYMBOL_EMPTY;
+  static const Symbol SYMBOL_EOF;
+
+  static const Symbols symbols;
 
   static const GrammarRules rules;
 
@@ -117,6 +122,12 @@ const Symbol ClassicGrammar::SYMBOL_CLOSE_PAREN = {")", true};
 const Symbol ClassicGrammar::SYMBOL_NUM = {"num", true};
 const Symbol ClassicGrammar::SYMBOL_NAME = {"name", true};
 const Symbol ClassicGrammar::SYMBOL_EMPTY = {"e", true};
+const Symbol ClassicGrammar::SYMBOL_EOF = {"eof", true};
+
+// Not including SYMBOL_EMPTY or SYMBOL_EOF.
+const Symbols ClassicGrammar::symbols = {
+  SYMBOL_GOAL, SYMBOL_EXPR, SYMBOL_EXPR_PRIME, SYMBOL_TERM, SYMBOL_TERM_PRIME, SYMBOL_FACTOR,
+  SYMBOL_PLUS, SYMBOL_MINUS, SYMBOL_MULTIPLY, SYMBOL_DIVIDE, SYMBOL_OPEN_PAREN, SYMBOL_CLOSE_PAREN, SYMBOL_NUM, SYMBOL_NAME};
 
 const GrammarRules ClassicGrammar::rules = {
   {SYMBOL_GOAL,
@@ -158,6 +169,9 @@ public:
   static const Symbol SYMBOL_NAME;
 
   static const Symbol SYMBOL_EMPTY;
+  static const Symbol SYMBOL_EOF;
+
+  static const Symbols symbols;
 
   /// The "right-recursive variant of the classic expression grammar" from page 101, in section 3.3.1.
   static const GrammarRules rules;
@@ -203,6 +217,12 @@ const Symbol RightRecursiveGrammar::SYMBOL_CLOSE_PAREN = {")", true};
 const Symbol RightRecursiveGrammar::SYMBOL_NUM = {"num", true};
 const Symbol RightRecursiveGrammar::SYMBOL_NAME = {"name", true};
 const Symbol RightRecursiveGrammar::SYMBOL_EMPTY = {"e", true};
+const Symbol RightRecursiveGrammar::SYMBOL_EOF = {"eof", true};
+
+// Not including SYMBOL_EMPTY or SYMBOL_EOF.
+const Symbols RightRecursiveGrammar::symbols = {
+  SYMBOL_GOAL, SYMBOL_EXPR, SYMBOL_EXPR_PRIME, SYMBOL_TERM, SYMBOL_TERM_PRIME, SYMBOL_FACTOR,
+  SYMBOL_PLUS, SYMBOL_MINUS, SYMBOL_MULTIPLY, SYMBOL_DIVIDE, SYMBOL_OPEN_PAREN, SYMBOL_CLOSE_PAREN, SYMBOL_NUM, SYMBOL_NAME, SYMBOL_EMPTY};
 
 const GrammarRules RightRecursiveGrammar::rules = {
   {SYMBOL_GOAL,
@@ -224,4 +244,5 @@ const GrammarRules RightRecursiveGrammar::rules = {
     {SYMBOL_NUM},
     {SYMBOL_NAME}}}
   };
+
 #endif // MURRAYC_COMPILER_EXPERIMENTS_GRAMMARS_H
