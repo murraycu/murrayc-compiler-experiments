@@ -51,33 +51,6 @@ match(const WordsMap& words_map, const Symbol& symbol, const std::string& word) 
   return word_symbol == symbol;
 }
 
-using SymbolSet = std::set<Symbol>;
-
-template <typename T_Container, typename T_Value>
-static T_Container
-remove_symbol(const T_Container& symbols, const T_Value& symbol) {
-  auto result = symbols;
-
-  auto iter = result.find(symbol);
-  if (iter != std::end(result)) {
-    result.erase(iter);
-  }
-
-  /*
-  result.erase(
-    std::remove(std::begin(result), std::end(result), symbol),
-    std::end(result));
-  */
-  return result;
-}
-
-template <typename T_Container, typename T_Value>
-static bool
-contains(const T_Container& symbols, const T_Value& symbol) {
-  return std::find(std::begin(symbols), std::end(symbols), symbol) !=
-    std::end(symbols);
-}
-
 template <typename T_Grammar>
 static bool
 check_grammar_is_backtrack_free() {

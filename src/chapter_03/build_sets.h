@@ -19,10 +19,36 @@
 #define MURRAYC_COMPILER_EXPERIMENTS_BUILD_SETS_H
 
 #include "symbol.h"
+#include <algorithm>
 #include <iostream>
 #include <set>
 #include <map>
 #include <cassert>
+
+template <typename T_Container, typename T_Value>
+static bool
+contains(const T_Container& symbols, const T_Value& symbol) {
+  return std::find(std::begin(symbols), std::end(symbols), symbol) !=
+    std::end(symbols);
+}
+
+template <typename T_Container, typename T_Value>
+static T_Container
+remove_symbol(const T_Container& symbols, const T_Value& symbol) {
+  auto result = symbols;
+
+  auto iter = result.find(symbol);
+  if (iter != std::end(result)) {
+    result.erase(iter);
+  }
+
+  /*
+  result.erase(
+    std::remove(std::begin(result), std::end(result), symbol),
+    std::end(result));
+  */
+  return result;
+}
 
 using SymbolSet = std::set<Symbol>;
 using FirstSets = std::map<Symbol, SymbolSet>;
