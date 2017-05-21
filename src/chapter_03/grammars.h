@@ -28,10 +28,10 @@ using Symbols = std::vector<Symbol>;
 // A set of possible expansions.
 using Expansions = std::vector<Symbols>;
 
-// A set of rules, mapping a symbol to its possible expansions.
-// We could instead just have a flat set of rules (in a multimap),
-// with more than one with the same left symbol.
-// That might be what the pseudo code in Figure 3.2 is meant to use.
+// A set of rules (also known as productions, or productin rules), mapping a
+// symbol to its possible expansions.  We could instead just have a flat set of
+// rules (in a multimap), with more than one with the same left symbol.  That
+// might be what the pseudo code in Figure 3.2 is meant to use.
 using GrammarRules = std::map<Symbol, Expansions>;
 
 using WordsMap = std::map<std::string, Symbol>;
