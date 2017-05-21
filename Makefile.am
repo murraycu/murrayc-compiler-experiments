@@ -61,6 +61,7 @@ section_2_5_1_table_driven_scanner_avoiding_excess_rollback_LDADD = \
 	$(COMMON_LIBS)
 
 section_3_3_1_top_down_parser_leftmost_SOURCES = \
+	src/chapter_03/grammar.h \
 	src/chapter_03/symbol.h \
 	src/chapter_03/tree.h \
 	src/chapter_03/section_3_3_1_top_down_parser_leftmost.cc

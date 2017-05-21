@@ -15,6 +15,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include "grammars.h"
 #include "symbol.h"
 #include "tree.h"
 
@@ -25,68 +26,12 @@
 #include <iostream>
 #include <cassert>
 
-
-// Non-terminals:
-static const Symbol SYMBOL_GOAL = {"Goal"};
-static const Symbol SYMBOL_EXPR = {"Expr"};
-static const Symbol SYMBOL_EXPR_PRIME = {"Expr'"};
-static const Symbol SYMBOL_TERM = {"Term"};
-static const Symbol SYMBOL_TERM_PRIME = {"Term'"};
-static const Symbol SYMBOL_FACTOR = {"Factor"};
-
-// Terminals:
-static const Symbol SYMBOL_PLUS = {"+", true};
-static const Symbol SYMBOL_MINUS = {"-", true};
-static const Symbol SYMBOL_MULTIPLY = {"x", true};
-static const Symbol SYMBOL_DIVIDE = {"÷", true};
-static const Symbol SYMBOL_OPEN_PAREN = {"(", true};
-static const Symbol SYMBOL_CLOSE_PAREN = {")", true};
-static const Symbol SYMBOL_NUM = {"num", true};
-static const Symbol SYMBOL_NAME = {"name", true};
-static const Symbol SYMBOL_EMPTY = {"e", true};
-
-// A set of symbols, such as a possible expansion, or a full parse.
-using Symbols = std::vector<Symbol>;
-
-// A set of possible expansions.
-using Expansions = std::vector<Symbols>;
-
-// A set of rules, mapping a symbol to its possible expansions.
-// We could instead just have a flat set of rules (in a multimap),
-// with more than one with the same left symbol.
-// That might be what the pseudo code in Figure 3.2 is meant to use.
-using GrammarRules = std::map<Symbol, std::vector<std::vector<Symbol>>>;
-
 using WordsMap = std::map<std::string, Symbol>;
 
-static Symbol
-recognise_word(const WordsMap& words_map, const std::string& word) {
-  // A rather dumb implementation just to get things working:
-
-  const auto iter = words_map.find(word);
-  if (iter != std::end(words_map)) {
-    return iter->second;
-  }
-
-  return SYMBOL_NAME;
-}
-
-static WordsMap
-build_words_map() {
-  WordsMap result;
-
-  const std::vector<Symbol> simple = {{SYMBOL_PLUS, SYMBOL_MINUS,
-    SYMBOL_MULTIPLY, SYMBOL_DIVIDE, SYMBOL_OPEN_PAREN, SYMBOL_CLOSE_PAREN}};
-  for (const auto& symbol : simple) {
-    result[symbol.name] = symbol;
-  }
-
-  return result;
-}
-
+template <typename T_Grammar>
 static bool
 match(const WordsMap& words_map, const Symbol& symbol, const std::string& word) {
-  const auto word_symbol  = recognise_word(words_map, word);
+  const auto word_symbol = T_Grammar::recognise_word(words_map, word);
   return word_symbol == symbol;
 }
 
@@ -105,8 +50,11 @@ public:
   std::size_t symbols_count = 0;
 };
 
+template <typename T_Grammar>
 static Symbols
-top_down_parse(const GrammarRules& rules, const std::vector<std::string>& words) {
+top_down_parse(const std::vector<std::string>& words) {
+  const auto& rules = T_Grammar::rules;
+
   // We gradually build up the answer in this stack:
   std::stack<Symbol> terminals;
 
@@ -117,7 +65,7 @@ top_down_parse(const GrammarRules& rules, const std::vector<std::string>& words)
 
   constexpr const char* WORD_EOF = "eof";
 
-  const auto words_map = build_words_map();
+  const auto words_map = T_Grammar::build_words_map();
 
   std::size_t input_focus = 0;
   std::string word = words[input_focus];
@@ -125,7 +73,7 @@ top_down_parse(const GrammarRules& rules, const std::vector<std::string>& words)
   using Node = TreeNode<SymbolAndStatus>;
 
   // TODO: Don't leak.
-  auto root = new Node({SYMBOL_GOAL, 0});
+  auto root = new Node({T_Grammar::SYMBOL_GOAL, 0});
   auto focus = root;
 
   // The pseudocode seems to push a symbol onto the stack,
@@ -183,7 +131,7 @@ top_down_parse(const GrammarRules& rules, const std::vector<std::string>& words)
       // Use b1:
       const auto& b1 = expansion[0];
       focus = focus->add({b1, 0, 0, n});
-    } else if (focus_symbol == SYMBOL_EMPTY) {
+    } else if (focus_symbol == T_Grammar::SYMBOL_EMPTY) {
       // The description on page 100 just says
       // "This E-production requires careful interpretation in the
       // parsing algorithm."
@@ -195,7 +143,7 @@ top_down_parse(const GrammarRules& rules, const std::vector<std::string>& words)
 
       focus = st.top();
       st.pop();
-    } else if (match(words_map, focus_symbol, word)) {
+    } else if (match<T_Grammar>(words_map, focus_symbol, word)) {
       // Use it in the result:
       terminals.emplace(focus_symbol);
 
@@ -254,62 +202,28 @@ int main() {
 
   {
     // The "classic expression grammar" from page 93, in section 3.2.4.
-    const GrammarRules expression_grammar = {
-      {SYMBOL_GOAL,
-        {{SYMBOL_EXPR}}},
-      {SYMBOL_EXPR, {
-        {SYMBOL_EXPR, SYMBOL_PLUS, SYMBOL_TERM},
-        {SYMBOL_EXPR, SYMBOL_MINUS, SYMBOL_TERM},
-        {SYMBOL_TERM}}},
-      {SYMBOL_TERM, {
-        {SYMBOL_TERM, SYMBOL_MULTIPLY, SYMBOL_FACTOR},
-        {SYMBOL_TERM, SYMBOL_DIVIDE, SYMBOL_FACTOR},
-        {SYMBOL_FACTOR}}},
-      {SYMBOL_FACTOR, {
-        {SYMBOL_OPEN_PAREN, SYMBOL_EXPR, SYMBOL_CLOSE_PAREN},
-        {SYMBOL_NUM},
-        {SYMBOL_NAME}}}
-      };
+    using Grammar = ClassicGrammar;
 
     {
       // Just to avoid a compiler warning about an unused declaration.
       // This code is not expected to work, and will in fact loop infinitely.
       const std::vector<std::string> input = {};
       const Symbols expected = {};
-      assert(top_down_parse(expression_grammar, input) == expected);
+      assert(top_down_parse<Grammar>(input) == expected);
     }
 
     {
       // This code is not expected to work, and will in fact loop infinitely,
       // due to infinite left recursion, caused by the grammar.
       // const std::vector<std::string> input = {"a", "+", "b", "x", "c"};
-      // const Symbols expected = {SYMBOL_NAME, SYMBOL_PLUS, SYMBOL_NAME, SYMBOL_MULTIPLY, SYMBOL_NAME};
-      // assert(top_down_parse(expression_grammar, input) == expected);
+      // const Symbols expected = {Grammar::SYMBOL_NAME, Grammar::SYMBOL_PLUS, Grammar::SYMBOL_NAME, Grammar::SYMBOL_MULTIPLY, Grammar::SYMBOL_NAME};
+      // assert(top_down_parse<Grammar>(input) == expected);
     }
   }
 
   {
     // The "right-recursive variant of the classic expression grammar" from page 101, in section 3.3.1.
-    const GrammarRules expression_grammar = {
-      {SYMBOL_GOAL,
-        {{SYMBOL_EXPR}}},
-      {SYMBOL_EXPR, {
-        {SYMBOL_TERM, SYMBOL_EXPR_PRIME}}},
-      {SYMBOL_EXPR_PRIME, {
-        {SYMBOL_PLUS, SYMBOL_TERM, SYMBOL_EXPR_PRIME},
-        {SYMBOL_MINUS, SYMBOL_TERM, SYMBOL_EXPR_PRIME},
-        {SYMBOL_EMPTY}}},
-      {SYMBOL_TERM, {
-        {SYMBOL_FACTOR, SYMBOL_TERM_PRIME}}},
-      {SYMBOL_TERM_PRIME, {
-        {SYMBOL_MULTIPLY, SYMBOL_FACTOR, SYMBOL_TERM_PRIME},
-        {SYMBOL_DIVIDE, SYMBOL_FACTOR, SYMBOL_TERM_PRIME},
-        {SYMBOL_EMPTY}}},
-      {SYMBOL_FACTOR, {
-        {SYMBOL_OPEN_PAREN, SYMBOL_EXPR, SYMBOL_CLOSE_PAREN},
-        {SYMBOL_NUM},
-        {SYMBOL_NAME}}}
-      };
+    using Grammar = RightRecursiveGrammar;
 
     {
       // Just to avoid a compiler warning about an unused declaration.
@@ -317,13 +231,13 @@ int main() {
       // Page 101 says "The example still assumes oracular choice."
       const std::vector<std::string> input = {};
       const Symbols expected = {};
-      assert(top_down_parse(expression_grammar, input) == expected);
+      assert(top_down_parse<Grammar>(input) == expected);
     }
 
     {
       const std::vector<std::string> input = {"a", "+", "b", "x", "c"};
-      const Symbols expected = {SYMBOL_NAME, SYMBOL_PLUS, SYMBOL_NAME, SYMBOL_MULTIPLY, SYMBOL_NAME};
-      assert(top_down_parse(expression_grammar, input) == expected);
+      const Symbols expected = {Grammar::SYMBOL_NAME, Grammar::SYMBOL_PLUS, Grammar::SYMBOL_NAME, Grammar::SYMBOL_MULTIPLY, Grammar::SYMBOL_NAME};
+      assert(top_down_parse<Grammar>(input) == expected);
     }
   }
 
