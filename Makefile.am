@@ -86,7 +86,6 @@ section_3_3_1_top_down_parser_leftmost_backtrack_free_LDADD = \
 section_3_3_3_table_driven_ll1_parser_SOURCES = \
 	src/chapter_03/grammar.h \
 	src/chapter_03/symbol.h \
-	src/chapter_03/tree.h \
 	src/chapter_03/build_sets.h \
 	src/chapter_03/section_3_3_3_table_driven_ll1_parser.cc
 section_3_3_3_table_driven_ll1_parser_CXXFLAGS = \
