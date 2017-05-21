@@ -159,6 +159,9 @@ top_down_parse(const std::vector<std::string>& words) {
         expansion = expansions[0];
       } else {
         // Choose the expansion whose first set contain the lookahead symbol.
+        // (The expansion whose first symbol, or various possible recursive
+        // expansions of its first symbol, could match the lookahead symbol
+        // (matches the current word).
         for (const auto& b : expansions) {
           if (b.empty()) {
             continue;
@@ -185,7 +188,15 @@ top_down_parse(const std::vector<std::string>& words) {
           }
         }
 
-        if (expansion.empty()) {
+        // If no matching rule was found by looking at the first sets,
+        // maybe there is a rule using an empty symbol that is suitable.
+        //
+        // We cannot match an empty symbol to the lookahead symbol,
+        // but maybe the focus symbol could appear in a sentence
+        // immediately after the focus symbol, meaning it would make
+        // sense to use the rule with the empty symbol, leaving the
+        // current word for use by the next symbol.
+        if (expansion.empty() && !(expansion_empty.empty())) {
           const auto iter = follow.find(focus_symbol);
           if (iter == std::end(follow)) {
             continue;
