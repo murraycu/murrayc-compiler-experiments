@@ -28,6 +28,20 @@
 #include <iostream>
 #include <cassert>
 
+template <typename T_Container>
+static
+void print_symbols(const T_Container& symbols) {
+  bool is_first = true;
+  for (const auto& s : symbols) {
+    if (!is_first) {
+      std::cout << ", ";
+    }
+
+    is_first = false;
+
+    std::cout << s.name;
+  }
+}
 
 template <typename T_Grammar>
 static bool
@@ -126,22 +140,6 @@ build_first_sets() {
   return first;
 }
 
-
-template <typename T_Container>
-static
-void print_symbols(const T_Container& symbols) {
-  bool is_first = true;
-  for (const auto& s : symbols) {
-    if (!is_first) {
-      std::cout << ", ";
-    }
-
-    is_first = false;
-
-    std::cout << s.name;
-  }
-}
-
 using FollowSets = std::map<Symbol, SymbolSet>;
 
 /**
@@ -235,6 +233,113 @@ build_follow_sets(const FirstSets& first) {
   }
 
   return follow;
+}
+
+/** A left-hand side symbol and a possible right-hand side expansion.
+ */
+using GrammarRule = std::pair<Symbol, Symbols>; // GrammarRules::value_type;
+
+using FirstSetsForRules = std::map<GrammarRule, SymbolSet>;
+
+/**
+ * Compute the FIRST sets for rules in a grammar.
+ * (FIRST sets are usually for individual symbols.)
+ * Based on the definition in section 3.3.1, on page 105
+ * of "Engineering a Compiler".
+ */
+template <typename T_Grammar>
+static FirstSetsForRules
+build_first_sets_for_rules(const FirstSets& first) {
+  FirstSetsForRules result;
+
+  const auto& rules = T_Grammar::rules;
+  for (const auto& rule : rules) {
+    const auto& a = rule.first;
+    const auto& expansions = rule.second;
+    for (const auto& b : expansions) {
+      // Page 105 says "We define FIRST sets over single grammar symbols
+      // ..., For a string [set] of symbols, s = B1 B2 B3...Bn, we
+      // define FIRST(s) as the union of the FIRST sets for B1, B2...Bn,
+      // where Bn is the first symbol whose FIRST set does not contain E,
+      // and E".
+
+      SymbolSet firstb;
+      for (const auto bi : b) {
+        const auto iter = first.find(bi);
+        if (iter != std::end(first)) {
+          const auto& firstbi = iter->second;
+
+          firstb.insert(std::begin(firstbi), std::end(firstbi));
+
+          // Stop after the first symbols whose FIRST set does not contain E
+          if (!contains(firstbi, T_Grammar::SYMBOL_EMPTY)) {
+            break;
+          }
+        }
+      }
+
+      const auto single_rule= std::make_pair(a, b);
+      result[single_rule] = firstb;
+    }
+  }
+
+  return result;
+}
+
+using FirstPlusSets = std::map<GrammarRule, SymbolSet>;
+
+/**
+ * Compute the FIRST+ sets for symbols in a grammar.
+ * Based on the definition in section 3.3.1, on page 107
+ * of "Engineering a Compiler".
+ */
+template <typename T_Grammar>
+static FirstPlusSets
+build_first_plus_sets(const FirstSetsForRules& first, const FollowSets& follow) {
+  FirstPlusSets first_plus;
+
+  const auto& rules = T_Grammar::rules;
+  for (const auto& rule : rules) {
+    const auto& a = rule.first;
+    const auto& expansions = rule.second;
+    for (const auto& b : expansions) {
+      const auto single_rule= std::make_pair(a, b);
+
+      // Get FIRST(b):
+      SymbolSet firstb;
+      const auto iter = first.find(single_rule);
+      if (iter != std::end(first)) {
+        firstb = iter->second;
+      }
+
+      // std::cout << "FIRST[" << a.name << " -> ";
+      // print_symbols(b);
+      // std::cout << "]: ";
+      // print_symbols(firstb);
+      // std::cout << std::endl;
+
+      SymbolSet set = firstb;
+      if (contains(firstb, T_Grammar::SYMBOL_EMPTY)) {
+        const auto fiter = follow.find(a);
+        if (fiter != std::end(follow)) {
+          const auto& followa = fiter->second;
+          set.insert(std::begin(followa), std::end(followa));
+        }
+      }
+
+      first_plus[single_rule] = set;
+
+      // std::cout << "FIRST+[" << a.name << " -> ";
+      // print_symbols(b);
+      // std::cout << "]: ";
+      // print_symbols(set);
+      // std::cout << std::endl;
+    }
+
+    // std::cout << std::endl;
+  }
+
+  return first_plus;
 }
 
 /**
@@ -484,6 +589,35 @@ int main() {
       assert(follow[Grammar::SYMBOL_TERM] == expected_follow_term);
       assert(follow[Grammar::SYMBOL_TERM_PRIME] == expected_follow_term_prime);
       assert(follow[Grammar::SYMBOL_FACTOR] == expected_follow_factor);
+    }
+
+    // Test the FIRST sets for rules (not just for individual symbols):
+    auto first_for_rules = build_first_sets_for_rules<Grammar>(first);
+    {
+      // From the table on page 107:
+      const SymbolSet expected_expr_prime_to_empty = {Grammar::SYMBOL_EMPTY};
+      const SymbolSet expected_term_prime_to_empty = {Grammar::SYMBOL_EMPTY};
+
+      const auto key_expr_prime_to_empty = std::make_pair(Grammar::SYMBOL_EXPR_PRIME, Symbols({Grammar::SYMBOL_EMPTY}));
+      assert(first_for_rules[key_expr_prime_to_empty] == expected_expr_prime_to_empty);
+
+      const auto key_term_prime_to_empty = std::make_pair(Grammar::SYMBOL_TERM_PRIME, Symbols({Grammar::SYMBOL_EMPTY}));
+      assert(first_for_rules[key_term_prime_to_empty] == expected_term_prime_to_empty);
+    }
+
+    // Test the FIRST+ sets:
+    auto first_plus = build_first_plus_sets<Grammar>(first_for_rules, follow);
+    {
+      // From the table on page 107:
+      const SymbolSet expected_expr_prime_to_empty = {Grammar::SYMBOL_EMPTY, Grammar::SYMBOL_EOF, Grammar::SYMBOL_CLOSE_PAREN};
+      const SymbolSet expected_term_prime_to_empty = {Grammar::SYMBOL_EMPTY, Grammar::SYMBOL_EOF, Grammar::SYMBOL_PLUS,
+        Grammar::SYMBOL_MINUS, Grammar::SYMBOL_CLOSE_PAREN};
+
+      const auto key_expr_prime_to_empty = std::make_pair(Grammar::SYMBOL_EXPR_PRIME, Symbols({Grammar::SYMBOL_EMPTY}));
+      assert(first_plus[key_expr_prime_to_empty] == expected_expr_prime_to_empty);
+
+      const auto key_term_prime_to_empty = std::make_pair(Grammar::SYMBOL_TERM_PRIME, Symbols({Grammar::SYMBOL_EMPTY}));
+      assert(first_plus[key_term_prime_to_empty] == expected_term_prime_to_empty);
     }
 
     {
