@@ -1,0 +1,351 @@
+/* Copyright (C) 2017 Murray Cumming
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3.0 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
+#include "symbol.h"
+#include "grammars.h"
+
+#include <algorithm>
+#include <map>
+#include <set>
+#include <stack>
+#include <string>
+#include <unordered_map>
+#include <vector>
+#include <iostream>
+#include <cassert>
+
+template <typename T_Container>
+static
+void print_symbols(const T_Container& symbols) {
+  bool is_first = true;
+  for (const auto& s : symbols) {
+    if (!is_first) {
+      std::cout << ", ";
+    }
+
+    is_first = false;
+
+    std::cout << s.name;
+  }
+}
+
+/** See Figure 3.11, in section 3.3.3, on page 112, of "Engineering a
+ * Compiler".
+ *
+ * A map of non-terminals and terminals to productions (expansions).  TODO: The
+ * book uses a rule (production) number rather than storing the expansion
+ * itself. That would be more efficient.
+ */
+using Table = std::map<Symbol, std::map<Symbol, Symbols>>;
+
+static const Symbol SYMBOL_ERROR = {"Error", true};
+
+using Grammar = ParenthesesGrammar;
+
+enum class ActionType {
+  NONE,
+  SHIFT,
+  REDUCE,
+  ACCEPT
+};
+
+using State = int;
+
+class Action {
+public:
+  ActionType type = ActionType::NONE;
+  std::size_t arg = 0;
+};
+
+using ActionTable = std::map<State, std::map<Symbol, Action>>;
+
+// Based on Figure 3.16, in section 3.4.1, on page 120
+// of "Enginnering a Compiler."
+const ActionTable action_table = {
+  {0, {
+    {Grammar::SYMBOL_EOF, {}},
+    {Grammar::SYMBOL_OPEN_PAREN, {ActionType::SHIFT, 3}},
+    {Grammar::SYMBOL_CLOSE_PAREN, {}}},
+  },
+  {1, {
+    {Grammar::SYMBOL_EOF, {ActionType::ACCEPT, 0}},
+    {Grammar::SYMBOL_OPEN_PAREN, {ActionType::SHIFT, 3}},
+    {Grammar::SYMBOL_CLOSE_PAREN, {}}},
+  },
+  {2, {
+    {Grammar::SYMBOL_EOF, {ActionType::REDUCE, 3}},
+    {Grammar::SYMBOL_OPEN_PAREN, {ActionType::REDUCE, 3}},
+    {Grammar::SYMBOL_CLOSE_PAREN, {}}},
+  },
+  {3, {
+    {Grammar::SYMBOL_EOF, {}},
+    {Grammar::SYMBOL_OPEN_PAREN, {ActionType::SHIFT, 6}},
+    {Grammar::SYMBOL_CLOSE_PAREN, {ActionType::SHIFT, 7}}},
+  },
+  {4, {
+    {Grammar::SYMBOL_EOF, {ActionType::REDUCE, 2}},
+    {Grammar::SYMBOL_OPEN_PAREN, {ActionType::REDUCE, 2}},
+    {Grammar::SYMBOL_CLOSE_PAREN, {}}},
+  },
+  {5, {
+    {Grammar::SYMBOL_EOF, {}},
+    {Grammar::SYMBOL_OPEN_PAREN, {}},
+    {Grammar::SYMBOL_CLOSE_PAREN, {ActionType::SHIFT, 8}}},
+  },
+  {6, {
+    {Grammar::SYMBOL_EOF, {}},
+    {Grammar::SYMBOL_OPEN_PAREN, {ActionType::SHIFT, 6}},
+    {Grammar::SYMBOL_CLOSE_PAREN, {ActionType::SHIFT, 10}}},
+  },
+  {7, {
+    {Grammar::SYMBOL_EOF, {ActionType::REDUCE, 5}},
+    {Grammar::SYMBOL_OPEN_PAREN, {ActionType::REDUCE, 5}},
+    {Grammar::SYMBOL_CLOSE_PAREN, {}}},
+  },
+  {8, {
+    {Grammar::SYMBOL_EOF, {ActionType::REDUCE, 4}},
+    {Grammar::SYMBOL_OPEN_PAREN, {ActionType::REDUCE, 4}},
+    {Grammar::SYMBOL_CLOSE_PAREN, {}}},
+  },
+  {9, {
+    {Grammar::SYMBOL_EOF, {}},
+    {Grammar::SYMBOL_OPEN_PAREN, {}},
+    {Grammar::SYMBOL_CLOSE_PAREN, {ActionType::SHIFT, 11}}},
+  },
+  {10, {
+    {Grammar::SYMBOL_EOF, {}},
+    {Grammar::SYMBOL_OPEN_PAREN, {}},
+    {Grammar::SYMBOL_CLOSE_PAREN, {ActionType::REDUCE, 5}}},
+  },
+  {11, {
+    {Grammar::SYMBOL_EOF, {}},
+    {Grammar::SYMBOL_OPEN_PAREN, {}},
+    {Grammar::SYMBOL_CLOSE_PAREN, {ActionType::REDUCE, 4}}},
+  }
+};
+
+using GotoTable = std::map<State, std::map<Symbol, std::size_t>>;
+
+// Based on Figure 3.16, in section 3.4.1, on page 120
+// of "Enginnering a Compiler."
+const GotoTable goto_table = {
+  {0, {
+    {Grammar::SYMBOL_LIST, 1},
+    {Grammar::SYMBOL_PAIR, 2}},
+  },
+  {1, {
+    {Grammar::SYMBOL_LIST, 0},
+    {Grammar::SYMBOL_PAIR, 4}},
+  },
+  {2, {
+    {Grammar::SYMBOL_LIST, 0},
+    {Grammar::SYMBOL_PAIR, 0}},
+  },
+  {3, {
+    {Grammar::SYMBOL_LIST, 0},
+    {Grammar::SYMBOL_PAIR, 5}},
+  },
+  {4, {
+    {Grammar::SYMBOL_LIST, 0},
+    {Grammar::SYMBOL_PAIR, 0}},
+  },
+  {5, {
+    {Grammar::SYMBOL_LIST, 0},
+    {Grammar::SYMBOL_PAIR, 0}},
+  },
+  {6, {
+    {Grammar::SYMBOL_LIST, 0},
+    {Grammar::SYMBOL_PAIR, 9}},
+  },
+  {7, {
+    {Grammar::SYMBOL_LIST, 0},
+    {Grammar::SYMBOL_PAIR, 0}},
+  },
+  {8, {
+    {Grammar::SYMBOL_LIST, 0},
+    {Grammar::SYMBOL_PAIR, 0}},
+  },
+  {9, {
+    {Grammar::SYMBOL_LIST, 0},
+    {Grammar::SYMBOL_PAIR, 0}},
+  },
+  {10, {
+    {Grammar::SYMBOL_LIST, 0},
+    {Grammar::SYMBOL_PAIR, 0}},
+  },
+  {11, {
+    {Grammar::SYMBOL_LIST, 0},
+    {Grammar::SYMBOL_PAIR, 0}},
+  }
+};
+
+template <typename T_Grammar>
+static bool
+match(const WordsMap& words_map, const Symbol& symbol, const std::string& word) {
+  const auto word_symbol = T_Grammar::recognise_word(words_map, word);
+  return word_symbol == symbol;
+}
+
+// Just to hide the use of find() that is nececessary with
+// a const std::map.
+static Action
+get_action_from_table(const ActionTable& table, State state, const Symbol& symbol) {
+  const auto iteras = table.find(state);
+  if (iteras == std::end(table)) {
+    // Error.
+    return {};
+  }
+
+  const auto& actions = iteras->second;
+
+  const auto iteraa = actions.find(symbol);
+  if (iteraa == std::end(actions)) {
+    // Error.
+    return {};
+  }
+
+  return iteraa->second;
+}
+
+// Just to hide the use of find() that is nececessary with
+// a const std::map.
+static std::size_t
+get_goto_from_table(const GotoTable& table, State state, const Symbol& symbol) {
+  const auto iteras = table.find(state);
+  if (iteras == std::end(table)) {
+    // Error.
+    return {};
+  }
+
+  const auto& m = iteras->second;
+  const auto iteraa = m.find(symbol);
+  if (iteraa == std::end(m)) {
+    // Error.
+    return {};
+  }
+
+  return iteraa->second;
+}
+/** Based on the pseudocode in Figure 3.11, in section 3.3.3, on page 112,
+ * of "Engineering a Compiler".
+ */
+template <typename T_Grammar>
+static Symbols
+bottom_up_lr1_parse(const std::vector<std::string>& words) {
+  const auto n_words = words.size();
+  if (n_words == 0) {
+    return {};
+  }
+
+  // The pseudo code puts both the symbol and the state (number) on the same stack.
+  // Instead this uses 2 stacks, to simplify type safety.
+  std::stack<Symbol> symbol_stack;
+  std::stack<State> state_stack;
+
+  symbol_stack.emplace(T_Grammar::SYMBOL_GOAL);
+  state_stack.emplace(0);
+
+  const auto words_map = T_Grammar::build_words_map();
+
+  constexpr const char* WORD_EOF = "eof";
+
+  std::size_t input_focus = 0;
+  auto word = words[input_focus];
+
+  Symbols result;
+  while (true) {
+    const auto state = state_stack.top();
+
+    const auto symbol_for_word = T_Grammar::recognise_word(words_map, word);
+
+    const auto action = get_action_from_table(action_table, state, symbol_for_word);
+
+    if (action.type == ActionType::REDUCE) {
+      // Get the A -> B rule:
+      const auto iter = T_Grammar::rules_by_number.find(action.arg);
+      if (iter == std::end(T_Grammar::rules_by_number)) {
+        return {SYMBOL_ERROR};
+      }
+
+      const auto& rule = iter->second;
+      const auto& a = rule.first;
+      const auto& b = rule.second;
+
+      for (auto i = 0u; i < b.size(); ++i) {
+        state_stack.pop();
+        symbol_stack.pop();
+      }
+
+      symbol_stack.emplace(a);
+
+      const auto prev_state = state_stack.top();
+      const auto next_state = get_goto_from_table(goto_table, prev_state, a);
+      state_stack.emplace(next_state);
+
+    } else if (action.type == ActionType::SHIFT) {
+      const auto next_state = action.arg;
+
+      symbol_stack.push(symbol_for_word);
+      state_stack.push(next_state);
+
+      if (symbol_for_word.terminal) {
+        result.emplace_back(symbol_for_word);
+      }
+
+      ++input_focus;
+      word = input_focus >= n_words ? WORD_EOF : words[input_focus];
+    } else if (action.type == ActionType::ACCEPT) {
+      // TODO: Return the result.
+      break;
+    } else {
+      return {SYMBOL_ERROR};
+    }
+  }
+
+  return result;
+}
+
+int main() {
+  {
+    // The "right-recursive variant of the classic expression grammar" from page 101, in section 3.3.1.
+    using Grammar = ParenthesesGrammar;
+
+    {
+      // Valid input:
+      const std::vector<std::string> input = {"(", ")"};
+      const Symbols expected = {Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_CLOSE_PAREN};
+      assert(bottom_up_lr1_parse<Grammar>(input) == expected);
+    }
+
+    {
+      // Valid input:
+      const std::vector<std::string> input = {"(", "(", ")", ")", "(", ")"};
+      const Symbols expected = {Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_CLOSE_PAREN,
+        Grammar::SYMBOL_CLOSE_PAREN, Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_CLOSE_PAREN};
+      assert(bottom_up_lr1_parse<Grammar>(input) == expected);
+    }
+
+    {
+      // Invalid input:
+      const std::vector<std::string> input = {"(", ")", ")"};
+      const Symbols expected = {SYMBOL_ERROR};
+      assert(bottom_up_lr1_parse<Grammar>(input) == expected);
+    }
+  }
+
+  return 0;
+}
