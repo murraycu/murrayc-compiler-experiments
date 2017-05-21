@@ -15,35 +15,16 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include "symbol.h"
 #include "tree.h"
 
 #include <algorithm>
 #include <map>
 #include <stack>
-#include <string>
 #include <vector>
 #include <iostream>
 #include <cassert>
 
-// An enum would be more efficient.
-class Symbol {
-public:
-  bool operator==(const Symbol& other) const {
-    return name == other.name &&
-      terminal == other.terminal;
-  }
-
-  bool operator<(const Symbol& other) const {
-    if (name == other.name) {
-      return terminal < other.terminal;
-    }
-
-    return name < other.name;
-  }
-
-  std::string name;
-  bool terminal = false;
-};
 
 // Non-terminals:
 static const Symbol SYMBOL_GOAL = {"Goal"};
