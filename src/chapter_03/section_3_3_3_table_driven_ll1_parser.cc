@@ -191,13 +191,13 @@ top_down_parse(const std::vector<std::string>& words) {
         word = input_focus >= n_words ? WORD_EOF : words[input_focus];
       } else {
         // Error looking for symbol at top of stack.
-        return {};
+        return {SYMBOL_ERROR};
       }
     } else {
       const auto iter = table.find(focus);
       if (iter == std::end(table)) {
         // Error expanding focus.
-        return {};
+        return {SYMBOL_ERROR};
       }
 
       const auto& tablea = iter->second;
@@ -207,7 +207,7 @@ top_down_parse(const std::vector<std::string>& words) {
       const auto iterb = tablea.find(word_symbol);
       if (iterb == std::end(tablea)) {
         // Error expanding focus.
-        return {};
+        return {SYMBOL_ERROR};
       }
 
       const auto& b = iterb->second;
@@ -264,8 +264,16 @@ int main() {
     }
 
     {
+      // Valid input:
       const std::vector<std::string> input = {"a", "+", "b", "x", "c"};
       const Symbols expected = {Grammar::SYMBOL_NAME, Grammar::SYMBOL_PLUS, Grammar::SYMBOL_NAME, Grammar::SYMBOL_MULTIPLY, Grammar::SYMBOL_NAME};
+      assert(top_down_parse<Grammar>(input) == expected);
+    }
+
+    {
+      // Invalid input:
+      const std::vector<std::string> input = {"x", "+", "*", "y"};
+      const Symbols expected = {SYMBOL_ERROR};
       assert(top_down_parse<Grammar>(input) == expected);
     }
   }
