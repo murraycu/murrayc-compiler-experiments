@@ -27,7 +27,8 @@ check_PROGRAMS = \
   section_2_5_1_table_driven_scanner \
   section_2_5_1_table_driven_scanner_avoiding_excess_rollback \
   section_3_3_1_top_down_parser_leftmost \
-  section_3_3_1_top_down_parser_leftmost_backtrack_free
+  section_3_3_1_top_down_parser_leftmost_backtrack_free \
+  section_3_3_3_table_driven_ll1_parser
 
 TESTS = $(check_PROGRAMS)
 
@@ -80,4 +81,15 @@ section_3_3_1_top_down_parser_leftmost_backtrack_free_SOURCES = \
 section_3_3_1_top_down_parser_leftmost_backtrack_free_CXXFLAGS = \
 	$(COMMON_CXXFLAGS)
 section_3_3_1_top_down_parser_leftmost_backtrack_free_LDADD = \
+	$(COMMON_LIBS)
+
+section_3_3_3_table_driven_ll1_parser_SOURCES = \
+	src/chapter_03/grammar.h \
+	src/chapter_03/symbol.h \
+	src/chapter_03/tree.h \
+	src/chapter_03/build_sets.h \
+	src/chapter_03/section_3_3_3_table_driven_ll1_parser.cc
+section_3_3_3_table_driven_ll1_parser_CXXFLAGS = \
+	$(COMMON_CXXFLAGS)
+section_3_3_3_table_driven_ll1_parser_LDADD = \
 	$(COMMON_LIBS)
