@@ -133,21 +133,6 @@ match(const WordsMap& words_map, const Symbol& symbol, const std::string& word) 
   return word_symbol == symbol;
 }
 
-/**
- * A left-hand symbol, and the index of its right-hand expansion (in its rule) that is currently being used.
- */
-class SymbolAndStatus {
-public:
-  Symbol symbol;
-  std::size_t expansions_used = 0; // 0 means no rules have been tried yet.
-
-  // The index of this symbol in the expansion of which this symbol is a part.
-  std::size_t symbol_index = 0;
-
-  // The number of symbols in the expansion of which this symbol is a part.
-  std::size_t symbols_count = 0;
-};
-
 /** Based on the pseudocode in Figure 3.11, in section 3.3.3, on page 112,
  * of "Engineering a Compiler".
  */
