@@ -342,6 +342,50 @@ build_first_plus_sets(const FirstSetsForRules& first, const FollowSets& follow) 
   return first_plus;
 }
 
+template <typename T_Grammar>
+static bool
+check_grammar_is_backtrack_free() {
+  const auto first = build_first_sets<T_Grammar>();
+  const auto follow = build_follow_sets<T_Grammar>(first);
+  const auto first_for_rules = build_first_sets_for_rules<T_Grammar>(first);
+  const auto first_plus = build_first_plus_sets<T_Grammar>(first_for_rules, follow);
+
+  const auto& rules = T_Grammar::rules;
+  for (const auto& rule : rules) {
+    const auto& a = rule.first;
+    if (a.terminal) {
+      continue;
+    }
+
+    const auto& expansions = rule.second;
+
+    const auto k = expansions.size();
+    if (k <= 1) {
+      continue;
+    }
+
+    std::map<Symbol, std::size_t> counts;
+    for (const auto& b : expansions) {
+      const auto single_rule= std::make_pair(a, b);
+      const auto iter = first_plus.find(single_rule);
+      if (iter == std::end(first_plus)) {
+        continue;
+      }
+
+      const auto first_plus_b = iter->second;
+      for (const auto& s : first_plus_b) {
+        counts[s]++;
+
+        if (counts[s] > 1) {
+          return false;
+        }
+      }
+    }
+  }
+
+  return true;
+}
+
 /**
  * A left-hand symbol, and the index of its right-hand expansion (in its rule) that is currently being used.
  */
@@ -528,6 +572,10 @@ int main() {
       // const Symbols expected = {Grammar::SYMBOL_NAME, Grammar::SYMBOL_PLUS, Grammar::SYMBOL_NAME, Grammar::SYMBOL_MULTIPLY, Grammar::SYMBOL_NAME};
       // assert(top_down_parse<Grammar>(input) == expected);
     }
+
+    {
+      assert(check_grammar_is_backtrack_free<Grammar>() == false);
+    }
   }
 
   {
@@ -618,6 +666,10 @@ int main() {
 
       const auto key_term_prime_to_empty = std::make_pair(Grammar::SYMBOL_TERM_PRIME, Symbols({Grammar::SYMBOL_EMPTY}));
       assert(first_plus[key_term_prime_to_empty] == expected_term_prime_to_empty);
+    }
+
+    {
+      assert(check_grammar_is_backtrack_free<Grammar>() == true);
     }
 
     {
