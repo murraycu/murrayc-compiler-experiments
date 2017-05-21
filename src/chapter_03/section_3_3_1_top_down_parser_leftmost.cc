@@ -34,11 +34,11 @@ public:
   }
 
   bool operator<(const Symbol& other) const {
-    if (name < other.name) {
-      return true;
+    if (name == other.name) {
+      return terminal < other.terminal;
     }
 
-    return terminal < other.terminal;
+    return name < other.name;
   }
 
   std::string name;
