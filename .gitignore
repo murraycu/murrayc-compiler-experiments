@@ -52,15 +52,12 @@ Makefile.in
 /test-driver
 /test-suite.log
 
+*.log
+*.trs
+
 /section_2_4_3_subset_construction
 /section_2_4_4_minimal_dfa_with_hopcrofts_algorithm
 /section_2_5_1_table_driven_scanner
 /section_2_5_1_table_driven_scanner_avoiding_excess_rollback
 /section_3_3_1_top_down_parser_leftmost
 /section_3_3_1_top_down_parser_leftmost_backtrack_free
-
-*.log
-*.trs
-
-
-
