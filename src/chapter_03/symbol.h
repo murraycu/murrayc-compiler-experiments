@@ -19,24 +19,51 @@
 #define MURRAYC_COMPILER_EXPERIMENTS_SYMBOL_H
 
 #include <string>
+#include <cstring>
 
 // An enum would be more efficient.
 class Symbol {
 public:
   bool operator==(const Symbol& other) const {
-    return name == other.name &&
-      terminal == other.terminal;
+    if (!name) {
+      return !(other.name);
+    } else if (!(other.name)) {
+      return !name;
+    }
+
+    if (name == other.name) {
+      return true;
+    }
+
+    return strcmp(name, other.name) == 0;
   }
 
   bool operator<(const Symbol& other) const {
+    // Sort null before non-null,
+    // though we don't expect nulls anyway.
+    if (name && !(other.name)) {
+      return true;
+    }
+
+    if (!name && other.name) {
+      return false;
+    }
+
     if (name == other.name) {
       return terminal < other.terminal;
     }
 
-    return name < other.name;
+    const auto c = strcmp(name, other.name);
+    if (c == 0) {
+      return terminal < other.terminal;
+    } else {
+      return c < 0;
+    }
   }
 
-  std::string name;
+  // TODO: Use std::string_view
+  const char* name;
+
   bool terminal = false;
 };
 

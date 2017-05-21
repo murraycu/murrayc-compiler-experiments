@@ -56,25 +56,25 @@ using WordsMap = std::map<std::string, Symbol>;
 class ClassicGrammar {
 public:
   // Non-terminals:
-  static const Symbol SYMBOL_GOAL;
-  static const Symbol SYMBOL_EXPR;
-  static const Symbol SYMBOL_EXPR_PRIME;
-  static const Symbol SYMBOL_TERM;
-  static const Symbol SYMBOL_TERM_PRIME;
-  static const Symbol SYMBOL_FACTOR;
+  static constexpr Symbol SYMBOL_GOAL = {"Goal"};
+  static constexpr Symbol SYMBOL_EXPR = {"Expr"};
+  static constexpr Symbol SYMBOL_EXPR_PRIME = {"Expr'"};
+  static constexpr Symbol SYMBOL_TERM = {"Term"};
+  static constexpr Symbol SYMBOL_TERM_PRIME = {"Term'"};
+  static constexpr Symbol SYMBOL_FACTOR = {"Factor"};
 
   // Terminals:
-  static const Symbol SYMBOL_PLUS;
-  static const Symbol SYMBOL_MINUS;
-  static const Symbol SYMBOL_MULTIPLY;
-  static const Symbol SYMBOL_DIVIDE;
-  static const Symbol SYMBOL_OPEN_PAREN;
-  static const Symbol SYMBOL_CLOSE_PAREN;
-  static const Symbol SYMBOL_NUM;
-  static const Symbol SYMBOL_NAME;
+  static constexpr Symbol SYMBOL_PLUS = {"+", true};
+  static constexpr Symbol SYMBOL_MINUS = {"-", true};
+  static constexpr Symbol SYMBOL_MULTIPLY = {"x", true};
+  static constexpr Symbol SYMBOL_DIVIDE = {"÷", true};
+  static constexpr Symbol SYMBOL_OPEN_PAREN = {"(", true};
+  static constexpr Symbol SYMBOL_CLOSE_PAREN = {")", true};
+  static constexpr Symbol SYMBOL_NUM = {"num", true};
+  static constexpr Symbol SYMBOL_NAME = {"name", true};
 
-  static const Symbol SYMBOL_EMPTY;
-  static const Symbol SYMBOL_EOF;
+  static constexpr Symbol SYMBOL_EMPTY = {"e", true};
+  static constexpr Symbol SYMBOL_EOF = {"eof", true};
 
   static const Symbols symbols;
 
@@ -110,24 +110,6 @@ public:
   }
 };
 
-
-const Symbol ClassicGrammar::SYMBOL_GOAL = {"Goal"};
-const Symbol ClassicGrammar::SYMBOL_EXPR = {"Expr"};
-const Symbol ClassicGrammar::SYMBOL_EXPR_PRIME = {"Expr'"};
-const Symbol ClassicGrammar::SYMBOL_TERM = {"Term"};
-const Symbol ClassicGrammar::SYMBOL_TERM_PRIME = {"Term'"};
-const Symbol ClassicGrammar::SYMBOL_FACTOR = {"Factor"};
-const Symbol ClassicGrammar::SYMBOL_PLUS = {"+", true};
-const Symbol ClassicGrammar::SYMBOL_MINUS = {"-", true};
-const Symbol ClassicGrammar::SYMBOL_MULTIPLY = {"x", true};
-const Symbol ClassicGrammar::SYMBOL_DIVIDE = {"÷", true};
-const Symbol ClassicGrammar::SYMBOL_OPEN_PAREN = {"(", true};
-const Symbol ClassicGrammar::SYMBOL_CLOSE_PAREN = {")", true};
-const Symbol ClassicGrammar::SYMBOL_NUM = {"num", true};
-const Symbol ClassicGrammar::SYMBOL_NAME = {"name", true};
-const Symbol ClassicGrammar::SYMBOL_EMPTY = {"e", true};
-const Symbol ClassicGrammar::SYMBOL_EOF = {"eof", true};
-
 // Not including SYMBOL_EMPTY or SYMBOL_EOF.
 const Symbols ClassicGrammar::symbols = {
   SYMBOL_GOAL, SYMBOL_EXPR, SYMBOL_EXPR_PRIME, SYMBOL_TERM, SYMBOL_TERM_PRIME, SYMBOL_FACTOR,
@@ -155,25 +137,25 @@ const GrammarRules ClassicGrammar::rules = {
 class RightRecursiveGrammar {
 public:
   // Non-terminals:
-  static const Symbol SYMBOL_GOAL;
-  static const Symbol SYMBOL_EXPR;
-  static const Symbol SYMBOL_EXPR_PRIME;
-  static const Symbol SYMBOL_TERM;
-  static const Symbol SYMBOL_TERM_PRIME;
-  static const Symbol SYMBOL_FACTOR;
+  static constexpr Symbol SYMBOL_GOAL = {"Goal"};
+  static constexpr Symbol SYMBOL_EXPR = {"Expr"};
+  static constexpr Symbol SYMBOL_EXPR_PRIME = {"Expr'"};
+  static constexpr Symbol SYMBOL_TERM = {"Term"};
+  static constexpr Symbol SYMBOL_TERM_PRIME = {"Term'"};
+  static constexpr Symbol SYMBOL_FACTOR = {"Factor"};
 
   // Terminals:
-  static const Symbol SYMBOL_PLUS;
-  static const Symbol SYMBOL_MINUS;
-  static const Symbol SYMBOL_MULTIPLY;
-  static const Symbol SYMBOL_DIVIDE;
-  static const Symbol SYMBOL_OPEN_PAREN;
-  static const Symbol SYMBOL_CLOSE_PAREN;
-  static const Symbol SYMBOL_NUM;
-  static const Symbol SYMBOL_NAME;
+  static constexpr Symbol SYMBOL_PLUS = {"+", true};
+  static constexpr Symbol SYMBOL_MINUS = {"-", true};
+  static constexpr Symbol SYMBOL_MULTIPLY = {"x", true};
+  static constexpr Symbol SYMBOL_DIVIDE = {"÷", true};
+  static constexpr Symbol SYMBOL_OPEN_PAREN = {"(", true};
+  static constexpr Symbol SYMBOL_CLOSE_PAREN = {")", true};
+  static constexpr Symbol SYMBOL_NUM = {"num", true};
+  static constexpr Symbol SYMBOL_NAME = {"name", true};
 
-  static const Symbol SYMBOL_EMPTY;
-  static const Symbol SYMBOL_EOF;
+  static constexpr Symbol SYMBOL_EMPTY = {"e", true};
+  static constexpr Symbol SYMBOL_EOF = {"eof", true};
 
   static const Symbols symbols;
 
@@ -209,23 +191,6 @@ public:
     return result;
   }
 };
-
-const Symbol RightRecursiveGrammar::SYMBOL_GOAL = {"Goal"};
-const Symbol RightRecursiveGrammar::SYMBOL_EXPR = {"Expr"};
-const Symbol RightRecursiveGrammar::SYMBOL_EXPR_PRIME = {"Expr'"};
-const Symbol RightRecursiveGrammar::SYMBOL_TERM = {"Term"};
-const Symbol RightRecursiveGrammar::SYMBOL_TERM_PRIME = {"Term'"};
-const Symbol RightRecursiveGrammar::SYMBOL_FACTOR = {"Factor"};
-const Symbol RightRecursiveGrammar::SYMBOL_PLUS = {"+", true};
-const Symbol RightRecursiveGrammar::SYMBOL_MINUS = {"-", true};
-const Symbol RightRecursiveGrammar::SYMBOL_MULTIPLY = {"x", true};
-const Symbol RightRecursiveGrammar::SYMBOL_DIVIDE = {"÷", true};
-const Symbol RightRecursiveGrammar::SYMBOL_OPEN_PAREN = {"(", true};
-const Symbol RightRecursiveGrammar::SYMBOL_CLOSE_PAREN = {")", true};
-const Symbol RightRecursiveGrammar::SYMBOL_NUM = {"num", true};
-const Symbol RightRecursiveGrammar::SYMBOL_NAME = {"name", true};
-const Symbol RightRecursiveGrammar::SYMBOL_EMPTY = {"e", true};
-const Symbol RightRecursiveGrammar::SYMBOL_EOF = {"eof", true};
 
 // Not including SYMBOL_EMPTY or SYMBOL_EOF.
 const Symbols RightRecursiveGrammar::symbols = {
