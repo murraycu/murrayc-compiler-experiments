@@ -16,7 +16,6 @@
  */
 
 #include "symbol.h"
-#include "tree.h"
 #include "grammars.h"
 #include "build_sets.h"
 
@@ -107,6 +106,8 @@ build_table() {
     }
   }
 
+  // Print the table, for debug information:
+  /*
   for (const auto& pair : table) {
     const auto& nt = pair.first;
     const auto& table_nt = pair.second;
@@ -120,6 +121,7 @@ build_table() {
       std::cout << std::endl;
     }
   }
+  */
 
   return table;
 }
@@ -146,146 +148,84 @@ public:
   std::size_t symbols_count = 0;
 };
 
+/** Based on the pseudocode in Figure 3.11, in section 3.3.3, on page 112,
+ * of "Engineering a Compiler".
+ */
 template <typename T_Grammar>
 static Symbols
 top_down_parse(const std::vector<std::string>& words) {
-  const auto& rules = T_Grammar::rules;
-
-  // We gradually build up the answer in this stack:
-  std::stack<Symbol> terminals;
-
   const auto n_words = words.size();
   if (n_words == 0) {
     return {};
   }
 
-  const auto first = build_first_sets<T_Grammar>();
+  // We gradually build up the answer in this stack:
+  std::stack<Symbol> terminals;
+  std::stack<Symbol> st;
+  st.emplace(T_Grammar::SYMBOL_EOF);
+  st.emplace(T_Grammar::SYMBOL_GOAL);
+
+  const auto table = build_table<T_Grammar>();
+  const auto words_map = T_Grammar::build_words_map();
 
   constexpr const char* WORD_EOF = "eof";
-
-  const auto words_map = T_Grammar::build_words_map();
 
   std::size_t input_focus = 0;
   std::string word = words[input_focus];
 
-  using Node = TreeNode<SymbolAndStatus>;
-
-  // TODO: Don't leak.
-  auto root = new Node({T_Grammar::SYMBOL_GOAL, 0});
-  auto focus = root;
-
-  // The pseudocode seems to push a symbol onto the stack,
-  // but pop a tree node off the stack,
-  // so we use the node, which gives us a symbol.
-  std::stack<Node*> st;
-
+  Symbols result;
   while (true) {
-    auto& focusv = focus->value();
-    const auto& focus_symbol = focusv.symbol;
-    if (!(focus_symbol.terminal)) {
-      // Pick next rule to expand focus:
-      const auto rule_iter = rules.find(focus_symbol);
-      if (rule_iter == std::end(rules)) {
-        return {}; // Error.
-      }
+    auto focus = st.top();
+    if (focus == T_Grammar::SYMBOL_EOF && word == WORD_EOF) {
+      // Success
+      break;
+    }
 
-      const auto& expansions = rule_iter->second;
-      if (expansions.empty()) {
-        return {}; // Error.
-      }
+    if (focus.terminal || focus == T_Grammar::SYMBOL_EOF) {
+      if (match<T_Grammar>(words_map, focus, word)) {
+        st.pop();
+        result.emplace_back(focus);
 
-      // This is the oracular part:
-      // If this could pick the corect expansion each time,
-      // instead of just picking the next untried one,
-      // then it could avoid the need to backtrack.
-      const auto n_expansions = expansions.size();
-      auto& expansions_used = focusv.expansions_used;
-      if (expansions_used >= n_expansions) {
-        // TODO: Backtrack.
+        // Next word:
+        ++input_focus;
+        word = input_focus >= n_words ? WORD_EOF : words[input_focus];
+      } else {
+        // Error looking for symbol at top of stack.
+        return {};
+      }
+    } else {
+      const auto iter = table.find(focus);
+      if (iter == std::end(table)) {
+        // Error expanding focus.
         return {};
       }
 
-      // Pick the next unused expansion.
-      // Remember which expansion we used,
-      // so we can try the next one next time, if we backtrack.
-      // The pseudocode in the book (Figure 3.2) doesn't
-      // say how this should be done.
-      expansions_used++;
-      const auto& expansion = expansions[expansions_used - 1];
-      if (expansion.empty()) {
-        return {}; //Error
+      const auto& tablea = iter->second;
+
+      // focus is a non-terminal:
+      const auto word_symbol = T_Grammar::recognise_word(words_map, word);
+      const auto iterb = tablea.find(word_symbol);
+      if (iterb == std::end(tablea)) {
+        // Error expanding focus.
+        return {};
       }
 
-      // Build nodes for b1, b2...bn as children of focus:
+      const auto& b = iterb->second;
 
-      // Push symbols bn to b2 on the stack:
-      const auto n = expansion.size();
-      for (auto i = n - 1; i > 0; --i) {
-        const auto& symbol = expansion[i];
-        auto child_node = focus->add({symbol, 0, i, n});
-        st.emplace(child_node);
-      }
-
-      // Use b1:
-      const auto& b1 = expansion[0];
-      focus = focus->add({b1, 0, 0, n});
-    } else if (focus_symbol == T_Grammar::SYMBOL_EMPTY) {
-      // The description on page 100 just says
-      // "This E-production requires careful interpretation in the
-      // parsing algorithm."
-      // and there is no handling of it in the pseduocode.
-
-      if (st.empty()) {
-        break;
-      }
-
-      focus = st.top();
       st.pop();
-    } else if (match<T_Grammar>(words_map, focus_symbol, word)) {
-      // Use it in the result:
-      terminals.emplace(focus_symbol);
 
-      ++input_focus;
-      word = input_focus >= n_words ? WORD_EOF : words[input_focus];
+      const auto k = b.size();
+      for (int i = (k - 1); i >= 0; --i) {
+        const auto& bi = b[i];
 
-      // For instance, use the next symbol in the used rule:
-      if (st.empty()) {
-        break;
+        if (!(bi == T_Grammar::SYMBOL_EMPTY)) {
+          st.emplace(bi);
+        }
       }
-      focus = st.top();
-      st.pop();
-    } else if (word == WORD_EOF && focus == nullptr) {
-      // The peudocode says "accept the input and return the root".
-      break;
-    } else {
-      // backtrack
-      // The pseudocode says
-      // "sets focus to its parent in the partially-built parse tree and disconnects its children.
-      // If an untried rule remains with focus on its left-hand side, the parse expands focus by
-      // that rule."
-
-      auto used = focusv.symbol_index;
-      auto unused = focusv.symbols_count - used - 1;
-
-      // Pop unused symbols (from this expression) from the stack.
-      // The pseudo code, and its description, don't mention this, but it seems to be necessary.
-      while (unused--) {
-        st.pop();
-      }
-
-      // Decrement input_focus to move left back befor words we need to re-examine.
-      input_focus -= used;
-
-      // Remove mistakenly-added terminals from the result:
-      while (used--) {
-        terminals.pop();
-      }
-
-      focus = focus->pop_to_parent();
     }
   }
 
-  Symbols result;
+  /*
   result.reserve(terminals.size());
   while (!terminals.empty()) {
     result.emplace_back(terminals.top());
@@ -293,6 +233,7 @@ top_down_parse(const std::vector<std::string>& words) {
   }
 
   std::reverse(std::begin(result), std::end(result));
+  */
   return result;
 }
 

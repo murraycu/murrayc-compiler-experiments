@@ -102,6 +102,10 @@ public:
       result[symbol.name] = symbol;
     }
 
+    // TODO: Don't use a word string for this.
+    // It stops us from having a name called "eof".
+    result["eof"] = SYMBOL_EOF;
+
     return result;
   }
 };
@@ -197,6 +201,10 @@ public:
     for (const auto& symbol : simple) {
       result[symbol.name] = symbol;
     }
+
+    // TODO: Don't use a word string for this.
+    // It stops us from having a name called "eof".
+    result["eof"] = SYMBOL_EOF;
 
     return result;
   }
