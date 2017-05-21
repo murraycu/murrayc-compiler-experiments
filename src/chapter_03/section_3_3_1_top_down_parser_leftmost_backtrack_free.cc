@@ -95,21 +95,6 @@ check_grammar_is_backtrack_free() {
   return true;
 }
 
-/**
- * A left-hand symbol, and the index of its right-hand expansion (in its rule) that is currently being used.
- */
-class SymbolAndStatus {
-public:
-  Symbol symbol;
-  std::size_t expansions_used = 0; // 0 means no rules have been tried yet.
-
-  // The index of this symbol in the expansion of which this symbol is a part.
-  std::size_t symbol_index = 0;
-
-  // The number of symbols in the expansion of which this symbol is a part.
-  std::size_t symbols_count = 0;
-};
-
 template <typename T_Grammar>
 static Symbols
 top_down_parse(const std::vector<std::string>& words) {
@@ -124,6 +109,8 @@ top_down_parse(const std::vector<std::string>& words) {
   }
 
   const auto first = build_first_sets<T_Grammar>();
+  const auto follow = build_follow_sets<T_Grammar>(first);
+  const auto first_for_rules = build_first_sets_for_rules<T_Grammar>(first);
 
   constexpr const char* WORD_EOF = "eof";
 
@@ -132,10 +119,10 @@ top_down_parse(const std::vector<std::string>& words) {
   std::size_t input_focus = 0;
   std::string word = words[input_focus];
 
-  using Node = TreeNode<SymbolAndStatus>;
+  using Node = TreeNode<Symbol>;
 
   // TODO: Don't leak.
-  auto root = new Node({T_Grammar::SYMBOL_GOAL, 0});
+  auto root = new Node(T_Grammar::SYMBOL_GOAL);
   auto focus = root;
 
   // The pseudocode seems to push a symbol onto the stack,
@@ -144,8 +131,7 @@ top_down_parse(const std::vector<std::string>& words) {
   std::stack<Node*> st;
 
   while (true) {
-    auto& focusv = focus->value();
-    const auto& focus_symbol = focusv.symbol;
+    const auto& focus_symbol = focus->value();
     if (!(focus_symbol.terminal)) {
       // Pick next rule to expand focus:
       const auto rule_iter = rules.find(focus_symbol);
@@ -159,23 +145,59 @@ top_down_parse(const std::vector<std::string>& words) {
       }
 
       // This is the oracular part:
-      // If this could pick the corect expansion each time,
+      // If this could pick the correct expansion each time,
       // instead of just picking the next untried one,
       // then it could avoid the need to backtrack.
-      const auto n_expansions = expansions.size();
-      auto& expansions_used = focusv.expansions_used;
-      if (expansions_used >= n_expansions) {
-        // TODO: Backtrack.
-        return {};
+
+      // Use the lookahead symbol, and sometimes the FOLLOW set, to see what rule could match it.
+      const auto word_symbol = T_Grammar::recognise_word(words_map, word);
+
+      Symbols expansion;
+      Symbols expansion_empty;
+
+      if (expansions.size() == 1) {
+        expansion = expansions[0];
+      } else {
+        // Choose the expansion whose first set contain the lookahead symbol.
+        for (const auto& b : expansions) {
+          if (b.empty()) {
+            continue;
+          }
+
+          // TODO: Can there ever be an expansion that starts with E and then has other symbols?
+          // If not, we can just use {SYMBOL_EMPTY} later instead of doing this.
+          if (b[0] == T_Grammar::SYMBOL_EMPTY) {
+            expansion_empty = b;
+          }
+
+          const auto p = std::make_pair(focus_symbol, b);
+          const auto iter = first_for_rules.find(p);
+          if (iter == std::end(first_for_rules)) {
+            continue;
+          }
+
+          const auto& f = iter->second;
+
+          // Check if the lookahead symbol is in FIRST[rule]
+          if (contains(f, word_symbol)) {
+            expansion = b;
+            break;
+          }
+        }
+
+        if (expansion.empty()) {
+          const auto iter = follow.find(focus_symbol);
+          if (iter == std::end(follow)) {
+            continue;
+          }
+
+          const auto& f = iter->second;
+          if (contains(f, word_symbol)) {
+            expansion = expansion_empty;
+          }
+        }
       }
 
-      // Pick the next unused expansion.
-      // Remember which expansion we used,
-      // so we can try the next one next time, if we backtrack.
-      // The pseudocode in the book (Figure 3.2) doesn't
-      // say how this should be done.
-      expansions_used++;
-      const auto& expansion = expansions[expansions_used - 1];
       if (expansion.empty()) {
         return {}; //Error
       }
@@ -186,13 +208,13 @@ top_down_parse(const std::vector<std::string>& words) {
       const auto n = expansion.size();
       for (auto i = n - 1; i > 0; --i) {
         const auto& symbol = expansion[i];
-        auto child_node = focus->add({symbol, 0, i, n});
+        auto child_node = focus->add(symbol);
         st.emplace(child_node);
       }
 
       // Use b1:
       const auto& b1 = expansion[0];
-      focus = focus->add({b1, 0, 0, n});
+      focus = focus->add(b1);
     } else if (focus_symbol == T_Grammar::SYMBOL_EMPTY) {
       // The description on page 100 just says
       // "This E-production requires careful interpretation in the
@@ -222,30 +244,8 @@ top_down_parse(const std::vector<std::string>& words) {
       // The peudocode says "accept the input and return the root".
       break;
     } else {
-      // backtrack
-      // The pseudocode says
-      // "sets focus to its parent in the partially-built parse tree and disconnects its children.
-      // If an untried rule remains with focus on its left-hand side, the parse expands focus by
-      // that rule."
-
-      auto used = focusv.symbol_index;
-      auto unused = focusv.symbols_count - used - 1;
-
-      // Pop unused symbols (from this expression) from the stack.
-      // The pseudo code, and its description, don't mention this, but it seems to be necessary.
-      while (unused--) {
-        st.pop();
-      }
-
-      // Decrement input_focus to move left back befor words we need to re-examine.
-      input_focus -= used;
-
-      // Remove mistakenly-added terminals from the result:
-      while (used--) {
-        terminals.pop();
-      }
-
-      focus = focus->pop_to_parent();
+      // Error. No backtracking should be necessary.
+      return {};
     }
   }
 
@@ -261,32 +261,6 @@ top_down_parse(const std::vector<std::string>& words) {
 }
 
 int main() {
-
-  {
-    // The "classic expression grammar" from page 93, in section 3.2.4.
-    using Grammar = ClassicGrammar;
-
-    {
-      // Just to avoid a compiler warning about an unused declaration.
-      // This code is not expected to work, and will in fact loop infinitely.
-      const std::vector<std::string> input = {};
-      const Symbols expected = {};
-      assert(top_down_parse<Grammar>(input) == expected);
-    }
-
-    {
-      // This code is not expected to work, and will in fact loop infinitely,
-      // due to infinite left recursion, caused by the grammar.
-      // const std::vector<std::string> input = {"a", "+", "b", "x", "c"};
-      // const Symbols expected = {Grammar::SYMBOL_NAME, Grammar::SYMBOL_PLUS, Grammar::SYMBOL_NAME, Grammar::SYMBOL_MULTIPLY, Grammar::SYMBOL_NAME};
-      // assert(top_down_parse<Grammar>(input) == expected);
-    }
-
-    {
-      assert(check_grammar_is_backtrack_free<Grammar>() == false);
-    }
-  }
-
   {
     // The "right-recursive variant of the classic expression grammar" from page 101, in section 3.3.1.
     using Grammar = RightRecursiveGrammar;
@@ -311,10 +285,11 @@ int main() {
       const SymbolSet expected_name = {Grammar::SYMBOL_NAME};
       const SymbolSet expected_plus = {Grammar::SYMBOL_PLUS};
       const SymbolSet expected_open_paren = {Grammar::SYMBOL_OPEN_PAREN};
+      const SymbolSet expected_empty = {Grammar::SYMBOL_EMPTY};
       assert(first[Grammar::SYMBOL_NUM] == expected_num);
       assert(first[Grammar::SYMBOL_NAME] == expected_name);
       assert(first[Grammar::SYMBOL_PLUS] == expected_plus);
-      assert(first[Grammar::SYMBOL_OPEN_PAREN] == expected_open_paren);
+      assert(first[Grammar::SYMBOL_EMPTY] == expected_empty);
 
       // Non-terminals:
       const SymbolSet expected_expr = {Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_NAME, Grammar::SYMBOL_NUM};
