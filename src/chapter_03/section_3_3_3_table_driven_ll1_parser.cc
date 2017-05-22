@@ -145,7 +145,6 @@ top_down_parse(const std::vector<std::string>& words) {
   }
 
   // We gradually build up the answer in this stack:
-  std::stack<Symbol> terminals;
   std::stack<Symbol> st;
   st.emplace(T_Grammar::SYMBOL_EOF);
   st.emplace(T_Grammar::SYMBOL_GOAL);
@@ -160,7 +159,7 @@ top_down_parse(const std::vector<std::string>& words) {
 
   Symbols result;
   while (true) {
-    auto focus = st.top();
+    const auto focus = st.top();
     if (focus == T_Grammar::SYMBOL_EOF && word == WORD_EOF) {
       // Success
       break;
@@ -210,15 +209,6 @@ top_down_parse(const std::vector<std::string>& words) {
     }
   }
 
-  /*
-  result.reserve(terminals.size());
-  while (!terminals.empty()) {
-    result.emplace_back(terminals.top());
-    terminals.pop();
-  }
-
-  std::reverse(std::begin(result), std::end(result));
-  */
   return result;
 }
 
