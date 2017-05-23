@@ -251,7 +251,8 @@ bottom_up_lr1_parse(const std::vector<std::string>& words) {
     return {};
   }
 
-  // The pseudo code puts both the symbol and the state (number) on the same stack.
+  // The pseudo code puts both the symbol and the state (number) on the same stack,
+  // pushing and popping two each time. That seems unnecessarily complicated.
   // Instead this uses 2 stacks, to simplify type safety.
   std::stack<Symbol> symbol_stack;
   std::stack<State> state_stack;
@@ -309,7 +310,6 @@ bottom_up_lr1_parse(const std::vector<std::string>& words) {
       ++input_focus;
       word = input_focus >= n_words ? WORD_EOF : words[input_focus];
     } else if (action.type == ActionType::ACCEPT) {
-      // TODO: Return the result.
       break;
     } else {
       return {SYMBOL_ERROR};
