@@ -23,9 +23,6 @@
 #include <unordered_map>
 #include <vector>
 
-// A set of symbols, such as a possible expansion, or a full parse.
-using Symbols = std::vector<Symbol>;
-
 // A set of possible expansions.
 using Expansions = std::vector<Symbols>;
 

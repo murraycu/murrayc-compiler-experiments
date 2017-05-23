@@ -19,6 +19,7 @@
 #define MURRAYC_COMPILER_EXPERIMENTS_SYMBOL_H
 
 #include <string>
+#include <vector>
 #include <cstring>
 
 // An enum would be more efficient.
@@ -67,4 +68,7 @@ public:
   bool terminal = false;
 };
 
+// A set of symbols, such as a possible expansion, or a full parse.
+
+using Symbols = std::vector<Symbol>;
 #endif // MURRAYC_COMPILER_EXPERIMENTS_SYMBOL_H
