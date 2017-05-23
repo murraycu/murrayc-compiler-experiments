@@ -63,3 +63,4 @@ Makefile.in
 /section_3_3_1_top_down_parser_leftmost_backtrack_free
 /section_3_3_3_top_down_table_driven_ll1_parser
 /section_3_4_1_bottom_up_lr1_parser
+/section_3_4_2_bottom_up_lr1_parser_with_generated_tables

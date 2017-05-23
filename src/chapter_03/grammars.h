@@ -269,9 +269,9 @@ public:
   }
 };
 
-// Not including SYMBOL_EMPTY or SYMBOL_EOF.
+// Not including SYMBOL_EMPTY.
 const Symbols ParenthesesGrammar::symbols = {
-  SYMBOL_GOAL, SYMBOL_LIST, SYMBOL_PAIR, SYMBOL_OPEN_PAREN, SYMBOL_CLOSE_PAREN};
+  SYMBOL_GOAL, SYMBOL_LIST, SYMBOL_PAIR, SYMBOL_OPEN_PAREN, SYMBOL_CLOSE_PAREN, SYMBOL_EOF};
 
 const GrammarRules ParenthesesGrammar::rules = {
   {SYMBOL_GOAL,

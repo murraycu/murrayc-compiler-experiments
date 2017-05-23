@@ -39,6 +39,10 @@ public:
     return strcmp(name, other.name) == 0;
   }
 
+  bool operator!=(const Symbol& other) const {
+    return !(operator==(other));
+  }
+
   bool operator<(const Symbol& other) const {
     // Sort null before non-null,
     // though we don't expect nulls anyway.
