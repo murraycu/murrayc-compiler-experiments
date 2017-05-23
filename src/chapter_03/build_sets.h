@@ -228,6 +228,40 @@ build_follow_sets(const FirstSets& first) {
  */
 using GrammarRule = std::pair<Symbol, Symbols>; // GrammarRules::value_type;
 
+/**
+ * Compute the FIRST sets for rules in a grammar.
+ * (FIRST sets are usually for individual symbols.)
+ * Based on the definition in section 3.3.1, on page 105
+ * of "Engineering a Compiler".
+ */
+template <typename T_Grammar>
+static SymbolSet
+build_first_set_for_symbols(const FirstSets& first, const Symbols& symbols) {
+  SymbolSet result;
+
+  // Page 105 says "We define FIRST sets over single grammar symbols
+  // ..., For a string [set] of symbols, s = B1 B2 B3...Bn, we
+  // define FIRST(s) as the union of the FIRST sets for B1, B2...Bn,
+  // where Bn is the first symbol whose FIRST set does not contain E,
+  // and E".
+
+  for (const auto bi : symbols) {
+    const auto iter = first.find(bi);
+    if (iter != std::end(first)) {
+      const auto& firstbi = iter->second;
+
+      result.insert(std::begin(firstbi), std::end(firstbi));
+
+      // Stop after the first symbols whose FIRST set does not contain E
+      if (!contains(firstbi, T_Grammar::SYMBOL_EMPTY)) {
+        break;
+      }
+    }
+  }
+
+  return result;
+}
+
 using FirstSetsForRules = std::map<GrammarRule, SymbolSet>;
 
 /**
@@ -246,27 +280,7 @@ build_first_sets_for_rules(const FirstSets& first) {
     const auto& a = rule.first;
     const auto& expansions = rule.second;
     for (const auto& b : expansions) {
-      // Page 105 says "We define FIRST sets over single grammar symbols
-      // ..., For a string [set] of symbols, s = B1 B2 B3...Bn, we
-      // define FIRST(s) as the union of the FIRST sets for B1, B2...Bn,
-      // where Bn is the first symbol whose FIRST set does not contain E,
-      // and E".
-
-      SymbolSet firstb;
-      for (const auto bi : b) {
-        const auto iter = first.find(bi);
-        if (iter != std::end(first)) {
-          const auto& firstbi = iter->second;
-
-          firstb.insert(std::begin(firstbi), std::end(firstbi));
-
-          // Stop after the first symbols whose FIRST set does not contain E
-          if (!contains(firstbi, T_Grammar::SYMBOL_EMPTY)) {
-            break;
-          }
-        }
-      }
-
+      const auto firstb = build_first_set_for_symbols<T_Grammar>(first, b);
       const auto single_rule= std::make_pair(a, b);
       result[single_rule] = firstb;
     }
