@@ -61,5 +61,5 @@ Makefile.in
 /section_2_5_1_table_driven_scanner_avoiding_excess_rollback
 /section_3_3_1_top_down_parser_leftmost
 /section_3_3_1_top_down_parser_leftmost_backtrack_free
-/section_3_3_3_table_driven_ll1_parser
+/section_3_3_3_top_down_table_driven_ll1_parser
 /section_3_4_1_bottom_up_lr1_parser
