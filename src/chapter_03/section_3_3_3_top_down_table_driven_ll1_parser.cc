@@ -54,6 +54,11 @@ using Table = std::map<Symbol, std::map<Symbol, Symbols>>;
 
 static const Symbol SYMBOL_ERROR = {"Error", true};
 
+/** Create an LL(1) parse table for a right-recursive expression grammar.
+ *
+ * Based on the pseudocode in Figure 3.12, in section 3.3.3,
+ * on page 111, of "Engineering a Compiler".
+ */
 template <typename T_Grammar>
 static Table
 build_table() {
