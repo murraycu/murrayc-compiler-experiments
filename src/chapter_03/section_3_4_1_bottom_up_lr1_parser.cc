@@ -43,15 +43,6 @@ void print_symbols(const T_Container& symbols) {
   }
 }
 
-/** See Figure 3.11, in section 3.3.3, on page 112, of "Engineering a
- * Compiler".
- *
- * A map of non-terminals and terminals to productions (expansions).  TODO: The
- * book uses a rule (production) number rather than storing the expansion
- * itself. That would be more efficient.
- */
-using Table = std::map<Symbol, std::map<Symbol, Symbols>>;
-
 static const Symbol SYMBOL_ERROR = {"Error", true};
 
 using Grammar = ParenthesesGrammar;
