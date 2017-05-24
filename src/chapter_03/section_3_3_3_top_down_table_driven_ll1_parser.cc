@@ -225,7 +225,7 @@ int main() {
       const Symbols expected_plus_plus = {}; // No rule
       assert(table[Grammar::SYMBOL_PLUS][Grammar::SYMBOL_PLUS] == expected_plus_plus);
 
-      const Symbols expected_goal_eof = {}; // No rule. TODO: Shouldn't this be SYMBOL_ERROR?
+      const Symbols expected_goal_eof = {SYMBOL_ERROR}; // No rule.
       assert(table[Grammar::SYMBOL_GOAL][Grammar::SYMBOL_EOF] == expected_goal_eof);
 
       const Symbols expected_goal_open_paren = {Grammar::SYMBOL_EXPR}; // Rule 0.
