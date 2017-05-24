@@ -226,6 +226,9 @@ int main() {
       auto table = build_table<Grammar>();
       assert(!table.empty());
 
+      // These expected results are based on the table in Figure 3.11 (b), in section 3.3.3,
+      // on page 112, of "Engineering a Compiler".
+
       // The table should not have any terminals.
       const Symbols expected_plus_plus = {}; // No rule
       assert(table[Grammar::SYMBOL_PLUS][Grammar::SYMBOL_PLUS] == expected_plus_plus);
