@@ -53,8 +53,9 @@ remove_symbol(const T_Container& symbols, const T_Value& symbol) {
 using SymbolSet = std::set<Symbol>;
 using FirstSets = std::map<Symbol, SymbolSet>;
 
-/**
- * Compute the FIRST sets for symbols in a grammar.
+/** Compute the FIRST sets for symbols in a grammar.
+ * A FIRST(symbol) set is the set of terminals that can appear at the start of a sentence derived from the symbol.
+ *
  * Based on the pseudocode in Figure 3.7, in section 3.3.1, on page 104
  * of "Engineering a Compiler".
  */
@@ -131,8 +132,9 @@ build_first_sets() {
 
 using FollowSets = std::map<Symbol, SymbolSet>;
 
-/**
- * Compute the FOLLOWS sets for symbols in a grammar.
+/** Compute the FOLLOWS sets for symbols in a grammar.
+ * A FOLLOWS(Symbol) set is the set of words that can occur immediately after the (nonterminal) symbol in a sentence.
+ *
  * Based on the pseudocode in Figure 3.8, in section 3.3.1, on page 106
  * of "Engineering a Compiler".
  */
@@ -228,9 +230,10 @@ build_follow_sets(const FirstSets& first) {
  */
 using GrammarRule = std::pair<Symbol, Symbols>; // GrammarRules::value_type;
 
-/**
- * Compute the FIRST sets for rules in a grammar.
+/** Compute the FIRST sets for a sequence of symbols in a grammar.
  * (FIRST sets are usually for individual symbols.)
+ * Union of FIRST(symbol) for b1 b2 ... bn, where bn is the first symbol whose FIRST(symbol) does not contain the empty symbol ε.
+ *
  * Based on the definition in section 3.3.1, on page 105
  * of "Engineering a Compiler".
  */
@@ -264,9 +267,10 @@ build_first_set_for_symbols(const FirstSets& first, const Symbols& symbols) {
 
 using FirstSetsForRules = std::map<GrammarRule, SymbolSet>;
 
-/**
- * Compute the FIRST sets for rules in a grammar.
+/** Compute the FIRST sets for rules in a grammar.
  * (FIRST sets are usually for individual symbols.)
+ * See build_first_sets_for_symbols().
+ *
  * Based on the definition in section 3.3.1, on page 105
  * of "Engineering a Compiler".
  */
@@ -291,8 +295,10 @@ build_first_sets_for_rules(const FirstSets& first) {
 
 using FirstPlusSets = std::map<GrammarRule, SymbolSet>;
 
-/**
- * Compute the FIRST+ sets for symbols in a grammar.
+/** Compute the FIRST+ sets for symbols in a grammar.
+ * A FIRST+(rule) set is FIRST(production), if that does not contain the empty symbol ε.
+ * Otherwise, it is the union of FIRST(production) and FOLLOW(a).
+ *
  * Based on the definition in section 3.3.1, on page 107
  * of "Engineering a Compiler".
  */
