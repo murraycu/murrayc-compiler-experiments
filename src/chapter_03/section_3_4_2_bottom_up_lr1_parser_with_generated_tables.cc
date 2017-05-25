@@ -279,8 +279,6 @@ template <typename T_Grammar>
 static LR1Item
 get_initial_lr1item() {
   const auto initial_rule = get_initial_rule<T_Grammar>();
-  const Rule expected_initial_rule = {
-    T_Grammar::SYMBOL_GOAL, {T_Grammar::SYMBOL_LIST}};
   return {initial_rule, 0, T_Grammar::SYMBOL_EOF};
 }
 
