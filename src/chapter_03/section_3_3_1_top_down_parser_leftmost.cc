@@ -15,8 +15,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
-#include "grammars.h"
-#include "symbol.h"
+#include "classic_expression_grammar.h"
+#include "right_recursive_expression_grammar.h"
 #include "tree.h"
 
 #include <algorithm>

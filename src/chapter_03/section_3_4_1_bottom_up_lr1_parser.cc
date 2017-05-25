@@ -15,7 +15,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
-#include "grammars.h"
+#include "parentheses_grammar.h"
 #include "symbol.h"
 
 #include <algorithm>

@@ -68,6 +68,8 @@ section_3_3_1_top_down_parser_leftmost_SOURCES = \
 	src/chapter_03/grammar.h \
 	src/chapter_03/symbol.h \
 	src/chapter_03/tree.h \
+	src/chapter_03/classic_expression_grammar.h \
+	src/chapter_03/right_recursive_expression_grammar.h \
 	src/chapter_03/section_3_3_1_top_down_parser_leftmost.cc
 section_3_3_1_top_down_parser_leftmost_CXXFLAGS = \
 	$(COMMON_CXXFLAGS)
@@ -79,6 +81,7 @@ section_3_3_1_top_down_parser_leftmost_backtrack_free_SOURCES = \
 	src/chapter_03/symbol.h \
 	src/chapter_03/tree.h \
 	src/chapter_03/build_sets.h \
+	src/chapter_03/right_recursive_expression_grammar.h \
 	src/chapter_03/section_3_3_1_top_down_parser_leftmost_backtrack_free.cc
 section_3_3_1_top_down_parser_leftmost_backtrack_free_CXXFLAGS = \
 	$(COMMON_CXXFLAGS)
@@ -89,6 +92,7 @@ section_3_3_3_top_down_table_driven_ll1_parser_SOURCES = \
 	src/chapter_03/grammar.h \
 	src/chapter_03/symbol.h \
 	src/chapter_03/build_sets.h \
+	src/chapter_03/right_recursive_expression_grammar.h \
 	src/chapter_03/section_3_3_3_top_down_table_driven_ll1_parser.cc
 section_3_3_3_top_down_table_driven_ll1_parser_CXXFLAGS = \
 	$(COMMON_CXXFLAGS)
@@ -98,6 +102,7 @@ section_3_3_3_top_down_table_driven_ll1_parser_LDADD = \
 section_3_4_1_bottom_up_lr1_parser_SOURCES = \
 	src/chapter_03/grammar.h \
 	src/chapter_03/symbol.h \
+	src/chapter_03/parentheses_grammar.h \
 	src/chapter_03/section_3_4_1_bottom_up_lr1_parser.cc
 section_3_4_1_bottom_up_lr1_parser_CXXFLAGS = \
 	$(COMMON_CXXFLAGS)
@@ -107,6 +112,7 @@ section_3_4_1_bottom_up_lr1_parser_LDADD = \
 section_3_4_2_bottom_up_lr1_parser_with_generated_tables_SOURCES = \
 	src/chapter_03/grammar.h \
 	src/chapter_03/symbol.h \
+	src/chapter_03/parentheses_grammar.h \
 	src/chapter_03/section_3_4_2_bottom_up_lr1_parser_with_generated_tables.cc
 section_3_4_2_bottom_up_lr1_parser_with_generated_tables_CXXFLAGS = \
 	$(COMMON_CXXFLAGS)

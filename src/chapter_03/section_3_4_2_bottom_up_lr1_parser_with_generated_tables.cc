@@ -16,7 +16,7 @@
  */
 
 #include "build_sets.h"
-#include "grammars.h"
+#include "parentheses_grammar.h"
 #include "symbol.h"
 
 #include <algorithm>
