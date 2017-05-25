@@ -74,7 +74,10 @@ public:
   static constexpr Symbol SYMBOL_EMPTY = {"e", true};
   static constexpr Symbol SYMBOL_EOF = {"eof", true};
 
-  static const Symbols symbols;
+  // Not including SYMBOL_EMPTY.
+  static constexpr std::array<Symbol, 15> symbols = {{
+    SYMBOL_GOAL, SYMBOL_EXPR, SYMBOL_EXPR_PRIME, SYMBOL_TERM, SYMBOL_TERM_PRIME, SYMBOL_FACTOR,
+    SYMBOL_PLUS, SYMBOL_MINUS, SYMBOL_MULTIPLY, SYMBOL_DIVIDE, SYMBOL_OPEN_PAREN, SYMBOL_CLOSE_PAREN, SYMBOL_NUM, SYMBOL_NAME, SYMBOL_EOF}};
 
   static const GrammarRules rules;
 
@@ -107,11 +110,6 @@ public:
     return result;
   }
 };
-
-// Not including SYMBOL_EMPTY.
-const Symbols ClassicGrammar::symbols = {
-  SYMBOL_GOAL, SYMBOL_EXPR, SYMBOL_EXPR_PRIME, SYMBOL_TERM, SYMBOL_TERM_PRIME, SYMBOL_FACTOR,
-  SYMBOL_PLUS, SYMBOL_MINUS, SYMBOL_MULTIPLY, SYMBOL_DIVIDE, SYMBOL_OPEN_PAREN, SYMBOL_CLOSE_PAREN, SYMBOL_NUM, SYMBOL_NAME, SYMBOL_EOF};
 
 const GrammarRules ClassicGrammar::rules = {
   {SYMBOL_GOAL,
@@ -155,7 +153,10 @@ public:
   static constexpr Symbol SYMBOL_EMPTY = {"e", true};
   static constexpr Symbol SYMBOL_EOF = {"eof", true};
 
-  static const Symbols symbols;
+// Not including SYMBOL_EMPTY.
+  static constexpr std::array<Symbol, 16> symbols = {{
+    SYMBOL_GOAL, SYMBOL_EXPR, SYMBOL_EXPR_PRIME, SYMBOL_TERM, SYMBOL_TERM_PRIME, SYMBOL_FACTOR,
+    SYMBOL_PLUS, SYMBOL_MINUS, SYMBOL_MULTIPLY, SYMBOL_DIVIDE, SYMBOL_OPEN_PAREN, SYMBOL_CLOSE_PAREN, SYMBOL_NUM, SYMBOL_NAME, SYMBOL_EMPTY, SYMBOL_EOF}};
 
   /// The "right-recursive variant of the classic expression grammar" from page 101, in section 3.3.1.
   static const GrammarRules rules;
@@ -189,11 +190,6 @@ public:
     return result;
   }
 };
-
-// Not including SYMBOL_EMPTY.
-const Symbols RightRecursiveGrammar::symbols = {
-  SYMBOL_GOAL, SYMBOL_EXPR, SYMBOL_EXPR_PRIME, SYMBOL_TERM, SYMBOL_TERM_PRIME, SYMBOL_FACTOR,
-  SYMBOL_PLUS, SYMBOL_MINUS, SYMBOL_MULTIPLY, SYMBOL_DIVIDE, SYMBOL_OPEN_PAREN, SYMBOL_CLOSE_PAREN, SYMBOL_NUM, SYMBOL_NAME, SYMBOL_EMPTY, SYMBOL_EOF};
 
 const GrammarRules RightRecursiveGrammar::rules = {
   {SYMBOL_GOAL,
@@ -231,7 +227,9 @@ public:
   static constexpr Symbol SYMBOL_EMPTY = {"e", true};
   static constexpr Symbol SYMBOL_EOF = {"eof", true};
 
-  static const Symbols symbols;
+  // Not including SYMBOL_EMPTY.
+  static constexpr std::array<Symbol, 6> symbols = {{
+    SYMBOL_GOAL, SYMBOL_LIST, SYMBOL_PAIR, SYMBOL_OPEN_PAREN, SYMBOL_CLOSE_PAREN, SYMBOL_EOF}};
 
   static const GrammarRules rules;
 
@@ -268,10 +266,6 @@ public:
     return result;
   }
 };
-
-// Not including SYMBOL_EMPTY.
-const Symbols ParenthesesGrammar::symbols = {
-  SYMBOL_GOAL, SYMBOL_LIST, SYMBOL_PAIR, SYMBOL_OPEN_PAREN, SYMBOL_CLOSE_PAREN, SYMBOL_EOF};
 
 const GrammarRules ParenthesesGrammar::rules = {
   {SYMBOL_GOAL,
