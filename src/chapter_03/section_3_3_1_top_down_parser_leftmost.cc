@@ -12,7 +12,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
 #include "grammars.h"
@@ -20,23 +20,25 @@
 #include "tree.h"
 
 #include <algorithm>
+#include <cassert>
+#include <iostream>
 #include <map>
 #include <stack>
 #include <vector>
-#include <iostream>
-#include <cassert>
 
 using WordsMap = std::map<std::string, Symbol>;
 
 template <typename T_Grammar>
 static bool
-match(const WordsMap& words_map, const Symbol& symbol, const std::string& word) {
+match(
+  const WordsMap& words_map, const Symbol& symbol, const std::string& word) {
   const auto word_symbol = T_Grammar::recognise_word(words_map, word);
   return word_symbol == symbol;
 }
 
 /**
- * A left-hand symbol, and the index of its right-hand expansion (in its rule) that is currently being used.
+ * A left-hand symbol, and the index of its right-hand expansion (in its rule)
+ * that is currently being used.
  */
 class SymbolAndStatus {
 public:
@@ -115,7 +117,7 @@ top_down_parse(const std::vector<std::string>& words) {
       expansions_used++;
       const auto& expansion = expansions[expansions_used - 1];
       if (expansion.empty()) {
-        return {}; //Error
+        return {}; // Error
       }
 
       // Build nodes for b1, b2...bn as children of focus:
@@ -162,20 +164,24 @@ top_down_parse(const std::vector<std::string>& words) {
     } else {
       // backtrack
       // The pseudocode says
-      // "sets focus to its parent in the partially-built parse tree and disconnects its children.
-      // If an untried rule remains with focus on its left-hand side, the parse expands focus by
+      // "sets focus to its parent in the partially-built parse tree and
+      // disconnects its children.
+      // If an untried rule remains with focus on its left-hand side, the parse
+      // expands focus by
       // that rule."
 
       auto used = focusv.symbol_index;
       auto unused = focusv.symbols_count - used - 1;
 
       // Pop unused symbols (from this expression) from the stack.
-      // The pseudo code, and its description, don't mention this, but it seems to be necessary.
+      // The pseudo code, and its description, don't mention this, but it seems
+      // to be necessary.
       while (unused--) {
         st.pop();
       }
 
-      // Decrement input_focus to move left back befor words we need to re-examine.
+      // Decrement input_focus to move left back befor words we need to
+      // re-examine.
       input_focus -= used;
 
       // Remove mistakenly-added terminals from the result:
@@ -198,7 +204,8 @@ top_down_parse(const std::vector<std::string>& words) {
   return result;
 }
 
-int main() {
+int
+main() {
 
   {
     // The "classic expression grammar" from page 93, in section 3.2.4.
@@ -216,13 +223,15 @@ int main() {
       // This code is not expected to work, and will in fact loop infinitely,
       // due to infinite left recursion, caused by the grammar.
       // const std::vector<std::string> input = {"a", "+", "b", "x", "c"};
-      // const Symbols expected = {Grammar::SYMBOL_NAME, Grammar::SYMBOL_PLUS, Grammar::SYMBOL_NAME, Grammar::SYMBOL_MULTIPLY, Grammar::SYMBOL_NAME};
+      // const Symbols expected = {Grammar::SYMBOL_NAME, Grammar::SYMBOL_PLUS,
+      // Grammar::SYMBOL_NAME, Grammar::SYMBOL_MULTIPLY, Grammar::SYMBOL_NAME};
       // assert(top_down_parse<Grammar>(input) == expected);
     }
   }
 
   {
-    // The "right-recursive variant of the classic expression grammar" from page 101, in section 3.3.1.
+    // The "right-recursive variant of the classic expression grammar" from page
+    // 101, in section 3.3.1.
     using Grammar = RightRecursiveGrammar;
 
     {
@@ -236,7 +245,8 @@ int main() {
 
     {
       const std::vector<std::string> input = {"a", "+", "b", "x", "c"};
-      const Symbols expected = {Grammar::SYMBOL_NAME, Grammar::SYMBOL_PLUS, Grammar::SYMBOL_NAME, Grammar::SYMBOL_MULTIPLY, Grammar::SYMBOL_NAME};
+      const Symbols expected = {Grammar::SYMBOL_NAME, Grammar::SYMBOL_PLUS,
+        Grammar::SYMBOL_NAME, Grammar::SYMBOL_MULTIPLY, Grammar::SYMBOL_NAME};
       assert(top_down_parse<Grammar>(input) == expected);
     }
   }

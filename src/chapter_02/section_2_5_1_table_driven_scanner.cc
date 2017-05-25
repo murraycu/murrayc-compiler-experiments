@@ -1,13 +1,13 @@
+#include <cassert>
 #include <set>
 #include <stack>
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <cassert>
 
 constexpr const char* STATE_BAD = "bad";
 constexpr const char* STATE_END = "se";
-constexpr const char CHAR_EOF = '$'; //arbitrary value.
+constexpr const char CHAR_EOF = '$'; // arbitrary value.
 
 template <typename T_Element>
 static void
@@ -30,14 +30,18 @@ constexpr const char* TOKEN_TYPE_INVALID = "invalid";
  * @param states The set of all states, not including the end state.
  * @param s0 The starting state.
  * @param CharCat The classifier table, mapping character to categories.
- * @param Delta The transition table, mapping states and categories to subsequent states.
+ * @param Delta The transition table, mapping states and categories to
+ * subsequent states.
  * @param Type The token type table, mapping accepting states to token types.
  * the classifier table @a CharCat,
  * the .
  */
-template <typename T_StateID, typename T_CharCat, typename T_Delta, typename T_Type>
+template <typename T_StateID, typename T_CharCat, typename T_Delta,
+  typename T_Type>
 static std::pair<TokenType, std::string>
-scan(const std::string& str, const std::set<T_StateID>& states, const T_StateID& s0, const T_CharCat& CharCat, const T_Delta& Delta, const T_Type& Type) {
+scan(const std::string& str, const std::set<T_StateID>& states,
+  const T_StateID& s0, const T_CharCat& CharCat, const T_Delta& Delta,
+  const T_Type& Type) {
   auto state = s0;
   std::string lexeme;
 
@@ -82,8 +86,7 @@ scan(const std::string& str, const std::set<T_StateID>& states, const T_StateID&
   //
   // For instance, when we hit the end state,
   // we must roll back once.
-  while (!states.count(state) &&
-    state != STATE_BAD) {
+  while (!states.count(state) && state != STATE_BAD) {
     state = st.top();
     st.pop();
 
@@ -105,11 +108,7 @@ scan(const std::string& str, const std::set<T_StateID>& states, const T_StateID&
  */
 static std::pair<std::string, std::string>
 recognise_register(const std::string& str) {
-  enum class Categories {
-    REGISTER,
-    DIGIT,
-    OTHER
-  };
+  enum class Categories { REGISTER, DIGIT, OTHER };
 
   // These tables are from Figure 2.14, in section 2.5.1,
   // of "Engineering a compiler".
@@ -156,10 +155,12 @@ recognise_register(const std::string& str) {
     {"s2", "register"},
     {"s3", TOKEN_TYPE_INVALID}};
 
-  return scan(str, states, std::string("s0"), classifier_table, transition_table, token_type_table);
+  return scan(str, states, std::string("s0"), classifier_table,
+    transition_table, token_type_table);
 }
 
-int main() {
+int
+main() {
   {
     assert(recognise_register("r2").second == "register");
     assert(recognise_register("r9").second == "register");

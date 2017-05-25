@@ -12,25 +12,25 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
-#include "symbol.h"
 #include "grammars.h"
+#include "symbol.h"
 
 #include <algorithm>
+#include <cassert>
+#include <iostream>
 #include <map>
 #include <set>
 #include <stack>
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <iostream>
-#include <cassert>
 
 template <typename T_Container>
-static
-void print_symbols(const T_Container& symbols) {
+static void
+print_symbols(const T_Container& symbols) {
   bool is_first = true;
   for (const auto& s : symbols) {
     if (!is_first) {
@@ -67,126 +67,121 @@ using ActionTable = std::map<State, std::map<Symbol, Action>>;
 // Based on Figure 3.16, in section 3.4.1, on page 120
 // of "Enginnering a Compiler."
 const ActionTable action_table = {
-  {0, {
-    {Grammar::SYMBOL_EOF, {}},
-    {Grammar::SYMBOL_OPEN_PAREN, {ActionType::SHIFT, 3}},
-    {Grammar::SYMBOL_CLOSE_PAREN, {}}},
+  {
+    0,
+    {{Grammar::SYMBOL_EOF, {}},
+      {Grammar::SYMBOL_OPEN_PAREN, {ActionType::SHIFT, 3}},
+      {Grammar::SYMBOL_CLOSE_PAREN, {}}},
   },
-  {1, {
-    {Grammar::SYMBOL_EOF, {ActionType::ACCEPT, 0}},
-    {Grammar::SYMBOL_OPEN_PAREN, {ActionType::SHIFT, 3}},
-    {Grammar::SYMBOL_CLOSE_PAREN, {}}},
+  {
+    1,
+    {{Grammar::SYMBOL_EOF, {ActionType::ACCEPT, 0}},
+      {Grammar::SYMBOL_OPEN_PAREN, {ActionType::SHIFT, 3}},
+      {Grammar::SYMBOL_CLOSE_PAREN, {}}},
   },
-  {2, {
-    {Grammar::SYMBOL_EOF, {ActionType::REDUCE, 3}},
-    {Grammar::SYMBOL_OPEN_PAREN, {ActionType::REDUCE, 3}},
-    {Grammar::SYMBOL_CLOSE_PAREN, {}}},
+  {
+    2,
+    {{Grammar::SYMBOL_EOF, {ActionType::REDUCE, 3}},
+      {Grammar::SYMBOL_OPEN_PAREN, {ActionType::REDUCE, 3}},
+      {Grammar::SYMBOL_CLOSE_PAREN, {}}},
   },
-  {3, {
-    {Grammar::SYMBOL_EOF, {}},
-    {Grammar::SYMBOL_OPEN_PAREN, {ActionType::SHIFT, 6}},
-    {Grammar::SYMBOL_CLOSE_PAREN, {ActionType::SHIFT, 7}}},
+  {
+    3,
+    {{Grammar::SYMBOL_EOF, {}},
+      {Grammar::SYMBOL_OPEN_PAREN, {ActionType::SHIFT, 6}},
+      {Grammar::SYMBOL_CLOSE_PAREN, {ActionType::SHIFT, 7}}},
   },
-  {4, {
-    {Grammar::SYMBOL_EOF, {ActionType::REDUCE, 2}},
-    {Grammar::SYMBOL_OPEN_PAREN, {ActionType::REDUCE, 2}},
-    {Grammar::SYMBOL_CLOSE_PAREN, {}}},
+  {
+    4,
+    {{Grammar::SYMBOL_EOF, {ActionType::REDUCE, 2}},
+      {Grammar::SYMBOL_OPEN_PAREN, {ActionType::REDUCE, 2}},
+      {Grammar::SYMBOL_CLOSE_PAREN, {}}},
   },
-  {5, {
-    {Grammar::SYMBOL_EOF, {}},
-    {Grammar::SYMBOL_OPEN_PAREN, {}},
-    {Grammar::SYMBOL_CLOSE_PAREN, {ActionType::SHIFT, 8}}},
+  {
+    5,
+    {{Grammar::SYMBOL_EOF, {}}, {Grammar::SYMBOL_OPEN_PAREN, {}},
+      {Grammar::SYMBOL_CLOSE_PAREN, {ActionType::SHIFT, 8}}},
   },
-  {6, {
-    {Grammar::SYMBOL_EOF, {}},
-    {Grammar::SYMBOL_OPEN_PAREN, {ActionType::SHIFT, 6}},
-    {Grammar::SYMBOL_CLOSE_PAREN, {ActionType::SHIFT, 10}}},
+  {
+    6,
+    {{Grammar::SYMBOL_EOF, {}},
+      {Grammar::SYMBOL_OPEN_PAREN, {ActionType::SHIFT, 6}},
+      {Grammar::SYMBOL_CLOSE_PAREN, {ActionType::SHIFT, 10}}},
   },
-  {7, {
-    {Grammar::SYMBOL_EOF, {ActionType::REDUCE, 5}},
-    {Grammar::SYMBOL_OPEN_PAREN, {ActionType::REDUCE, 5}},
-    {Grammar::SYMBOL_CLOSE_PAREN, {}}},
+  {
+    7,
+    {{Grammar::SYMBOL_EOF, {ActionType::REDUCE, 5}},
+      {Grammar::SYMBOL_OPEN_PAREN, {ActionType::REDUCE, 5}},
+      {Grammar::SYMBOL_CLOSE_PAREN, {}}},
   },
-  {8, {
-    {Grammar::SYMBOL_EOF, {ActionType::REDUCE, 4}},
-    {Grammar::SYMBOL_OPEN_PAREN, {ActionType::REDUCE, 4}},
-    {Grammar::SYMBOL_CLOSE_PAREN, {}}},
+  {
+    8,
+    {{Grammar::SYMBOL_EOF, {ActionType::REDUCE, 4}},
+      {Grammar::SYMBOL_OPEN_PAREN, {ActionType::REDUCE, 4}},
+      {Grammar::SYMBOL_CLOSE_PAREN, {}}},
   },
-  {9, {
-    {Grammar::SYMBOL_EOF, {}},
-    {Grammar::SYMBOL_OPEN_PAREN, {}},
-    {Grammar::SYMBOL_CLOSE_PAREN, {ActionType::SHIFT, 11}}},
+  {
+    9,
+    {{Grammar::SYMBOL_EOF, {}}, {Grammar::SYMBOL_OPEN_PAREN, {}},
+      {Grammar::SYMBOL_CLOSE_PAREN, {ActionType::SHIFT, 11}}},
   },
-  {10, {
-    {Grammar::SYMBOL_EOF, {}},
-    {Grammar::SYMBOL_OPEN_PAREN, {}},
-    {Grammar::SYMBOL_CLOSE_PAREN, {ActionType::REDUCE, 5}}},
+  {
+    10,
+    {{Grammar::SYMBOL_EOF, {}}, {Grammar::SYMBOL_OPEN_PAREN, {}},
+      {Grammar::SYMBOL_CLOSE_PAREN, {ActionType::REDUCE, 5}}},
   },
-  {11, {
-    {Grammar::SYMBOL_EOF, {}},
-    {Grammar::SYMBOL_OPEN_PAREN, {}},
-    {Grammar::SYMBOL_CLOSE_PAREN, {ActionType::REDUCE, 4}}},
-  }
-};
+  {
+    11,
+    {{Grammar::SYMBOL_EOF, {}}, {Grammar::SYMBOL_OPEN_PAREN, {}},
+      {Grammar::SYMBOL_CLOSE_PAREN, {ActionType::REDUCE, 4}}},
+  }};
 
 using GotoTable = std::map<State, std::map<Symbol, std::size_t>>;
 
 // Based on Figure 3.16, in section 3.4.1, on page 120
 // of "Enginnering a Compiler."
 const GotoTable goto_table = {
-  {0, {
-    {Grammar::SYMBOL_LIST, 1},
-    {Grammar::SYMBOL_PAIR, 2}},
+  {
+    0, {{Grammar::SYMBOL_LIST, 1}, {Grammar::SYMBOL_PAIR, 2}},
   },
-  {1, {
-    {Grammar::SYMBOL_LIST, 0},
-    {Grammar::SYMBOL_PAIR, 4}},
+  {
+    1, {{Grammar::SYMBOL_LIST, 0}, {Grammar::SYMBOL_PAIR, 4}},
   },
-  {2, {
-    {Grammar::SYMBOL_LIST, 0},
-    {Grammar::SYMBOL_PAIR, 0}},
+  {
+    2, {{Grammar::SYMBOL_LIST, 0}, {Grammar::SYMBOL_PAIR, 0}},
   },
-  {3, {
-    {Grammar::SYMBOL_LIST, 0},
-    {Grammar::SYMBOL_PAIR, 5}},
+  {
+    3, {{Grammar::SYMBOL_LIST, 0}, {Grammar::SYMBOL_PAIR, 5}},
   },
-  {4, {
-    {Grammar::SYMBOL_LIST, 0},
-    {Grammar::SYMBOL_PAIR, 0}},
+  {
+    4, {{Grammar::SYMBOL_LIST, 0}, {Grammar::SYMBOL_PAIR, 0}},
   },
-  {5, {
-    {Grammar::SYMBOL_LIST, 0},
-    {Grammar::SYMBOL_PAIR, 0}},
+  {
+    5, {{Grammar::SYMBOL_LIST, 0}, {Grammar::SYMBOL_PAIR, 0}},
   },
-  {6, {
-    {Grammar::SYMBOL_LIST, 0},
-    {Grammar::SYMBOL_PAIR, 9}},
+  {
+    6, {{Grammar::SYMBOL_LIST, 0}, {Grammar::SYMBOL_PAIR, 9}},
   },
-  {7, {
-    {Grammar::SYMBOL_LIST, 0},
-    {Grammar::SYMBOL_PAIR, 0}},
+  {
+    7, {{Grammar::SYMBOL_LIST, 0}, {Grammar::SYMBOL_PAIR, 0}},
   },
-  {8, {
-    {Grammar::SYMBOL_LIST, 0},
-    {Grammar::SYMBOL_PAIR, 0}},
+  {
+    8, {{Grammar::SYMBOL_LIST, 0}, {Grammar::SYMBOL_PAIR, 0}},
   },
-  {9, {
-    {Grammar::SYMBOL_LIST, 0},
-    {Grammar::SYMBOL_PAIR, 0}},
+  {
+    9, {{Grammar::SYMBOL_LIST, 0}, {Grammar::SYMBOL_PAIR, 0}},
   },
-  {10, {
-    {Grammar::SYMBOL_LIST, 0},
-    {Grammar::SYMBOL_PAIR, 0}},
+  {
+    10, {{Grammar::SYMBOL_LIST, 0}, {Grammar::SYMBOL_PAIR, 0}},
   },
-  {11, {
-    {Grammar::SYMBOL_LIST, 0},
-    {Grammar::SYMBOL_PAIR, 0}},
-  }
-};
+  {
+    11, {{Grammar::SYMBOL_LIST, 0}, {Grammar::SYMBOL_PAIR, 0}},
+  }};
 
 template <typename T_Grammar>
 static bool
-match(const WordsMap& words_map, const Symbol& symbol, const std::string& word) {
+match(
+  const WordsMap& words_map, const Symbol& symbol, const std::string& word) {
   const auto word_symbol = T_Grammar::recognise_word(words_map, word);
   return word_symbol == symbol;
 }
@@ -194,7 +189,8 @@ match(const WordsMap& words_map, const Symbol& symbol, const std::string& word) 
 // Just to hide the use of find() that is nececessary with
 // a const std::map.
 static Action
-get_action_from_table(const ActionTable& table, State state, const Symbol& symbol) {
+get_action_from_table(
+  const ActionTable& table, State state, const Symbol& symbol) {
   const auto iteras = table.find(state);
   if (iteras == std::end(table)) {
     // Error.
@@ -242,7 +238,8 @@ bottom_up_lr1_parse(const std::vector<std::string>& words) {
     return {};
   }
 
-  // The pseudo code puts both the symbol and the state (number) on the same stack,
+  // The pseudo code puts both the symbol and the state (number) on the same
+  // stack,
   // pushing and popping two each time. That seems unnecessarily complicated.
   // Instead this uses 2 stacks, to simplify type safety.
   std::stack<Symbol> symbol_stack;
@@ -264,7 +261,8 @@ bottom_up_lr1_parse(const std::vector<std::string>& words) {
 
     const auto symbol_for_word = T_Grammar::recognise_word(words_map, word);
 
-    const auto action = get_action_from_table(action_table, state, symbol_for_word);
+    const auto action =
+      get_action_from_table(action_table, state, symbol_for_word);
 
     if (action.type == ActionType::REDUCE) {
       // Get the A -> B rule:
@@ -306,22 +304,26 @@ bottom_up_lr1_parse(const std::vector<std::string>& words) {
   return result;
 }
 
-int main() {
+int
+main() {
   {
     using Grammar = ParenthesesGrammar;
 
     {
       // Valid input:
       const std::vector<std::string> input = {"(", ")"};
-      const Symbols expected = {Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_CLOSE_PAREN};
+      const Symbols expected = {
+        Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_CLOSE_PAREN};
       assert(bottom_up_lr1_parse<Grammar>(input) == expected);
     }
 
     {
       // Valid input:
       const std::vector<std::string> input = {"(", "(", ")", ")", "(", ")"};
-      const Symbols expected = {Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_CLOSE_PAREN,
-        Grammar::SYMBOL_CLOSE_PAREN, Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_CLOSE_PAREN};
+      const Symbols expected = {Grammar::SYMBOL_OPEN_PAREN,
+        Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_CLOSE_PAREN,
+        Grammar::SYMBOL_CLOSE_PAREN, Grammar::SYMBOL_OPEN_PAREN,
+        Grammar::SYMBOL_CLOSE_PAREN};
       assert(bottom_up_lr1_parse<Grammar>(input) == expected);
     }
 

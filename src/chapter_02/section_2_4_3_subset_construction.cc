@@ -12,20 +12,19 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
 #include <algorithm>
+#include <cassert>
+#include <iostream>
 #include <iterator>
 #include <map>
 #include <queue>
 #include <set>
 #include <vector>
-#include <iostream>
-#include <cassert>
 
 #include "state.h"
-
 
 using States = State::States;
 
@@ -155,7 +154,7 @@ subset_construction(const std::shared_ptr<State>& n0) {
  */
 static bool
 contains_accepting_state(const States& states) {
-  for (const auto& s: states) {
+  for (const auto& s : states) {
     if (s && s->is_accepting()) {
       return true;
     }
@@ -171,7 +170,8 @@ contains_accepting_state(const States& states) {
  * "From Q to D" section on page 50.
  */
 static auto
-from_q_to_d(const std::set<States>& Q, const std::map<std::pair<States, char>, States>& T) {
+from_q_to_d(const std::set<States>& Q,
+  const std::map<std::pair<States, char>, States>& T) {
   // TODO: Performance: Using the set as a key is very inefficient.
   std::unordered_map<int, std::shared_ptr<State>> D;
   std::map<States, int> q_ids;
@@ -192,7 +192,8 @@ from_q_to_d(const std::set<States>& Q, const std::map<std::pair<States, char>, S
   // std::cout << std::endl;
 
   // For each state di (identified by its distinct set of states qi),
-  // create a transition to another di, by matching the distinct set of states in q,
+  // create a transition to another di, by matching the distinct set of states
+  // in q,
   // that the states qi have a transition to.
   for (const auto& ti : T) {
     const auto& [p, qdest] = ti;
@@ -241,7 +242,8 @@ nfa_to_dfa(const std::shared_ptr<State>& n0) {
  * and check that it is to the expected subsequent state.
  */
 static std::shared_ptr<State>
-check_only_transition(const std::shared_ptr<State>& state, State::char_t c, const std::string& dest_id) {
+check_only_transition(const std::shared_ptr<State>& state, State::char_t c,
+  const std::string& dest_id) {
   assert(state);
   const auto dest_states = state->next_states(c);
   assert(dest_states.size() == 1);
@@ -250,7 +252,8 @@ check_only_transition(const std::shared_ptr<State>& state, State::char_t c, cons
   return dest;
 }
 
-int main() {
+int
+main() {
   {
     // The NFA from Figure 2.7 on page 51.
     auto n0 = std::make_shared<State>("n0");

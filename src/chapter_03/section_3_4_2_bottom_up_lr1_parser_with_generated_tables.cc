@@ -12,14 +12,16 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
 #include "build_sets.h"
-#include "symbol.h"
 #include "grammars.h"
+#include "symbol.h"
 
 #include <algorithm>
+#include <cassert>
+#include <iostream>
 #include <map>
 #include <set>
 #include <stack>
@@ -27,8 +29,6 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
-#include <iostream>
-#include <cassert>
 
 /*
 static
@@ -63,20 +63,23 @@ using Rule = std::pair<Symbol, Symbols>;
  */
 class LR1Item {
 public:
-  // TODO: Why do we need to declare this. It isn't necessary for Symbol, for instance.
-  LR1Item(const Rule& production_in, std::size_t placeholder_in, const Symbol& lookahead_symbol_in)
+  // TODO: Why do we need to declare this. It isn't necessary for Symbol, for
+  // instance.
+  LR1Item(const Rule& production_in, std::size_t placeholder_in,
+    const Symbol& lookahead_symbol_in)
   : production(production_in),
     placeholder(placeholder_in),
     lookahead_symbol(lookahead_symbol_in) {
   }
 
-  bool operator==(const LR1Item& other) const {
-    return production == other.production &&
-      placeholder == other.placeholder &&
-      lookahead_symbol == other.lookahead_symbol;
+  bool
+  operator==(const LR1Item& other) const {
+    return production == other.production && placeholder == other.placeholder &&
+           lookahead_symbol == other.lookahead_symbol;
   }
 
-  bool operator<(const LR1Item& other) const {
+  bool
+  operator<(const LR1Item& other) const {
     if (production != other.production) {
       return production < other.production;
     }
@@ -190,9 +193,9 @@ closure(CCSet& s, const FirstSets& first) {
 
 /** Get the first symbol after the item's rules' placeholder position,
  * if any.
- * @result {true, symbol} if an symbol was found, else {false, ignored}. 
+ * @result {true, symbol} if an symbol was found, else {false, ignored}.
  */
-template<typename T_Grammar>
+template <typename T_Grammar>
 static std::pair<bool, Symbol>
 get_symbol_after_placeholder(const LR1Item& item) {
   const auto& rule = item.production;
@@ -276,7 +279,8 @@ template <typename T_Grammar>
 static LR1Item
 get_initial_lr1item() {
   const auto initial_rule = get_initial_rule<T_Grammar>();
-  const Rule expected_initial_rule = {T_Grammar::SYMBOL_GOAL, {T_Grammar::SYMBOL_LIST}};
+  const Rule expected_initial_rule = {
+    T_Grammar::SYMBOL_GOAL, {T_Grammar::SYMBOL_LIST}};
   return {initial_rule, 0, T_Grammar::SYMBOL_EOF};
 }
 
@@ -394,8 +398,10 @@ build_action_and_goto_tables(ActionTable& action_table, GotoTable& goto_table) {
         assert(cc_ids.count(ccj));
         const auto j = cc_ids[ccj];
         action_table[i][c] = {ActionType::SHIFT, j};
-      } else if (placeholder_at_end && rule.first == T_Grammar::SYMBOL_GOAL && a == T_Grammar::SYMBOL_EOF) {
-        // I's rule is S' (Goal)-> S, the placeholder is at the end, and I's lookahead is eof.
+      } else if (placeholder_at_end && rule.first == T_Grammar::SYMBOL_GOAL &&
+                 a == T_Grammar::SYMBOL_EOF) {
+        // I's rule is S' (Goal)-> S, the placeholder is at the end, and I's
+        // lookahead is eof.
         //
         // The placeholder is at the end of the expansion, so this would mean
         // that the parser has recognized the whole expansion.  And because the
@@ -403,7 +409,8 @@ build_action_and_goto_tables(ActionTable& action_table, GotoTable& goto_table) {
         // this is the accepting state.
         action_table[i][a] = {ActionType::ACCEPT, 0};
       } else if (placeholder_at_end) {
-        // I's rule is A -> B, the placeholder is at the end, and I's lookahead is a.
+        // I's rule is A -> B, the placeholder is at the end, and I's lookahead
+        // is a.
         //
         // The placeholder is at the end of the expansion, so this would mean
         // that the parser has recognized the whole expansion. This is then a
@@ -437,7 +444,8 @@ build_action_and_goto_tables(ActionTable& action_table, GotoTable& goto_table) {
 
 template <typename T_Grammar>
 static bool
-match(const WordsMap& words_map, const Symbol& symbol, const std::string& word) {
+match(
+  const WordsMap& words_map, const Symbol& symbol, const std::string& word) {
   const auto word_symbol = T_Grammar::recognise_word(words_map, word);
   return word_symbol == symbol;
 }
@@ -445,7 +453,8 @@ match(const WordsMap& words_map, const Symbol& symbol, const std::string& word) 
 // Just to hide the use of find() that is nececessary with
 // a const std::map.
 static Action
-get_action_from_table(const ActionTable& table, State state, const Symbol& symbol) {
+get_action_from_table(
+  const ActionTable& table, State state, const Symbol& symbol) {
   const auto iteras = table.find(state);
   if (iteras == std::end(table)) {
     // Error.
@@ -495,9 +504,10 @@ bottom_up_lr1_parse(const std::vector<std::string>& words) {
 
   ActionTable action_table;
   GotoTable goto_table;
-  build_action_and_goto_tables<T_Grammar>(action_table, goto_table); 
+  build_action_and_goto_tables<T_Grammar>(action_table, goto_table);
 
-  // The pseudo code puts both the symbol and the state (number) on the same stack,
+  // The pseudo code puts both the symbol and the state (number) on the same
+  // stack,
   // pushing and popping two each time. That seems unnecessarily complicated.
   // Instead this uses 2 stacks, to simplify type safety.
   std::stack<Symbol> symbol_stack;
@@ -519,7 +529,8 @@ bottom_up_lr1_parse(const std::vector<std::string>& words) {
 
     const auto symbol_for_word = T_Grammar::recognise_word(words_map, word);
 
-    const auto action = get_action_from_table(action_table, state, symbol_for_word);
+    const auto action =
+      get_action_from_table(action_table, state, symbol_for_word);
 
     if (action.type == ActionType::REDUCE) {
       // Get the A -> B rule:
@@ -677,7 +688,7 @@ test_action_and_goto() {
 
   ActionTable action_table;
   GotoTable goto_table;
-  build_action_and_goto_tables<Grammar>(action_table, goto_table); 
+  build_action_and_goto_tables<Grammar>(action_table, goto_table);
 
   // See Figure 3.16 (b) on page 120 of "Engineering a Compiler".
   assert(action_table.size() == 12);
@@ -740,7 +751,8 @@ test_action_and_goto() {
   */
 }
 
-int main() {
+int
+main() {
   test_first_set_for_symbols();
   test_closure();
   test_goto();
@@ -753,15 +765,18 @@ int main() {
     {
       // Valid input:
       const std::vector<std::string> input = {"(", ")"};
-      const Symbols expected = {Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_CLOSE_PAREN};
+      const Symbols expected = {
+        Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_CLOSE_PAREN};
       assert(bottom_up_lr1_parse<Grammar>(input) == expected);
     }
 
     {
       // Valid input:
       const std::vector<std::string> input = {"(", "(", ")", ")", "(", ")"};
-      const Symbols expected = {Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_CLOSE_PAREN,
-        Grammar::SYMBOL_CLOSE_PAREN, Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_CLOSE_PAREN};
+      const Symbols expected = {Grammar::SYMBOL_OPEN_PAREN,
+        Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_CLOSE_PAREN,
+        Grammar::SYMBOL_CLOSE_PAREN, Grammar::SYMBOL_OPEN_PAREN,
+        Grammar::SYMBOL_CLOSE_PAREN};
       assert(bottom_up_lr1_parse<Grammar>(input) == expected);
     }
 

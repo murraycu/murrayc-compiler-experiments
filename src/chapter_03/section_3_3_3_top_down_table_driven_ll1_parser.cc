@@ -12,25 +12,25 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
-#include "symbol.h"
-#include "grammars.h"
 #include "build_sets.h"
+#include "grammars.h"
+#include "symbol.h"
 
 #include <algorithm>
+#include <cassert>
+#include <iostream>
 #include <map>
 #include <set>
 #include <stack>
 #include <string>
 #include <vector>
-#include <iostream>
-#include <cassert>
 
 template <typename T_Container>
-static
-void print_symbols(const T_Container& symbols) {
+static void
+print_symbols(const T_Container& symbols) {
   bool is_first = true;
   for (const auto& s : symbols) {
     if (!is_first) {
@@ -67,9 +67,10 @@ build_table() {
   const auto first = build_first_sets<T_Grammar>();
   const auto follow = build_follow_sets<T_Grammar>(first);
   const auto first_for_rules = build_first_sets_for_rules<T_Grammar>(first);
-  const auto first_plus = build_first_plus_sets<T_Grammar>(first_for_rules, follow);
+  const auto first_plus =
+    build_first_plus_sets<T_Grammar>(first_for_rules, follow);
 
-  const auto& rules  = T_Grammar::rules;
+  const auto& rules = T_Grammar::rules;
 
   const auto& symbols = T_Grammar::symbols;
   for (const auto& a : symbols) {
@@ -134,7 +135,8 @@ build_table() {
 
 template <typename T_Grammar>
 static bool
-match(const WordsMap& words_map, const Symbol& symbol, const std::string& word) {
+match(
+  const WordsMap& words_map, const Symbol& symbol, const std::string& word) {
   const auto word_symbol = T_Grammar::recognise_word(words_map, word);
   return word_symbol == symbol;
 }
@@ -218,39 +220,51 @@ top_down_parse(const std::vector<std::string>& words) {
   return result;
 }
 
-int main() {
+int
+main() {
   {
-    // The "right-recursive variant of the classic expression grammar" from page 101, in section 3.3.1.
+    // The "right-recursive variant of the classic expression grammar" from page
+    // 101, in section 3.3.1.
     using Grammar = RightRecursiveGrammar;
 
     {
       auto table = build_table<Grammar>();
       assert(!table.empty());
 
-      // These expected results are based on the table in Figure 3.11 (b), in section 3.3.3,
+      // These expected results are based on the table in Figure 3.11 (b), in
+      // section 3.3.3,
       // on page 112, of "Engineering a Compiler".
 
       // The table should not have any terminals.
       const Symbols expected_plus_plus = {}; // No rule
-      assert(table[Grammar::SYMBOL_PLUS][Grammar::SYMBOL_PLUS] == expected_plus_plus);
+      assert(table[Grammar::SYMBOL_PLUS][Grammar::SYMBOL_PLUS] ==
+             expected_plus_plus);
 
       const Symbols expected_goal_eof = {SYMBOL_ERROR}; // No rule.
-      assert(table[Grammar::SYMBOL_GOAL][Grammar::SYMBOL_EOF] == expected_goal_eof);
+      assert(
+        table[Grammar::SYMBOL_GOAL][Grammar::SYMBOL_EOF] == expected_goal_eof);
 
-      const Symbols expected_goal_open_paren = {Grammar::SYMBOL_EXPR}; // Rule 0.
-      assert(table[Grammar::SYMBOL_GOAL][Grammar::SYMBOL_OPEN_PAREN] == expected_goal_open_paren);
+      const Symbols expected_goal_open_paren = {
+        Grammar::SYMBOL_EXPR}; // Rule 0.
+      assert(table[Grammar::SYMBOL_GOAL][Grammar::SYMBOL_OPEN_PAREN] ==
+             expected_goal_open_paren);
 
-      const Symbols expected_expr_prime_eof = {Grammar::SYMBOL_EMPTY}; // Rule 4.
-      assert(table[Grammar::SYMBOL_EXPR_PRIME][Grammar::SYMBOL_EOF] == expected_expr_prime_eof);
+      const Symbols expected_expr_prime_eof = {
+        Grammar::SYMBOL_EMPTY}; // Rule 4.
+      assert(table[Grammar::SYMBOL_EXPR_PRIME][Grammar::SYMBOL_EOF] ==
+             expected_expr_prime_eof);
 
-      const Symbols expected_factor_open_paren = {Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_EXPR, Grammar::SYMBOL_CLOSE_PAREN}; // Rule 9.
-      assert(table[Grammar::SYMBOL_FACTOR][Grammar::SYMBOL_OPEN_PAREN] == expected_factor_open_paren);
+      const Symbols expected_factor_open_paren = {Grammar::SYMBOL_OPEN_PAREN,
+        Grammar::SYMBOL_EXPR, Grammar::SYMBOL_CLOSE_PAREN}; // Rule 9.
+      assert(table[Grammar::SYMBOL_FACTOR][Grammar::SYMBOL_OPEN_PAREN] ==
+             expected_factor_open_paren);
     }
 
     {
       // Valid input:
       const std::vector<std::string> input = {"a", "+", "b", "x", "c"};
-      const Symbols expected = {Grammar::SYMBOL_NAME, Grammar::SYMBOL_PLUS, Grammar::SYMBOL_NAME, Grammar::SYMBOL_MULTIPLY, Grammar::SYMBOL_NAME};
+      const Symbols expected = {Grammar::SYMBOL_NAME, Grammar::SYMBOL_PLUS,
+        Grammar::SYMBOL_NAME, Grammar::SYMBOL_MULTIPLY, Grammar::SYMBOL_NAME};
       assert(top_down_parse<Grammar>(input) == expected);
     }
 

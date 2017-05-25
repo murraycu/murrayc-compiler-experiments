@@ -12,12 +12,12 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
+#include <cassert>
 #include <iostream>
 #include <map>
-#include <cassert>
 
 #include "state.h"
 
@@ -44,7 +44,8 @@ get_accepting_and_non_accepting_states(const States& states) {
 /** TODO: This is incredibly inefficient.
  */
 static States
-get_partition_containing_state(const Partitions& partitions, const std::shared_ptr<State>& s) {
+get_partition_containing_state(
+  const Partitions& partitions, const std::shared_ptr<State>& s) {
   for (const auto partition : partitions) {
     if (partition.count(s)) {
       return partition;
@@ -58,7 +59,8 @@ get_partition_containing_state(const Partitions& partitions, const std::shared_p
  * check the states that can be transitioned to
  * from each of the states in the set of @a states.
  * If these transitioned-to states are not all in the same partition,
- * split them into separate sets of states according to the partitions that they belong to.
+ * split them into separate sets of states according to the partitions that they
+ * belong to.
  * Otherwise return @a s.
  */
 static Partitions
@@ -71,7 +73,8 @@ split(const States& states, const Partitions& partitions) {
     for (const auto& s : states) {
       const auto next_states = s->next_states(c);
 
-      // We don't ignore empty next_states, because states with no transition on c
+      // We don't ignore empty next_states, because states with no transition on
+      // c
       // should be in their own partition, according to page 56.
       // (This also ensures that all the sets will be in the result.)
 
@@ -79,14 +82,16 @@ split(const States& states, const Partitions& partitions) {
       assert(next_states.size() <= 1);
 
       const auto next = *(next_states.begin());
-      const auto next_partition = get_partition_containing_state(partitions, next);
+      const auto next_partition =
+        get_partition_containing_state(partitions, next);
       states_by_next_partition[next_partition].emplace(s);
     }
 
     // If the next states are in more than one partition,
     // return the states that lead to the partitions:
     // TODO: The example on page 56 splits off just one partition each time,
-    // but in step 2, this would split {s0, s1, s2, s4} into {{s0}, {s1}, {s2, s4}},
+    // but in step 2, this would split {s0, s1, s2, s4} into {{s0}, {s1}, {s2,
+    // s4}},
     // instead of the {{s0, s1}, {s2, s4} shown in the example.
     // That seems to be OK.
     if (states_by_next_partition.size() > 1) {
@@ -171,7 +176,7 @@ construct_partitions(const States& states) {
  */
 static bool
 contains_accepting_state(const States& states) {
-  for (const auto& s: states) {
+  for (const auto& s : states) {
     if (s && s->is_accepting()) {
       return true;
     }
@@ -182,10 +187,12 @@ contains_accepting_state(const States& states) {
 
 /**
  * Return the minimized states, by using the @a partitions,
- * and return the state that corresponds to a partition with the original state @a s0.
+ * and return the state that corresponds to a partition with the original state
+ * @a s0.
  */
 static std::pair<States, std::shared_ptr<State>>
-construct_states_from_partitions(const Partitions& partitions, const std::shared_ptr<State>& s0) {
+construct_states_from_partitions(
+  const Partitions& partitions, const std::shared_ptr<State>& s0) {
   States result;
   std::shared_ptr<State> minimized_s0;
 
@@ -237,13 +244,15 @@ construct_states_from_partitions(const Partitions& partitions, const std::shared
       const auto nexti = iter->second;
       auto nextd = D[nexti];
 
-      // Add transitions to the new states that represent the transitioned-to partitions.
+      // Add transitions to the new states that represent the transitioned-to
+      // partitions.
       // (This part isn't really described in the book's test.)
       //
       // TODO: Allow one transition to have multiple characters,
       // as in the diagrams in the book?
       for (const auto c : next_partition_chars) {
-        std::cout << di->id() << ": adding transition (" << c << ") to " << nextd->id() << std::endl;
+        std::cout << di->id() << ": adding transition (" << c << ") to "
+                  << nextd->id() << std::endl;
         di->add(c, nextd);
       }
     }
@@ -257,12 +266,14 @@ construct_states_from_partitions(const Partitions& partitions, const std::shared
 static std::shared_ptr<State>
 construct_minimal_dfa(const std::shared_ptr<State>& s0, const States& states) {
   const auto partitions = construct_partitions(states);
-  const auto [minimized_states, minimized_s0] = construct_states_from_partitions(partitions, s0);
+  const auto[minimized_states, minimized_s0] =
+    construct_states_from_partitions(partitions, s0);
 
   return minimized_s0;
 }
 
-int main() {
+int
+main() {
   {
     // The DFA from Figure 2.7 on page 51,
     // and Figure 2.11 (a) on page 56:
