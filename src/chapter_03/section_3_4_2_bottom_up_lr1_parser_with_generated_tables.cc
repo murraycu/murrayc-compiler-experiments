@@ -17,6 +17,7 @@
 
 #include "build_sets.h"
 #include "parentheses_grammar.h"
+#include "if_then_else_ambiguous_grammar.h"
 #include "symbol.h"
 
 #include <algorithm>
@@ -794,6 +795,75 @@ test_action_and_goto() {
   */
 }
 
+static void
+test_parentheses_grammar() {
+  using Grammar = ParenthesesGrammar;
+
+  {
+    // Valid input:
+    const std::vector<std::string> input = {"(", ")"};
+    const Symbols expected = {
+      Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_CLOSE_PAREN};
+    assert(bottom_up_lr1_parse<Grammar>(input) == expected);
+  }
+
+  {
+    // Valid input:
+    const std::vector<std::string> input = {"(", "(", ")", ")", "(", ")"};
+    const Symbols expected = {Grammar::SYMBOL_OPEN_PAREN,
+      Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_CLOSE_PAREN,
+      Grammar::SYMBOL_CLOSE_PAREN, Grammar::SYMBOL_OPEN_PAREN,
+      Grammar::SYMBOL_CLOSE_PAREN};
+    assert(bottom_up_lr1_parse<Grammar>(input) == expected);
+  }
+
+  {
+    // Invalid input:
+    const std::vector<std::string> input = {"(", ")", ")"};
+    const Symbols expected = {SYMBOL_ERROR};
+    assert(bottom_up_lr1_parse<Grammar>(input) == expected);
+  }
+}
+
+static void
+test_if_then_else_grammar() {
+  using Grammar = IfThenElseGrammar;
+
+  // We expect all these to fail, because the grammar is ambiguous.
+  // See page 139 of "Engineering a compiler".
+
+  ActionTable action_table;
+  GotoTable goto_table;
+  const auto built = build_action_and_goto_tables<Grammar>(action_table, goto_table);
+  assert(!built);
+
+  {
+    // Valid input:
+    const std::vector<std::string> input = {"if", "foo", "then", "bar"};
+    const Symbols expected = {SYMBOL_ERROR};
+    // const Symbols expected = {
+    //  Grammar::SYMBOL_IF, Grammar::SYMBOL_EXPR, Grammar::SYMBOL_THEN, Grammar::SYMBOL_EXPR};
+    assert(bottom_up_lr1_parse<Grammar>(input) == expected);
+  }
+
+  {
+    // Valid input:
+    const std::vector<std::string> input = {"if", "foo", "then", "bar", "else", "goo"};
+    const Symbols expected = {SYMBOL_ERROR};
+    // const Symbols expected = {
+    //  Grammar::SYMBOL_IF, Grammar::SYMBOL_EXPR, Grammar::SYMBOL_THEN,
+    //  Grammar::SYMBOL_EXPR, Grammar::SYMBOL_ELSE, Grammar::SYMBOL_EXPR};
+    assert(bottom_up_lr1_parse<Grammar>(input) == expected);
+  }
+
+  {
+    // Invalid input:
+    const std::vector<std::string> input = {"if", "foo", "then", "else"};
+    const Symbols expected = {SYMBOL_ERROR};
+    assert(bottom_up_lr1_parse<Grammar>(input) == expected);
+  }
+}
+
 int
 main() {
   test_first_set_for_symbols();
@@ -802,34 +872,8 @@ main() {
   test_cc();
   test_action_and_goto();
 
-  {
-    using Grammar = ParenthesesGrammar;
-
-    {
-      // Valid input:
-      const std::vector<std::string> input = {"(", ")"};
-      const Symbols expected = {
-        Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_CLOSE_PAREN};
-      assert(bottom_up_lr1_parse<Grammar>(input) == expected);
-    }
-
-    {
-      // Valid input:
-      const std::vector<std::string> input = {"(", "(", ")", ")", "(", ")"};
-      const Symbols expected = {Grammar::SYMBOL_OPEN_PAREN,
-        Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_CLOSE_PAREN,
-        Grammar::SYMBOL_CLOSE_PAREN, Grammar::SYMBOL_OPEN_PAREN,
-        Grammar::SYMBOL_CLOSE_PAREN};
-      assert(bottom_up_lr1_parse<Grammar>(input) == expected);
-    }
-
-    {
-      // Invalid input:
-      const std::vector<std::string> input = {"(", ")", ")"};
-      const Symbols expected = {SYMBOL_ERROR};
-      assert(bottom_up_lr1_parse<Grammar>(input) == expected);
-    }
-  }
+  test_parentheses_grammar();
+  test_if_then_else_grammar();
 
   return 0;
 }
