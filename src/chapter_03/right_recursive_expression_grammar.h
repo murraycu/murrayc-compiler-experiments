@@ -21,7 +21,7 @@
 #include "grammar.h"
 
 /// The "right-recursive variant of the classic expression grammar" from page 101, in section 3.3.1.
-class RightRecursiveGrammar {
+class RightRecursiveExpressionGrammar {
 public:
   // Non-terminals:
   static constexpr Symbol SYMBOL_GOAL = {"Goal"};
@@ -82,7 +82,7 @@ public:
   }
 };
 
-const GrammarRules RightRecursiveGrammar::rules = {
+const GrammarRules RightRecursiveExpressionGrammar::rules = {
   {SYMBOL_GOAL,
     {{SYMBOL_EXPR}}},
   {SYMBOL_EXPR, {

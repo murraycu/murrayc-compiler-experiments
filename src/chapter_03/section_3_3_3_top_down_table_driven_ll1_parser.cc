@@ -225,7 +225,7 @@ main() {
   {
     // The "right-recursive variant of the classic expression grammar" from page
     // 101, in section 3.3.1.
-    using Grammar = RightRecursiveGrammar;
+    using Grammar = RightRecursiveExpressionGrammar;
 
     {
       auto table = build_table<Grammar>();

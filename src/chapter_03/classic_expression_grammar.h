@@ -21,7 +21,7 @@
 #include "grammar.h"
 
 /// The "classic expression grammar" from page 93, in section 3.2.4.
-class ClassicGrammar {
+class ClassicExpressionGrammar {
 public:
   // Non-terminals:
   static constexpr Symbol SYMBOL_GOAL = {"Goal"};
@@ -81,7 +81,7 @@ public:
   }
 };
 
-const GrammarRules ClassicGrammar::rules = {
+const GrammarRules ClassicExpressionGrammar::rules = {
   {SYMBOL_GOAL,
     {{SYMBOL_EXPR}}},
   {SYMBOL_EXPR, {
