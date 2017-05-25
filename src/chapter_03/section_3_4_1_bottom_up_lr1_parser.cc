@@ -268,12 +268,8 @@ bottom_up_lr1_parse(const std::vector<std::string>& words) {
 
     if (action.type == ActionType::REDUCE) {
       // Get the A -> B rule:
-      const auto iter = T_Grammar::rules_by_number.find(action.arg);
-      if (iter == std::end(T_Grammar::rules_by_number)) {
-        return {SYMBOL_ERROR};
-      }
-
-      const auto& rule = iter->second;
+      assert(T_Grammar::rules_by_number.count(action.arg));
+      const auto& rule = T_Grammar::rules_by_number.at(action.arg);
       const auto& a = rule.first;
       const auto& b = rule.second;
 

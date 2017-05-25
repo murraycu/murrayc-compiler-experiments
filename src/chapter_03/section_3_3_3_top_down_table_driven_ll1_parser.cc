@@ -95,19 +95,20 @@ build_table() {
       const auto p = std::make_pair(a, b);
 
       const auto iter = first_plus.find(p);
-      if (iter != std::end(first_plus)) {
-        const auto& first_plus_ab = iter->second;
-        for (const auto& w : first_plus_ab) {
-          if (w.terminal) {
-            table_a[w] = b;
-          }
-        }
+      if (iter == std::end(first_plus)) {
+        continue;
+      }
 
-        if (contains(first_plus_ab, T_Grammar::SYMBOL_EOF)) {
-          table_a[T_Grammar::SYMBOL_EOF] = b;
+      const auto& first_plus_ab = iter->second;
+      for (const auto& w : first_plus_ab) {
+        if (w.terminal) {
+          table_a[w] = b;
         }
       }
 
+      if (contains(first_plus_ab, T_Grammar::SYMBOL_EOF)) {
+        table_a[T_Grammar::SYMBOL_EOF] = b;
+      }
     }
   }
 

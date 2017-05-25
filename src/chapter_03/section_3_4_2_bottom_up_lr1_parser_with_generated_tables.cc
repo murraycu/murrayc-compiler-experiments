@@ -422,11 +422,13 @@ build_action_and_goto_tables(ActionTable& action_table, GotoTable& goto_table) {
         const auto ccj = do_goto<T_Grammar>(cci, n, first);
         const auto iter = cc_ids.find(ccj);
         if (iter == std::end(cc_ids)) {
-          // Error.
+          // This is acceptable.
+          // Not all parts of the goto table have entries.
           continue;
         }
 
-        const auto j = iter->second;
+        assert(cc_ids.count(ccj));
+        const auto j = cc_ids[ccj];
         goto_table[i][n] = j;
       }
     }
@@ -521,12 +523,8 @@ bottom_up_lr1_parse(const std::vector<std::string>& words) {
 
     if (action.type == ActionType::REDUCE) {
       // Get the A -> B rule:
-      const auto iter = T_Grammar::rules_by_number.find(action.arg);
-      if (iter == std::end(T_Grammar::rules_by_number)) {
-        return {SYMBOL_ERROR};
-      }
-
-      const auto& rule = iter->second;
+      assert(T_Grammar::rules_by_number.count(action.arg));
+      const auto& rule = T_Grammar::rules_by_number.at(action.arg);
       const auto& a = rule.first;
       const auto& b = rule.second;
 
