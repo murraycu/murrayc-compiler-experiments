@@ -1,0 +1,11 @@
+BasedOnStyle: LLVM
+PointerBindsToType: true
+IndentCaseLabels: true
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+ConstructorInitializerIndentWidth: 0
+ContinuationIndentWidth: 2
+AlignAfterOpenBracket: false
+AlwaysBreakTemplateDeclarations: true
+AlwaysBreakAfterReturnType: All
+Standard: Cpp11
+
