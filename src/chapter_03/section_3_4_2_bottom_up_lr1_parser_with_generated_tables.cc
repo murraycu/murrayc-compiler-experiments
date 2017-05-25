@@ -345,6 +345,17 @@ enum class ActionType {
 
 class Action {
 public:
+  bool
+  operator ==(const Action& other) const {
+    return type == other.type &&
+      arg == other.arg;
+  }
+
+  bool
+  operator !=(const Action& other) const {
+    return !operator==(other);
+  }
+
   ActionType type = ActionType::NONE;
   std::size_t arg = 0;
 };
@@ -358,9 +369,11 @@ using GotoTable = std::map<State, std::map<Symbol, std::size_t>>;
  * Based on the pseudo code in Figure 3.24, in section 3.4.2, on page 134, in
  * "Engineering a compiler". But with a slightly different order of if/else
  * blocks.
+ *
+ * @param bool Whether the table building succeeded.
  */
 template <typename T_Grammar>
-static void
+static bool
 build_action_and_goto_tables(ActionTable& action_table, GotoTable& goto_table) {
   // Get the rule numbers for each rule:
   std::map<Rule, std::size_t> rule_numbers;
@@ -396,7 +409,15 @@ build_action_and_goto_tables(ActionTable& action_table, GotoTable& goto_table) {
         const auto ccj = do_goto<T_Grammar>(cci, c, first);
         assert(cc_ids.count(ccj));
         const auto j = cc_ids[ccj];
-        action_table_i[c] = {ActionType::SHIFT, j};
+        const Action action = {ActionType::SHIFT, j};
+
+        if (const auto iter = action_table_i.find(c); iter != std::end(action_table_i) &&
+            action != iter->second) {
+          // Conflict: We cannot have 2 actions in the same place.
+          return false;
+        }
+
+        action_table_i[c] = action;
       } else if (placeholder_at_end && rule.first == T_Grammar::SYMBOL_GOAL &&
                  a == T_Grammar::SYMBOL_EOF) {
         // I's rule is S' (Goal)-> S, the placeholder is at the end, and I's
@@ -406,7 +427,15 @@ build_action_and_goto_tables(ActionTable& action_table, GotoTable& goto_table) {
         // that the parser has recognized the whole expansion.  And because the
         // left-hand side the goal symbol, and the lookahead symbol is eof,
         // this is the accepting state.
-        action_table_i[a] = {ActionType::ACCEPT, 0};
+        Action action = {ActionType::ACCEPT, 0};
+
+        if (const auto iter = action_table_i.find(a); iter != std::end(action_table_i) &&
+            action != iter->second) {
+          // Conflict: We cannot have 2 actions in the same place.
+          return false;
+        }
+
+        action_table_i[a] = action;
       } else if (placeholder_at_end) {
         // I's rule is A -> B, the placeholder is at the end, and I's lookahead
         // is a.
@@ -416,7 +445,15 @@ build_action_and_goto_tables(ActionTable& action_table, GotoTable& goto_table) {
         // handle, on lookahead symbol a.
         assert(rule_numbers.count(rule));
         const auto rule_number = rule_numbers[rule];
-        action_table_i[a] = {ActionType::REDUCE, rule_number};
+        const Action action = {ActionType::REDUCE, rule_number};
+
+        if (const auto iter = action_table_i.find(a); iter != std::end(action_table_i) &&
+            action != iter->second) {
+          // Conflict: We cannot have 2 actions in the same place.
+          return false;
+        }
+
+        action_table_i[a] = action;
       }
 
       // For each nonterminal:
@@ -439,6 +476,8 @@ build_action_and_goto_tables(ActionTable& action_table, GotoTable& goto_table) {
       }
     }
   }
+
+  return true;
 }
 
 template <typename T_Grammar>
@@ -503,7 +542,11 @@ bottom_up_lr1_parse(const std::vector<std::string>& words) {
 
   ActionTable action_table;
   GotoTable goto_table;
-  build_action_and_goto_tables<T_Grammar>(action_table, goto_table);
+  const auto built = build_action_and_goto_tables<T_Grammar>(action_table, goto_table);
+  if (!built) {
+    // A real parser would return some real clues.
+    return {SYMBOL_ERROR};
+  }
 
   // The pseudo code puts both the symbol and the state (number) on the same
   // stack,
@@ -687,7 +730,8 @@ test_action_and_goto() {
 
   ActionTable action_table;
   GotoTable goto_table;
-  build_action_and_goto_tables<Grammar>(action_table, goto_table);
+  const auto built = build_action_and_goto_tables<Grammar>(action_table, goto_table);
+  assert(built);
 
   // See Figure 3.16 (b) on page 120 of "Engineering a Compiler".
   assert(action_table.size() == 12);
