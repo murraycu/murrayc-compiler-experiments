@@ -374,13 +374,8 @@ build_action_and_goto_tables(ActionTable& action_table, GotoTable& goto_table) {
   build_cc<T_Grammar>(cc, cc_ids, first);
 
   for (const auto& cci : cc) {
-    const auto iteri = cc_ids.find(cci);
-    if (iteri == std::end(cc_ids)) {
-      // Error.
-      return;
-    }
-
-    const auto i = iteri->second;
+    assert(cc_ids.count(cci));
+    const auto i = cc_ids[cci];
 
     for (const auto& I : cci) {
       const auto& rule = I.production;
@@ -396,13 +391,8 @@ build_action_and_goto_tables(ActionTable& action_table, GotoTable& goto_table) {
         // via goto, and generate a shift action from this state, i, to that
         // state, j, via this symbol c.
         const auto ccj = do_goto<T_Grammar>(cci, c, first);
-        const auto iter = cc_ids.find(ccj);
-        if (iter == std::end(cc_ids)) {
-          // Error.
-          return;
-        }
-
-        const auto j = iter->second;
+        assert(cc_ids.count(ccj));
+        const auto j = cc_ids[ccj];
         action_table[i][c] = {ActionType::SHIFT, j};
       } else if (placeholder_at_end && rule.first == T_Grammar::SYMBOL_GOAL && a == T_Grammar::SYMBOL_EOF) {
         // I's rule is S' (Goal)-> S, the placeholder is at the end, and I's lookahead is eof.
@@ -418,13 +408,8 @@ build_action_and_goto_tables(ActionTable& action_table, GotoTable& goto_table) {
         // The placeholder is at the end of the expansion, so this would mean
         // that the parser has recognized the whole expansion. This is then a
         // handle, on lookahead symbol a.
-        const auto iter = rule_numbers.find(rule);
-        if (iter == std::end(rule_numbers)) {
-          // Error.
-          return;
-        }
-
-        const auto rule_number = iter->second;
+        assert(rule_numbers.count(rule));
+        const auto rule_number = rule_numbers[rule];
         action_table[i][a] = {ActionType::REDUCE, rule_number};
       }
 
