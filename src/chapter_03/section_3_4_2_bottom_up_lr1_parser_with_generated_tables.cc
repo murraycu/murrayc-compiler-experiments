@@ -378,6 +378,7 @@ build_action_and_goto_tables(ActionTable& action_table, GotoTable& goto_table) {
   for (const auto& cci : cc) {
     assert(cc_ids.count(cci));
     const auto i = cc_ids[cci];
+    auto& action_table_i = action_table[i];
 
     for (const auto& I : cci) {
       const auto& rule = I.production;
@@ -395,7 +396,7 @@ build_action_and_goto_tables(ActionTable& action_table, GotoTable& goto_table) {
         const auto ccj = do_goto<T_Grammar>(cci, c, first);
         assert(cc_ids.count(ccj));
         const auto j = cc_ids[ccj];
-        action_table[i][c] = {ActionType::SHIFT, j};
+        action_table_i[c] = {ActionType::SHIFT, j};
       } else if (placeholder_at_end && rule.first == T_Grammar::SYMBOL_GOAL &&
                  a == T_Grammar::SYMBOL_EOF) {
         // I's rule is S' (Goal)-> S, the placeholder is at the end, and I's
@@ -405,7 +406,7 @@ build_action_and_goto_tables(ActionTable& action_table, GotoTable& goto_table) {
         // that the parser has recognized the whole expansion.  And because the
         // left-hand side the goal symbol, and the lookahead symbol is eof,
         // this is the accepting state.
-        action_table[i][a] = {ActionType::ACCEPT, 0};
+        action_table_i[a] = {ActionType::ACCEPT, 0};
       } else if (placeholder_at_end) {
         // I's rule is A -> B, the placeholder is at the end, and I's lookahead
         // is a.
@@ -415,7 +416,7 @@ build_action_and_goto_tables(ActionTable& action_table, GotoTable& goto_table) {
         // handle, on lookahead symbol a.
         assert(rule_numbers.count(rule));
         const auto rule_number = rule_numbers[rule];
-        action_table[i][a] = {ActionType::REDUCE, rule_number};
+        action_table_i[a] = {ActionType::REDUCE, rule_number};
       }
 
       // For each nonterminal:
