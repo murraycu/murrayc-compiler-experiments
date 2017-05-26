@@ -114,7 +114,7 @@ using CCSet = std::set<LR1Item>;
 using CC = std::set<CCSet>;
 
 /**
- * @param pos If this is 0 zero the result will be {0, symbols}.
+ * @param pos If this is 0 zero the result will be {{}, symbols}.
  */
 static std::pair<Symbols, Symbols>
 split_rule(const Symbols& symbols, std::size_t pos) {
