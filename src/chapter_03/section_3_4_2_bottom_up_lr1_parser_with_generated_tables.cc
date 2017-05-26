@@ -427,7 +427,7 @@ build_action_and_goto_tables(ActionTable& action_table, GotoTable& goto_table) {
         // that the parser has recognized the whole expansion.  And because the
         // left-hand side the goal symbol, and the lookahead symbol is eof,
         // this is the accepting state.
-        Action action = {ActionType::ACCEPT, 0};
+        const Action action = {ActionType::ACCEPT, 0};
 
         if (const auto iter = action_table_i.find(a); iter != std::end(action_table_i) &&
             action != iter->second) {
