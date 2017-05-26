@@ -183,8 +183,7 @@ closure(CCSet& s, const FirstSets& first) {
 
         for (const auto& b : firstda) {
           const auto old_count = s.size();
-          const LR1Item item(Rule({c, y}), 0, b);
-          s.emplace(item);
+          s.emplace(Rule({c, y}), 0, b);
           changing |= (old_count != s.size());
         }
       }
