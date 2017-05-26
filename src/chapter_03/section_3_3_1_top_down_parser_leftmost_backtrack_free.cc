@@ -51,6 +51,11 @@ match(
   return word_symbol == symbol;
 }
 
+/** See page 107 of "Engineering a Compiler", in
+ * section 3.3.1: "Applying the backtrack-free condition pairwise
+ * to each set of alternate right-hand sides proves that the grammar is,
+ * indeed, backtrack free."
+ */
 template <typename T_Grammar>
 static bool
 check_grammar_is_backtrack_free() {
