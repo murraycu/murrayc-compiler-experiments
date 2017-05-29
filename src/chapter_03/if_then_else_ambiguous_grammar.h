@@ -43,10 +43,6 @@ public:
 
   static const GrammarRules rules;
 
-  // Just for the action table and goto table,
-  // as a one-off convenience.
-  static const GrammarRulesByNumber rules_by_number;
-
   static Symbol
   recognise_word(const WordsMap& words_map, const std::string& word) {
     // A rather dumb implementation just to get things working:
@@ -87,15 +83,6 @@ const GrammarRules IfThenElseGrammar::rules = {
     {SYMBOL_IF, SYMBOL_EXPR, SYMBOL_THEN, SYMBOL_STMT, SYMBOL_ELSE, SYMBOL_STMT},
     {SYMBOL_ASSIGN}}}
   };
-
-// Based on the grammar at the bottom of page 136, in section 3.4.3, of
-// "Engineering a Compiler".
-const GrammarRulesByNumber IfThenElseGrammar::rules_by_number = {
-  {SYMBOL_GOAL, {{SYMBOL_STMT}}},
-  {SYMBOL_STMT, {SYMBOL_IF, SYMBOL_EXPR, SYMBOL_THEN, SYMBOL_STMT}},
-  {SYMBOL_STMT, {SYMBOL_IF, SYMBOL_EXPR, SYMBOL_THEN, SYMBOL_STMT, SYMBOL_ELSE, SYMBOL_STMT}},
-  {SYMBOL_STMT, {SYMBOL_ASSIGN}}
-};
 
 
 #endif // MURRAYC_COMPILER_EXPERIMENTS_IF_THEN_ELSE_GRAMMAR_H

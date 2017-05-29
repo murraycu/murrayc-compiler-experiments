@@ -375,11 +375,13 @@ using GotoTable = std::map<State, std::map<Symbol, std::size_t>>;
 template <typename T_Grammar>
 static bool
 build_action_and_goto_tables(ActionTable& action_table, GotoTable& goto_table) {
+  const auto rules = rules_by_number<T_Grammar>();
+
   // Get the rule numbers for each rule:
   std::map<Rule, std::size_t> rule_numbers;
-  const auto n_rules = T_Grammar::rules_by_number.size();
+  const auto n_rules = rules.size();
   for (auto i = 0ul; i < n_rules; ++i) {
-    const auto& rule = T_Grammar::rules_by_number[i];
+    const auto& rule = rules[i];
     rule_numbers[rule] = i;
   }
 
@@ -540,6 +542,8 @@ bottom_up_lr1_parse(const std::vector<std::string>& words) {
     return {};
   }
 
+  const auto rules = rules_by_number<T_Grammar>();
+
   ActionTable action_table;
   GotoTable goto_table;
   const auto built = build_action_and_goto_tables<T_Grammar>(action_table, goto_table);
@@ -576,8 +580,8 @@ bottom_up_lr1_parse(const std::vector<std::string>& words) {
 
     if (action.type == ActionType::REDUCE) {
       // Get the A -> B rule:
-      assert(action.arg < T_Grammar::rules_by_number.size());
-      const auto& rule = T_Grammar::rules_by_number[action.arg];
+      assert(action.arg < rules.size());
+      const auto& rule = rules[action.arg];
       const auto& a = rule.first;
       const auto& b = rule.second;
 

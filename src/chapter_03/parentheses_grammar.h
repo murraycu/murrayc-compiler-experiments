@@ -41,10 +41,6 @@ public:
 
   static const GrammarRules rules;
 
-  // Just for the action table and goto table,
-  // as a one-off convenience.
-  static const GrammarRulesByNumber rules_by_number;
-
   static Symbol
   recognise_word(const WordsMap& words_map, const std::string& word) {
     // A rather dumb implementation just to get things working:
@@ -84,15 +80,5 @@ const GrammarRules ParenthesesGrammar::rules = {
     {SYMBOL_OPEN_PAREN, SYMBOL_PAIR, SYMBOL_CLOSE_PAREN},
     {SYMBOL_OPEN_PAREN, SYMBOL_CLOSE_PAREN}}},
   };
-
-// Based on Figure 3.16, in section 3.4.1, on page 120,
-// of "Engineering a Compiler".
-const GrammarRulesByNumber ParenthesesGrammar::rules_by_number = {
-  {SYMBOL_GOAL, {SYMBOL_LIST}},
-  {SYMBOL_LIST, {SYMBOL_LIST, SYMBOL_PAIR}},
-  {SYMBOL_LIST, {SYMBOL_PAIR}},
-  {SYMBOL_PAIR, {SYMBOL_OPEN_PAREN, SYMBOL_PAIR, SYMBOL_CLOSE_PAREN}},
-  {SYMBOL_PAIR, {SYMBOL_OPEN_PAREN, SYMBOL_CLOSE_PAREN}
-}};
 
 #endif // MURRAYC_COMPILER_EXPERIMENTS_PARENTHESES_GRAMMAR_H

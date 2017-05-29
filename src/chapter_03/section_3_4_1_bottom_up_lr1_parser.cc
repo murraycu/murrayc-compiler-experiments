@@ -67,6 +67,10 @@ using ActionTable = std::map<State, std::map<Symbol, Action>>;
 // Based on Figure 3.16, in section 3.4.1, on page 120
 // of "Enginnering a Compiler."
 // But with 0-indexed rule numbers.
+//
+// Note: The rule numbers with the REDUCE actions depend on rules_by_number<>()
+// filling its result with the rules in the expected orer, which seems fragile.
+// That is not a problem for the generated tables.
 const ActionTable action_table = {
   {
     0,
@@ -239,6 +243,8 @@ bottom_up_lr1_parse(const std::vector<std::string>& words) {
     return {};
   }
 
+  const auto rules = rules_by_number<T_Grammar>();
+
   // The pseudo code puts both the symbol and the state (number) on the same
   // stack,
   // pushing and popping two each time. That seems unnecessarily complicated.
@@ -267,8 +273,8 @@ bottom_up_lr1_parse(const std::vector<std::string>& words) {
 
     if (action.type == ActionType::REDUCE) {
       // Get the A -> B rule:
-      assert(action.arg < T_Grammar::rules_by_number.size());
-      const auto& rule = T_Grammar::rules_by_number[action.arg];
+      assert(action.arg < rules.size());
+      const auto& rule = rules[action.arg];
       const auto& a = rule.first;
       const auto& b = rule.second;
 

@@ -37,6 +37,29 @@ using WordsMap = std::map<std::string, Symbol>;
 using Production = std::pair<Symbol, Symbols>;
 using GrammarRulesByNumber = std::vector<Production>;
 
+/** Get a vector of rules, not necessarily grouped by the left-hand symbol,
+ * letting us refer to a rule by a number (its position in the vector).
+ */
+template <typename T_Grammar>
+GrammarRulesByNumber rules_by_number() {
+  // TODO: It would be nice to do this at compile time somehow.
+
+  static GrammarRulesByNumber result;
+  if (!result.empty()) {
+    return result;
+  }
+
+  for (const auto& p : T_Grammar::rules) {
+    const auto& a = p.first;
+    const auto& expansions = p.second;
+    for (const auto& b : expansions) {
+      result.emplace_back(a, b);
+    }
+  }
+
+  return result;
+}
+
 // The "concept" for grammar classes:
 // Grammar {
 //  static const Symbols symbols;
