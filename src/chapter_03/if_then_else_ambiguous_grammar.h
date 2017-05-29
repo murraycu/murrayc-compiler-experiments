@@ -45,7 +45,6 @@ public:
 
   // Just for the action table and goto table,
   // as a one-off convenience.
-  using GrammarRulesByNumber = std::vector<Production>;
   static const GrammarRulesByNumber rules_by_number;
 
   static Symbol
@@ -91,7 +90,7 @@ const GrammarRules IfThenElseGrammar::rules = {
 
 // Based on the grammar at the bottom of page 136, in section 3.4.3, of
 // "Engineering a Compiler".
-const IfThenElseGrammar::GrammarRulesByNumber IfThenElseGrammar::rules_by_number = {
+const GrammarRulesByNumber IfThenElseGrammar::rules_by_number = {
   {SYMBOL_GOAL, {{SYMBOL_STMT}}},
   {SYMBOL_STMT, {SYMBOL_IF, SYMBOL_EXPR, SYMBOL_THEN, SYMBOL_STMT}},
   {SYMBOL_STMT, {SYMBOL_IF, SYMBOL_EXPR, SYMBOL_THEN, SYMBOL_STMT, SYMBOL_ELSE, SYMBOL_STMT}},

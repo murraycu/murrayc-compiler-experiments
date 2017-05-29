@@ -35,6 +35,7 @@ using GrammarRules = std::map<Symbol, Expansions>;
 using WordsMap = std::map<std::string, Symbol>;
 
 using Production = std::pair<Symbol, Symbols>;
+using GrammarRulesByNumber = std::vector<Production>;
 
 // The "concept" for grammar classes:
 // Grammar {
