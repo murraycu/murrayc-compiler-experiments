@@ -377,9 +377,9 @@ static bool
 build_action_and_goto_tables(ActionTable& action_table, GotoTable& goto_table) {
   // Get the rule numbers for each rule:
   std::map<Rule, std::size_t> rule_numbers;
-  for (const auto& p : T_Grammar::rules_by_number) {
-    const auto i = p.first;
-    const auto& rule = p.second;
+  const auto n_rules = T_Grammar::rules_by_number.size();
+  for (auto i = 0ul; i < n_rules; ++i) {
+    const auto& rule = T_Grammar::rules_by_number[i];
     rule_numbers[rule] = i;
   }
 
@@ -576,8 +576,8 @@ bottom_up_lr1_parse(const std::vector<std::string>& words) {
 
     if (action.type == ActionType::REDUCE) {
       // Get the A -> B rule:
-      assert(T_Grammar::rules_by_number.count(action.arg));
-      const auto& rule = T_Grammar::rules_by_number.at(action.arg);
+      assert(action.arg < T_Grammar::rules_by_number.size());
+      const auto& rule = T_Grammar::rules_by_number[action.arg];
       const auto& a = rule.first;
       const auto& b = rule.second;
 

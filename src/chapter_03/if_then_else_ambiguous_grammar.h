@@ -45,7 +45,7 @@ public:
 
   // Just for the action table and goto table,
   // as a one-off convenience.
-  using GrammarRulesByNumber = std::unordered_map<std::size_t, std::pair<Symbol, Symbols>>;
+  using GrammarRulesByNumber = std::vector<Production>;
   static const GrammarRulesByNumber rules_by_number;
 
   static Symbol
@@ -92,10 +92,11 @@ const GrammarRules IfThenElseGrammar::rules = {
 // Based on the grammar at the bottom of page 136, in section 3.4.3, of
 // "Engineering a Compiler".
 const IfThenElseGrammar::GrammarRulesByNumber IfThenElseGrammar::rules_by_number = {
-  {1, {SYMBOL_GOAL, {SYMBOL_STMT}}},
-  {2, {SYMBOL_STMT, {SYMBOL_IF, SYMBOL_EXPR, SYMBOL_THEN, SYMBOL_STMT}}},
-  {3, {SYMBOL_STMT, {SYMBOL_IF, SYMBOL_EXPR, SYMBOL_THEN, SYMBOL_STMT, SYMBOL_ELSE, SYMBOL_STMT}}},
-  {4, {SYMBOL_STMT, {SYMBOL_ASSIGN}}}
+  {SYMBOL_GOAL, {{SYMBOL_STMT}}},
+  {SYMBOL_STMT, {SYMBOL_IF, SYMBOL_EXPR, SYMBOL_THEN, SYMBOL_STMT}},
+  {SYMBOL_STMT, {SYMBOL_IF, SYMBOL_EXPR, SYMBOL_THEN, SYMBOL_STMT, SYMBOL_ELSE, SYMBOL_STMT}},
+  {SYMBOL_STMT, {SYMBOL_ASSIGN}}
 };
+
 
 #endif // MURRAYC_COMPILER_EXPERIMENTS_IF_THEN_ELSE_GRAMMAR_H

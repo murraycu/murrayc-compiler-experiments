@@ -66,6 +66,7 @@ using ActionTable = std::map<State, std::map<Symbol, Action>>;
 
 // Based on Figure 3.16, in section 3.4.1, on page 120
 // of "Enginnering a Compiler."
+// But with 0-indexed rule numbers.
 const ActionTable action_table = {
   {
     0,
@@ -81,8 +82,8 @@ const ActionTable action_table = {
   },
   {
     2,
-    {{Grammar::SYMBOL_EOF, {ActionType::REDUCE, 3}},
-      {Grammar::SYMBOL_OPEN_PAREN, {ActionType::REDUCE, 3}},
+    {{Grammar::SYMBOL_EOF, {ActionType::REDUCE, 2}},
+      {Grammar::SYMBOL_OPEN_PAREN, {ActionType::REDUCE, 2}},
       {Grammar::SYMBOL_CLOSE_PAREN, {}}},
   },
   {
@@ -93,8 +94,8 @@ const ActionTable action_table = {
   },
   {
     4,
-    {{Grammar::SYMBOL_EOF, {ActionType::REDUCE, 2}},
-      {Grammar::SYMBOL_OPEN_PAREN, {ActionType::REDUCE, 2}},
+    {{Grammar::SYMBOL_EOF, {ActionType::REDUCE, 1}},
+      {Grammar::SYMBOL_OPEN_PAREN, {ActionType::REDUCE, 1}},
       {Grammar::SYMBOL_CLOSE_PAREN, {}}},
   },
   {
@@ -110,14 +111,14 @@ const ActionTable action_table = {
   },
   {
     7,
-    {{Grammar::SYMBOL_EOF, {ActionType::REDUCE, 5}},
-      {Grammar::SYMBOL_OPEN_PAREN, {ActionType::REDUCE, 5}},
+    {{Grammar::SYMBOL_EOF, {ActionType::REDUCE, 4}},
+      {Grammar::SYMBOL_OPEN_PAREN, {ActionType::REDUCE, 4}},
       {Grammar::SYMBOL_CLOSE_PAREN, {}}},
   },
   {
     8,
-    {{Grammar::SYMBOL_EOF, {ActionType::REDUCE, 4}},
-      {Grammar::SYMBOL_OPEN_PAREN, {ActionType::REDUCE, 4}},
+    {{Grammar::SYMBOL_EOF, {ActionType::REDUCE, 3}},
+      {Grammar::SYMBOL_OPEN_PAREN, {ActionType::REDUCE, 3}},
       {Grammar::SYMBOL_CLOSE_PAREN, {}}},
   },
   {
@@ -128,12 +129,12 @@ const ActionTable action_table = {
   {
     10,
     {{Grammar::SYMBOL_EOF, {}}, {Grammar::SYMBOL_OPEN_PAREN, {}},
-      {Grammar::SYMBOL_CLOSE_PAREN, {ActionType::REDUCE, 5}}},
+      {Grammar::SYMBOL_CLOSE_PAREN, {ActionType::REDUCE, 4}}},
   },
   {
     11,
     {{Grammar::SYMBOL_EOF, {}}, {Grammar::SYMBOL_OPEN_PAREN, {}},
-      {Grammar::SYMBOL_CLOSE_PAREN, {ActionType::REDUCE, 4}}},
+      {Grammar::SYMBOL_CLOSE_PAREN, {ActionType::REDUCE, 3}}},
   }};
 
 using GotoTable = std::map<State, std::map<Symbol, std::size_t>>;
@@ -266,8 +267,8 @@ bottom_up_lr1_parse(const std::vector<std::string>& words) {
 
     if (action.type == ActionType::REDUCE) {
       // Get the A -> B rule:
-      assert(T_Grammar::rules_by_number.count(action.arg));
-      const auto& rule = T_Grammar::rules_by_number.at(action.arg);
+      assert(action.arg < T_Grammar::rules_by_number.size());
+      const auto& rule = T_Grammar::rules_by_number[action.arg];
       const auto& a = rule.first;
       const auto& b = rule.second;
 

@@ -43,7 +43,7 @@ public:
 
   // Just for the action table and goto table,
   // as a one-off convenience.
-  using GrammarRulesByNumber = std::unordered_map<std::size_t, std::pair<Symbol, Symbols>>;
+  using GrammarRulesByNumber = std::vector<Production>;
   static const GrammarRulesByNumber rules_by_number;
 
   static Symbol
@@ -89,11 +89,11 @@ const GrammarRules ParenthesesGrammar::rules = {
 // Based on Figure 3.16, in section 3.4.1, on page 120,
 // of "Engineering a Compiler".
 const ParenthesesGrammar::GrammarRulesByNumber ParenthesesGrammar::rules_by_number = {
-  {1, {SYMBOL_GOAL, {SYMBOL_LIST}}},
-  {2, {SYMBOL_LIST, {SYMBOL_LIST, SYMBOL_PAIR}}},
-  {3, {SYMBOL_LIST, {SYMBOL_PAIR}}},
-  {4, {SYMBOL_PAIR, {SYMBOL_OPEN_PAREN, SYMBOL_PAIR, SYMBOL_CLOSE_PAREN}}},
-  {5, {SYMBOL_PAIR, {SYMBOL_OPEN_PAREN, SYMBOL_CLOSE_PAREN}}}
-};
+  {SYMBOL_GOAL, {SYMBOL_LIST}},
+  {SYMBOL_LIST, {SYMBOL_LIST, SYMBOL_PAIR}},
+  {SYMBOL_LIST, {SYMBOL_PAIR}},
+  {SYMBOL_PAIR, {SYMBOL_OPEN_PAREN, SYMBOL_PAIR, SYMBOL_CLOSE_PAREN}},
+  {SYMBOL_PAIR, {SYMBOL_OPEN_PAREN, SYMBOL_CLOSE_PAREN}
+}};
 
 #endif // MURRAYC_COMPILER_EXPERIMENTS_PARENTHESES_GRAMMAR_H
