@@ -113,6 +113,7 @@ section_3_4_2_bottom_up_lr1_parser_with_generated_tables_SOURCES = \
 	src/chapter_03/grammar.h \
 	src/chapter_03/symbol.h \
 	src/chapter_03/build_sets.h \
+	src/chapter_03/build_action_and_goto_tables.h \
 	src/chapter_03/parentheses_grammar.h \
 	src/chapter_03/if_then_else_grammar.h \
 	src/chapter_03/section_3_4_2_bottom_up_lr1_parser_with_generated_tables.cc
