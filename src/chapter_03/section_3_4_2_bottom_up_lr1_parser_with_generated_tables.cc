@@ -16,6 +16,7 @@
  */
 
 #include "build_action_and_goto_tables.h"
+#include "print_action_and_goto_tables.h"
 #include "parentheses_grammar.h"
 #include "if_then_else_ambiguous_grammar.h"
 #include "right_recursive_expression_grammar.h"
@@ -32,11 +33,6 @@
 #include <vector>
 
 /*
-static
-void print_symbol(const Symbol& symbol) {
-  std::cout << symbol.name;
-}
-
 template <typename T_Container>
 static
 void print_symbols(const T_Container& symbols) {
@@ -222,29 +218,6 @@ test_cc() {
   }
 }
 
-/*
-static void
-print_action(const Action& action) {
-  std::string str;
-  switch (action.type) {
-    case ActionType::SHIFT:
-      str = "s";
-      break;
-    case ActionType::REDUCE:
-      str = "r";
-      break;
-    case ActionType::ACCEPT:
-      str = "a";
-      break;
-    default:
-      str = "?";
-      break;
-  }
-
-  std::cout << str << action.arg;
-}
-*/
-
 static void
 test_action_and_goto() {
   using Grammar = ParenthesesGrammar;
@@ -274,45 +247,7 @@ test_action_and_goto() {
     }
   }
 
-  /*
-  std::cout << "Action Table:" << std::endl;
-  for (const auto p : action_table) {
-    const auto state = p.first;
-    std::cout << state << ":" << std::endl;
-
-    const auto& actions = p.second;
-    for (const auto& p2 : actions) {
-      const auto& symbol = p2.first;
-      const auto& action = p2.second;
-
-      std::cout << "  ";
-      print_symbol(symbol);
-      std::cout << ": ";
-      print_action(action);
-      std::cout << std::endl;
-    }
-    std::cout << std::endl;
-  }
-
-  std::cout << std::endl;
-  std::cout << "Goto Table:" << std::endl;
-  for (const auto p : goto_table) {
-    const auto state = p.first;
-    std::cout << state << ":" << std::endl;
-
-    const auto& actions = p.second;
-    for (const auto& p2 : actions) {
-      const auto& symbol = p2.first;
-      const auto j = p2.second;
-
-      std::cout << "  ";
-      print_symbol(symbol);
-      std::cout << ": " << j << std::endl;
-    }
-
-    std::cout << std::endl;
-  }
-  */
+  // print_action_and_goto_tables();
 }
 
 static void
