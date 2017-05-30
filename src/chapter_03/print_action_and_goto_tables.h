@@ -21,9 +21,8 @@
 #include "build_action_and_goto_tables.h"
 #include <iostream>
 
-
 void
-print_action(const Action& action) {
+print_action(const Action& action, const GrammarRulesByNumber& rules) {
   std::string str;
   switch (action.type) {
     case ActionType::SHIFT:
@@ -41,6 +40,12 @@ print_action(const Action& action) {
   }
 
   std::cout << str << action.arg;
+
+  if (action.type == ActionType::REDUCE) {
+    std::cout << " (";
+    print_rule(rules.at(action.arg));
+    std::cout << ")";
+  }
 }
 
 template <typename T_Grammar>
@@ -71,7 +76,7 @@ print_action_and_goto_tables(const ActionTable& action_table, const GotoTable& g
       std::cout << "  ";
       print_symbol(symbol);
       std::cout << ": ";
-      print_action(action);
+      print_action(action, rules);
       std::cout << std::endl;
     }
     std::cout << std::endl;
