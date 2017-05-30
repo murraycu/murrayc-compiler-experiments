@@ -18,6 +18,7 @@
 #include "build_sets.h"
 #include "parentheses_grammar.h"
 #include "if_then_else_ambiguous_grammar.h"
+#include "right_recursive_expression_grammar.h"
 #include "symbol.h"
 
 #include <algorithm>
@@ -867,6 +868,28 @@ test_if_then_else_grammar() {
   }
 }
 
+static void
+test_right_recursive_expression_grammar() {
+  /*
+  using Grammar = RightRecursiveExpressionGrammar;
+
+  // TODO: Why doesn't this work?
+  // Page 144 of "Engineering a Compiler" says "Bottom up parsers can accomodate either left or right recursion."
+  ActionTable action_table;
+  GotoTable goto_table;
+  const auto built = build_action_and_goto_tables<Grammar>(action_table, goto_table);
+  assert(!built);
+
+  {
+    // Valid input:
+    const std::vector<std::string> input = {"a", "-", "2", "x", "c"};
+    const Symbols expected = {
+      Grammar::SYMBOL_NAME, Grammar::SYMBOL_MINUS, Grammar::SYMBOL_NUM, Grammar::SYMBOL_MULTIPLY, Grammar::SYMBOL_NAME};
+    assert(bottom_up_lr1_parse<Grammar>(input) == expected);
+  }
+  */
+}
+
 int
 main() {
   test_first_set_for_symbols();
@@ -877,6 +900,7 @@ main() {
 
   test_parentheses_grammar();
   test_if_then_else_grammar();
+  test_right_recursive_expression_grammar();
 
   return 0;
 }
