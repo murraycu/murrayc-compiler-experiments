@@ -35,6 +35,14 @@ using GrammarRules = std::map<Symbol, Expansions>;
 using WordsMap = std::map<std::string, Symbol>;
 
 using Production = std::pair<Symbol, Symbols>;
+
+void
+print_rule(const Production& rule) {
+  print_symbol(rule.first);
+  std::cout << " -> ";
+  print_symbols(rule.second);
+}
+
 using GrammarRulesByNumber = std::vector<Production>;
 
 /** Get a vector of rules, not necessarily grouped by the left-hand symbol,

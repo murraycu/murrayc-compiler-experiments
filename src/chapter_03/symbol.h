@@ -18,6 +18,7 @@
 #ifndef MURRAYC_COMPILER_EXPERIMENTS_SYMBOL_H
 #define MURRAYC_COMPILER_EXPERIMENTS_SYMBOL_H
 
+#include <iostream>
 #include <string>
 #include <vector>
 #include <cstring>
@@ -75,4 +76,25 @@ public:
 // A set of symbols, such as a possible expansion, or a full parse.
 
 using Symbols = std::vector<Symbol>;
+
+void
+print_symbol(const Symbol& symbol) {
+  std::cout << symbol.name;
+}
+
+template <typename T_Container>
+static
+void print_symbols(const T_Container& symbols) {
+  bool is_first = true;
+  for (const auto& s : symbols) {
+    if (!is_first) {
+      std::cout << ", ";
+    }
+
+    is_first = false;
+
+    print_symbol(s);
+  }
+}
+
 #endif // MURRAYC_COMPILER_EXPERIMENTS_SYMBOL_H

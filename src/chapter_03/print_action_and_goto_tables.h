@@ -21,9 +21,6 @@
 #include "build_action_and_goto_tables.h"
 #include <iostream>
 
-void print_symbol(const Symbol& symbol) {
-  std::cout << symbol.name;
-}
 
 void
 print_action(const Action& action) {
@@ -44,28 +41,6 @@ print_action(const Action& action) {
   }
 
   std::cout << str << action.arg;
-}
-
-template <typename T_Container>
-static
-void print_symbols(const T_Container& symbols) {
-  bool is_first = true;
-  for (const auto& s : symbols) {
-    if (!is_first) {
-      std::cout << ", ";
-    }
-
-    is_first = false;
-
-    print_symbol(s);
-  }
-}
-
-void
-print_rule(const Production& rule) {
-  print_symbol(rule.first);
-  std::cout << " -> ";
-  print_symbols(rule.second);
 }
 
 template <typename T_Grammar>

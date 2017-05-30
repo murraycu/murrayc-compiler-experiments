@@ -93,13 +93,6 @@ split_rule(const Symbols& symbols, std::size_t pos) {
 }
 
 /*
-static void
-print_rule(const Rule& rule) {
-  print_symbol(rule.first);
-  std::cout << " -> ";
-  print_symbols(rule.second);
-}
-
 static
 void print_cc_set(const CCSet& ccset) {
   for (const auto& item : ccset) {

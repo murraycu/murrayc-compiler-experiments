@@ -28,21 +28,6 @@
 #include <string>
 #include <vector>
 
-template <typename T_Container>
-static void
-print_symbols(const T_Container& symbols) {
-  bool is_first = true;
-  for (const auto& s : symbols) {
-    if (!is_first) {
-      std::cout << ", ";
-    }
-
-    is_first = false;
-
-    std::cout << s.name;
-  }
-}
-
 template <typename T_Grammar>
 static bool
 match(
