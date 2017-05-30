@@ -557,11 +557,10 @@ bottom_up_lr1_parse(const std::vector<std::string>& words) {
   // stack,
   // pushing and popping two each time. That seems unnecessarily complicated.
   // Instead this uses 2 stacks, to simplify type safety.
-  std::stack<Symbol> symbol_stack;
-  std::stack<State> state_stack;
+  using StackElement = std::pair<Symbol, State>;
+  std::stack<StackElement> st;
 
-  symbol_stack.emplace(T_Grammar::SYMBOL_GOAL);
-  state_stack.emplace(0);
+  st.emplace(T_Grammar::SYMBOL_GOAL, 0);
 
   const auto words_map = T_Grammar::build_words_map();
 
@@ -572,7 +571,7 @@ bottom_up_lr1_parse(const std::vector<std::string>& words) {
 
   Symbols result;
   while (true) {
-    const auto state = state_stack.top();
+    const auto state = st.top().second;
 
     const auto symbol_for_word = T_Grammar::recognise_word(words_map, word);
 
@@ -587,21 +586,17 @@ bottom_up_lr1_parse(const std::vector<std::string>& words) {
       const auto& b = rule.second;
 
       for (auto i = 0u; i < b.size(); ++i) {
-        state_stack.pop();
-        symbol_stack.pop();
+        st.pop();
       }
 
-      symbol_stack.emplace(a);
-
-      const auto prev_state = state_stack.top();
+      const auto prev_state = st.top().second;
       const auto next_state = get_goto_from_table(goto_table, prev_state, a);
-      state_stack.emplace(next_state);
+      st.emplace(a, next_state);
 
     } else if (action.type == ActionType::SHIFT) {
       const auto next_state = action.arg;
 
-      symbol_stack.push(symbol_for_word);
-      state_stack.push(next_state);
+      st.emplace(symbol_for_word, next_state);
 
       if (symbol_for_word.terminal) {
         result.emplace_back(symbol_for_word);
