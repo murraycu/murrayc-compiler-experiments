@@ -92,7 +92,6 @@ split_rule(const Symbols& symbols, std::size_t pos) {
   return {a, b};
 }
 
-/*
 static
 void print_cc_set(const CCSet& ccset) {
   for (const auto& item : ccset) {
@@ -103,7 +102,6 @@ void print_cc_set(const CCSet& ccset) {
     std::cout << std::endl;
   }
 }
-*/
 
 /**
  * Based on the pseudo code in Figure 3.20, in section 3.4.2,
@@ -244,6 +242,30 @@ get_initial_lr1item() {
 }
 
 using CCSetIDs = std::map<CCSet, std::size_t>;
+
+void
+print_cc(const CCSetIDs& cc_ids) {
+  // Get them in numerical order of state:
+  std::unordered_map<State, CCSet> ids;
+  for (const auto& p : cc_ids) {
+    const auto i = p.second;
+    assert(ids.count(i) == 0);
+
+    ids[i] = p.first;
+  }
+
+  std::cout << "Canonical Collection:" << std::endl;
+  const auto n = cc_ids.size();
+  for (auto i = 0ul; i < n; ++i) {
+    const auto& ccset = ids[i];
+
+    std::cout << i << ": " << std::endl;
+    print_cc_set(ccset);
+    std::cout << std::endl;
+  }
+
+  std::cout << std::endl;
+}
 
 /** Build the Canonical Collection.
  *
