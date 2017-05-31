@@ -112,9 +112,8 @@ top_down_parse(const std::vector<std::string>& words) {
 
   using Node = TreeNode<Symbol>;
 
-  // TODO: Don't leak.
-  auto root = new Node(T_Grammar::SYMBOL_GOAL);
-  auto focus = root;
+  Node root(T_Grammar::SYMBOL_GOAL);
+  auto focus = &root;
 
   // The pseudocode seems to push a symbol onto the stack,
   // but pop a tree node off the stack,
