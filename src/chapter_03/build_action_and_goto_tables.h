@@ -104,6 +104,13 @@ void print_cc_set(const CCSet& ccset) {
 }
 
 /**
+ * Complete a state, by adding any LR(1) items that the input
+ * LR(1) items, in @a s, imply.
+ *
+ * It does this by finding rules whose left hand side is
+ * implied by the symbols, and the lookahead symbol, after
+ * the placeholder (via the FIRST sets).
+ *
  * Based on the pseudo code in Figure 3.20, in section 3.4.2,
  * on page 128, in "Engineering a Compiler."
  */
@@ -116,9 +123,11 @@ closure(CCSet& s, const FirstSets& first) {
 
   bool changing = true;
   while (changing) {
+    // For each item [A -> B.Cd , a]:
     for (const auto& ccset : s) {
       changing = false;
 
+      // Get the C symbol, after the placeholder:
       const auto [b, cd] = split_rule(ccset.production.second, ccset.placeholder);
       if (cd.empty()) {
         continue;
@@ -129,6 +138,7 @@ closure(CCSet& s, const FirstSets& first) {
       const auto c = cpart[0];
       const auto a = ccset.lookahead_symbol;
 
+      // Get any productions with C on the left-hand side (C -> y):
       const auto iter = T_Grammar::rules.find(c);
       if (iter == std::end(T_Grammar::rules)) {
         continue;
@@ -136,11 +146,13 @@ closure(CCSet& s, const FirstSets& first) {
 
       const auto& expansions = iter->second;
       for (const auto& y : expansions) {
+        // For each b in FIRST(da):
         Symbols da = d;
         da.emplace_back(a);
         const auto firstda = build_first_set_for_symbols<T_Grammar>(first, da);
 
         for (const auto& b : firstda) {
+          // Build an item [C -> .y , b]:
           const auto old_count = s.size();
           s.emplace(Rule({c, y}), 0, b);
           changing |= (old_count != s.size());
@@ -176,7 +188,13 @@ get_symbol_after_placeholder(const LR1Item& item) {
   return {true, x[0]};
 }
 
-/**
+/** Discover the state (the set of LR(1) items) that the parser
+ * would transition to from state @a s after recognizing a symbol @a x.
+ *
+ * It does this by finding the LR(1) items in which the placeholder
+ * precedes the symbol @a x, and advancing the placeholder past that
+ * symbol @a x.
+ *
  * Based on the pseudo code in Figure 3.21, in section 3.4.2,
  * on page 129, in "Engineering a Compiler."
  */
@@ -210,6 +228,7 @@ do_goto(const CCSet& s, const Symbol& x, const FirstSets& first) {
     moved.emplace(item);
   }
 
+  // Complete the set to match a state in the canonical closure.
   if (!moved.empty()) {
     closure<T_Grammar>(moved, first);
   }
