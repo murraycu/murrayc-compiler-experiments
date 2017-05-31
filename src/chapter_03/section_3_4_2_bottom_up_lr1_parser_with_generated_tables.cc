@@ -33,7 +33,7 @@
 #include <unordered_set>
 #include <vector>
 
-/** Based on the pseudocode in Figure 3.11, in section 3.3.3, on page 112,
+/** Based on the pseudocode in Figure 3.15, in section 3.4.1, on page 119,
  * of "Engineering a Compiler".
  */
 template <typename T_Grammar>
