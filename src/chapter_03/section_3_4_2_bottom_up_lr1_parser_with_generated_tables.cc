@@ -122,6 +122,12 @@ bottom_up_lr1_parse(const std::vector<std::string>& words) {
     } else {
       std::cerr << "State " << state << " has no action for symbol "
         << symbol_for_word.name << std::endl;
+      std::cerr << "  parsed so far: ";
+      for (const auto& symbol : result) {
+        std::cerr << symbol.name << " ";
+      }
+      std::cerr << std::endl;
+
       return {SYMBOL_ERROR};
     }
   }
