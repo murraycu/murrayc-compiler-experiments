@@ -81,6 +81,47 @@ using CCSet = std::set<LR1Item>;
  */
 using CC = std::set<CCSet>;
 
+static
+void print_lr1_item(const LR1Item& item) {
+  const auto& rule = item.production;
+
+  std::cout << "{";
+  print_symbol(rule.first);
+  std::cout << " -> ";
+
+  bool is_first = true;
+  std::size_t i = 0;
+  for (const auto& s : rule.second) {
+    if (i == item.placeholder) {
+      std::cout << " . ";
+    }
+
+    if (!is_first) {
+      std::cout << ", ";
+    }
+
+    is_first = false;
+
+    print_symbol(s);
+    ++i;
+  }
+
+  if (item.placeholder == rule.second.size()) {
+    std::cout << " .";
+  }
+
+  std::cout << "}, ";
+  print_symbol(item.lookahead_symbol);
+  std::cout << std::endl;
+}
+
+static
+void print_cc_set(const CCSet& ccset) {
+  for (const auto& item : ccset) {
+    print_lr1_item(item);
+  }
+}
+
 /**
  * @param pos If this is 0 zero the result will be {{}, symbols}.
  */
@@ -90,17 +131,6 @@ split_rule(const Symbols& symbols, std::size_t pos) {
   const Symbols a(std::begin(symbols), std::begin(symbols) + pos);
   const Symbols b(std::begin(symbols) + pos, std::end(symbols));
   return {a, b};
-}
-
-static
-void print_cc_set(const CCSet& ccset) {
-  for (const auto& item : ccset) {
-    std::cout << "{";
-    print_rule(item.production);
-    std::cout << "}, " << item.placeholder << ", ";
-    print_symbol(item.lookahead_symbol);
-    std::cout << std::endl;
-  }
 }
 
 /**
@@ -323,14 +353,27 @@ build_cc(CC& cc, CCSetIDs& cc_ids, const FirstSets& first) {
           continue;
         }
 
+        // std::cout << "Transition from state " << cc_ids[cci] << " on symbol ";
+        // print_symbol(x);
+        // std::cout << std::endl;
+        // print_cc_set(cci);
+
         const auto temp = do_goto<T_Grammar>(cci, x, first);
         if (!cc.count(temp)) {
+          // std::cout << "to state " << id << ":" << std::endl;
+          // print_cc_set(temp);
+          // std::cout << std::endl;
+
           changing = true;
           cc.emplace(temp);
 
           cc_ids[temp] = id;
           ++id;
-        }
+        } // else {
+          // std::cout << "to existing state " << cc_ids[temp] << ":" << std::endl;
+          // print_cc_set(temp);
+          // std::cout << std::endl;
+        // }
 
         // TODO: Record the transition from CCi to temp on symbol x.
       }
