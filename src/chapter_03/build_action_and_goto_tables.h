@@ -519,14 +519,15 @@ build_action_and_goto_tables(ActionTable& action_table, GotoTable& goto_table) {
         }
 
         const auto ccj = do_goto<T_Grammar>(cci, n, first);
-        const auto iter = cc_ids.find(ccj);
-        if (iter == std::end(cc_ids)) {
+        if (ccj.empty()) {
           // This is acceptable.
           // Not all parts of the goto table have entries.
           continue;
         }
 
+        // If do_goto() generated a set, we should know about that set already:
         assert(cc_ids.count(ccj));
+
         const auto j = cc_ids[ccj];
         goto_table[i][n] = j;
       }
