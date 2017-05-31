@@ -73,8 +73,11 @@ bottom_up_lr1_parse(const std::vector<std::string>& words) {
   Symbols result;
   while (true) {
     const auto state = st.top().second;
-
     const auto symbol_for_word = T_Grammar::recognise_word(words_map, word);
+
+    // std::cout << "State: " << state << ", symbol: ";
+    // print_symbol(symbol_for_word);
+    // std::cout << ": " << std::endl;
 
     const auto action =
       get_action_from_table(action_table, state, symbol_for_word);
@@ -83,9 +86,15 @@ bottom_up_lr1_parse(const std::vector<std::string>& words) {
       // Get the A -> B rule:
       assert(action.arg < rules.size());
       const auto& rule = rules[action.arg];
+
+      // std::cout << "  Reduce: by rule: " << action.arg << " (";
+      // print_rule(rule);
+      // std::cout << "  )" << std::endl;
+
       const auto& a = rule.first;
       const auto& b = rule.second;
 
+      // std::cout << "  Popping " << b.size() << " from stack." << std::endl;
       for (auto i = 0u; i < b.size(); ++i) {
         st.pop();
       }
@@ -94,8 +103,10 @@ bottom_up_lr1_parse(const std::vector<std::string>& words) {
       const auto next_state = get_goto_from_table(goto_table, prev_state, a);
       st.emplace(a, next_state);
 
+      // std::cout << "  Moving from previous state " << prev_state << " to next state " << next_state << std::endl;
     } else if (action.type == ActionType::SHIFT) {
       const auto next_state = action.arg;
+      // std::cout << "  Shift: Moving to state " << next_state << std::endl;
 
       st.emplace(symbol_for_word, next_state);
 
@@ -106,6 +117,7 @@ bottom_up_lr1_parse(const std::vector<std::string>& words) {
       ++input_focus;
       word = input_focus >= n_words ? WORD_EOF : words[input_focus];
     } else if (action.type == ActionType::ACCEPT) {
+      // std::cout << "  Accept." << std::endl;
       break;
     } else {
       std::cerr << "State " << state << " has no action for symbol "
