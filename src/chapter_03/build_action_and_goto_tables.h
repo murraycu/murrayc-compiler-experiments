@@ -155,11 +155,11 @@ closure(CCSet& s, const FirstSets& first) {
   while (changing) {
     // For each item [A -> B.Cd , a]:
     // (d could be empty)
-    for (const auto& ccset : s) {
+    for (const auto& item : s) {
       changing = false;
 
       // Get the C symbol, after the placeholder:
-      const auto [b, cd] = split_rule(ccset.production.second, ccset.placeholder);
+      const auto [b, cd] = split_rule(item.production.second, item.placeholder);
       if (cd.empty()) {
         continue;
       }
@@ -167,7 +167,7 @@ closure(CCSet& s, const FirstSets& first) {
       const auto [cpart, d] = split_rule(cd, 1);
       assert(cpart.size() == 1);
       const auto c = cpart[0];
-      const auto a = ccset.lookahead_symbol;
+      const auto a = item.lookahead_symbol;
 
       // Get any productions with C on the left-hand side (C -> y):
       const auto iter = T_Grammar::rules.find(c);
