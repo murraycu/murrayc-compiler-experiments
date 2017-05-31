@@ -117,6 +117,10 @@ void print_lr1_item(const LR1Item& item) {
 
 static
 void print_cc_set(const CCSet& ccset) {
+  if (ccset.empty()) {
+    std::cout << "(EMPTY STATE SET)" << std::endl;
+  }
+
   for (const auto& item : ccset) {
     print_lr1_item(item);
   }
@@ -354,12 +358,16 @@ build_cc(CC& cc, CCSetIDs& cc_ids, const FirstSets& first) {
           continue;
         }
 
+        const auto temp = do_goto<T_Grammar>(cci, x, first);
+        if (temp.empty()) {
+          continue;
+        }
+
         // std::cout << "Transition from state " << cc_ids[cci] << " on symbol ";
         // print_symbol(x);
         // std::cout << std::endl;
         // print_cc_set(cci);
 
-        const auto temp = do_goto<T_Grammar>(cci, x, first);
         if (!cc.count(temp)) {
           // std::cout << "to state " << id << ":" << std::endl;
           // print_cc_set(temp);
