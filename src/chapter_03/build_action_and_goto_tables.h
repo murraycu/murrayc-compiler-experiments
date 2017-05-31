@@ -154,6 +154,7 @@ closure(CCSet& s, const FirstSets& first) {
   bool changing = true;
   while (changing) {
     // For each item [A -> B.Cd , a]:
+    // (d could be empty)
     for (const auto& ccset : s) {
       changing = false;
 
