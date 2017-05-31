@@ -108,6 +108,8 @@ bottom_up_lr1_parse(const std::vector<std::string>& words) {
     } else if (action.type == ActionType::ACCEPT) {
       break;
     } else {
+      std::cerr << "State " << state << " has no action for symbol "
+        << symbol_for_word.name << std::endl;
       return {SYMBOL_ERROR};
     }
   }
