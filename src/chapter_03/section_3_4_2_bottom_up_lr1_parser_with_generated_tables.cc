@@ -20,6 +20,7 @@
 #include "parentheses_grammar.h"
 #include "if_then_else_ambiguous_grammar.h"
 #include "right_recursive_expression_grammar.h"
+#include "signed_binary_numbers_grammar.h"
 #include "symbol.h"
 
 #include <algorithm>
@@ -324,6 +325,49 @@ test_right_recursive_expression_grammar() {
   */
 }
 
+// This grammar is actually from chapter 4,
+// section 4.3, page 182, of
+// "Engineering a Compiler",
+// but this parser should be able to parse it.
+static void
+test_signed_binary_numbers_grammar() {
+  using Grammar = SignedBinaryNumbersGrammar;
+
+  {
+    // Valid input:
+    const std::vector<std::string> input = {"+", "1"};
+    const Symbols expected = {
+      Grammar::SYMBOL_PLUS, Grammar::SYMBOL_1};
+    assert(bottom_up_lr1_parse<Grammar>(input) == expected);
+  }
+
+  {
+    // Valid input:
+    const std::vector<std::string> input = {"+", "0"};
+    const Symbols expected = {
+      Grammar::SYMBOL_PLUS, Grammar::SYMBOL_0};
+    assert(bottom_up_lr1_parse<Grammar>(input) == expected);
+  }
+
+  /* TODO: Why doesn't this work?
+  {
+    // Valid input:
+    const std::vector<std::string> input = {"+", "1", "1"};
+    const Symbols expected = {
+      Grammar::SYMBOL_PLUS, Grammar::SYMBOL_1, Grammar::SYMBOL_1};
+    assert(bottom_up_lr1_parse<Grammar>(input) == expected);
+  }
+
+  {
+    // Valid input:
+    const std::vector<std::string> input = {"+", "1", "0", "1"};
+    const Symbols expected = {
+      Grammar::SYMBOL_PLUS, Grammar::SYMBOL_1, Grammar::SYMBOL_0, Grammar::SYMBOL_1};
+    assert(bottom_up_lr1_parse<Grammar>(input) == expected);
+  }
+  */
+}
+
 int
 main() {
   test_first_set_for_symbols();
@@ -335,6 +379,7 @@ main() {
   test_parentheses_grammar();
   test_if_then_else_grammar();
   test_right_recursive_expression_grammar();
+  test_signed_binary_numbers_grammar();
 
   return 0;
 }
