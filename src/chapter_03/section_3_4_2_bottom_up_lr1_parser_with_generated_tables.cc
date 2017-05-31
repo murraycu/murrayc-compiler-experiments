@@ -57,7 +57,7 @@ bottom_up_lr1_parse(const std::vector<std::string>& words) {
   // The pseudo code puts both the symbol and the state (number) on the same
   // stack,
   // pushing and popping two each time. That seems unnecessarily complicated.
-  // Instead this uses 2 stacks, to simplify type safety.
+  // Instead this uses a stack of pairs, to simplify type safety.
   using StackElement = std::pair<Symbol, State>;
   std::stack<StackElement> st;
 
