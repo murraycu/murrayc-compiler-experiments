@@ -264,9 +264,145 @@ top_down_parse(const std::vector<std::string>& words) {
   return result;
 }
 
+static void
+test_first_sets() {
+  using Grammar = RightRecursiveExpressionGrammar;
+
+  // Test the FIRST sets:
+  auto first = build_first_sets<Grammar>();
+
+  {
+    // From the tables on page 105:
+
+    // Terminals:
+    const SymbolSet expected_num = {Grammar::SYMBOL_NUM};
+    const SymbolSet expected_name = {Grammar::SYMBOL_NAME};
+    const SymbolSet expected_plus = {Grammar::SYMBOL_PLUS};
+    const SymbolSet expected_open_paren = {Grammar::SYMBOL_OPEN_PAREN};
+    const SymbolSet expected_empty = {Grammar::SYMBOL_EMPTY};
+    assert(first[Grammar::SYMBOL_NUM] == expected_num);
+    assert(first[Grammar::SYMBOL_NAME] == expected_name);
+    assert(first[Grammar::SYMBOL_PLUS] == expected_plus);
+    assert(first[Grammar::SYMBOL_EMPTY] == expected_empty);
+  }
+
+  {
+    // Non-terminals:
+    const SymbolSet expected_expr = {
+      Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_NAME, Grammar::SYMBOL_NUM};
+    const SymbolSet expected_expr_prime = {
+      Grammar::SYMBOL_PLUS, Grammar::SYMBOL_MINUS, Grammar::SYMBOL_EMPTY};
+    const SymbolSet expected_term = {
+      Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_NAME, Grammar::SYMBOL_NUM};
+    const SymbolSet expected_term_prime = {Grammar::SYMBOL_MULTIPLY,
+      Grammar::SYMBOL_DIVIDE, Grammar::SYMBOL_EMPTY};
+    const SymbolSet expected_factor = {
+      Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_NAME, Grammar::SYMBOL_NUM};
+
+    assert(first[Grammar::SYMBOL_EXPR] == expected_expr);
+    assert(first[Grammar::SYMBOL_EXPR_PRIME] == expected_expr_prime);
+    assert(first[Grammar::SYMBOL_TERM] == expected_term);
+    assert(first[Grammar::SYMBOL_TERM_PRIME] == expected_term_prime);
+    assert(first[Grammar::SYMBOL_FACTOR] == expected_factor);
+  }
+}
+
+static void
+test_follow_sets() {
+  using Grammar = RightRecursiveExpressionGrammar;
+
+  // Test the FOLLOW sets:
+  const auto first = build_first_sets<Grammar>();
+  auto follow = build_follow_sets<Grammar>(first);
+
+  // From the table on page 106:
+  const SymbolSet expected_follow_expr = {
+    Grammar::SYMBOL_EOF, Grammar::SYMBOL_CLOSE_PAREN};
+  const SymbolSet expected_follow_expr_prime = {
+    Grammar::SYMBOL_EOF, Grammar::SYMBOL_CLOSE_PAREN};
+  const SymbolSet expected_follow_term = {Grammar::SYMBOL_EOF,
+    Grammar::SYMBOL_PLUS, Grammar::SYMBOL_MINUS,
+    Grammar::SYMBOL_CLOSE_PAREN};
+  const SymbolSet expected_follow_term_prime = {Grammar::SYMBOL_EOF,
+    Grammar::SYMBOL_PLUS, Grammar::SYMBOL_MINUS,
+    Grammar::SYMBOL_CLOSE_PAREN};
+  const SymbolSet expected_follow_factor = {Grammar::SYMBOL_EOF,
+    Grammar::SYMBOL_PLUS, Grammar::SYMBOL_MINUS, Grammar::SYMBOL_MULTIPLY,
+    Grammar::SYMBOL_DIVIDE, Grammar::SYMBOL_CLOSE_PAREN};
+
+  assert(follow[Grammar::SYMBOL_EXPR] == expected_follow_expr);
+  assert(follow[Grammar::SYMBOL_EXPR] == expected_follow_expr);
+  assert(follow[Grammar::SYMBOL_EXPR_PRIME] == expected_follow_expr_prime);
+  assert(follow[Grammar::SYMBOL_TERM] == expected_follow_term);
+  assert(follow[Grammar::SYMBOL_TERM_PRIME] == expected_follow_term_prime);
+  assert(follow[Grammar::SYMBOL_FACTOR] == expected_follow_factor);
+}
+
+static void
+test_first_sets_for_rules() {
+  using Grammar = RightRecursiveExpressionGrammar;
+
+  // Test the FIRST sets for rules (not just for individual symbols):
+  const auto first = build_first_sets<Grammar>();
+  auto first_for_rules = build_first_sets_for_rules<Grammar>(first);
+
+  // From the table on page 107:
+  const SymbolSet expected_expr_prime_to_empty = {Grammar::SYMBOL_EMPTY};
+  const SymbolSet expected_term_prime_to_empty = {Grammar::SYMBOL_EMPTY};
+
+  const auto key_expr_prime_to_empty = std::make_pair(
+    Grammar::SYMBOL_EXPR_PRIME, Symbols({Grammar::SYMBOL_EMPTY}));
+  assert(first_for_rules[key_expr_prime_to_empty] ==
+         expected_expr_prime_to_empty);
+
+  const auto key_term_prime_to_empty = std::make_pair(
+    Grammar::SYMBOL_TERM_PRIME, Symbols({Grammar::SYMBOL_EMPTY}));
+  assert(first_for_rules[key_term_prime_to_empty] ==
+         expected_term_prime_to_empty);
+}
+
+static void
+test_first_plus_sets() {
+  using Grammar = RightRecursiveExpressionGrammar;
+
+  // Test the FIRST+ sets:
+  const auto first = build_first_sets<Grammar>();
+  const auto first_for_rules = build_first_sets_for_rules<Grammar>(first);
+  const auto follow = build_follow_sets<Grammar>(first);
+  auto first_plus = build_first_plus_sets<Grammar>(first_for_rules, follow);
+
+  // From the table on page 107:
+  const SymbolSet expected_expr_prime_to_empty = {Grammar::SYMBOL_EMPTY,
+    Grammar::SYMBOL_EOF, Grammar::SYMBOL_CLOSE_PAREN};
+  const SymbolSet expected_term_prime_to_empty = {Grammar::SYMBOL_EMPTY,
+    Grammar::SYMBOL_EOF, Grammar::SYMBOL_PLUS, Grammar::SYMBOL_MINUS,
+    Grammar::SYMBOL_CLOSE_PAREN};
+
+  const auto key_expr_prime_to_empty = std::make_pair(
+    Grammar::SYMBOL_EXPR_PRIME, Symbols({Grammar::SYMBOL_EMPTY}));
+  assert(
+    first_plus[key_expr_prime_to_empty] == expected_expr_prime_to_empty);
+
+  const auto key_term_prime_to_empty = std::make_pair(
+    Grammar::SYMBOL_TERM_PRIME, Symbols({Grammar::SYMBOL_EMPTY}));
+  assert(
+    first_plus[key_term_prime_to_empty] == expected_term_prime_to_empty);
+}
+
+static void
+test_backtrack_free() {
+  assert(check_grammar_is_backtrack_free<RightRecursiveExpressionGrammar>() == true);
+}
+
 int
 main() {
   {
+    test_first_sets();
+    test_follow_sets();
+    test_first_sets_for_rules();
+    test_first_plus_sets();
+    test_backtrack_free();
+
     // The "right-recursive variant of the classic expression grammar" from page
     // 101, in section 3.3.1.
     using Grammar = RightRecursiveExpressionGrammar;
@@ -278,111 +414,6 @@ main() {
       const std::vector<std::string> input = {};
       const Symbols expected = {};
       assert(top_down_parse<Grammar>(input) == expected);
-    }
-
-    // Test the FIRST sets:
-    auto first = build_first_sets<Grammar>();
-    {
-
-      // From the tables on page 105:
-
-      // Terminals:
-      const SymbolSet expected_num = {Grammar::SYMBOL_NUM};
-      const SymbolSet expected_name = {Grammar::SYMBOL_NAME};
-      const SymbolSet expected_plus = {Grammar::SYMBOL_PLUS};
-      const SymbolSet expected_open_paren = {Grammar::SYMBOL_OPEN_PAREN};
-      const SymbolSet expected_empty = {Grammar::SYMBOL_EMPTY};
-      assert(first[Grammar::SYMBOL_NUM] == expected_num);
-      assert(first[Grammar::SYMBOL_NAME] == expected_name);
-      assert(first[Grammar::SYMBOL_PLUS] == expected_plus);
-      assert(first[Grammar::SYMBOL_EMPTY] == expected_empty);
-
-      // Non-terminals:
-      const SymbolSet expected_expr = {
-        Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_NAME, Grammar::SYMBOL_NUM};
-      const SymbolSet expected_expr_prime = {
-        Grammar::SYMBOL_PLUS, Grammar::SYMBOL_MINUS, Grammar::SYMBOL_EMPTY};
-      const SymbolSet expected_term = {
-        Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_NAME, Grammar::SYMBOL_NUM};
-      const SymbolSet expected_term_prime = {Grammar::SYMBOL_MULTIPLY,
-        Grammar::SYMBOL_DIVIDE, Grammar::SYMBOL_EMPTY};
-      const SymbolSet expected_factor = {
-        Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_NAME, Grammar::SYMBOL_NUM};
-
-      assert(first[Grammar::SYMBOL_EXPR] == expected_expr);
-      assert(first[Grammar::SYMBOL_EXPR_PRIME] == expected_expr_prime);
-      assert(first[Grammar::SYMBOL_TERM] == expected_term);
-      assert(first[Grammar::SYMBOL_TERM_PRIME] == expected_term_prime);
-      assert(first[Grammar::SYMBOL_FACTOR] == expected_factor);
-    }
-
-    // Test the FOLLOW sets:
-    auto follow = build_follow_sets<Grammar>(first);
-    {
-      // From the table on page 106:
-      const SymbolSet expected_follow_expr = {
-        Grammar::SYMBOL_EOF, Grammar::SYMBOL_CLOSE_PAREN};
-      const SymbolSet expected_follow_expr_prime = {
-        Grammar::SYMBOL_EOF, Grammar::SYMBOL_CLOSE_PAREN};
-      const SymbolSet expected_follow_term = {Grammar::SYMBOL_EOF,
-        Grammar::SYMBOL_PLUS, Grammar::SYMBOL_MINUS,
-        Grammar::SYMBOL_CLOSE_PAREN};
-      const SymbolSet expected_follow_term_prime = {Grammar::SYMBOL_EOF,
-        Grammar::SYMBOL_PLUS, Grammar::SYMBOL_MINUS,
-        Grammar::SYMBOL_CLOSE_PAREN};
-      const SymbolSet expected_follow_factor = {Grammar::SYMBOL_EOF,
-        Grammar::SYMBOL_PLUS, Grammar::SYMBOL_MINUS, Grammar::SYMBOL_MULTIPLY,
-        Grammar::SYMBOL_DIVIDE, Grammar::SYMBOL_CLOSE_PAREN};
-
-      assert(follow[Grammar::SYMBOL_EXPR] == expected_follow_expr);
-      assert(follow[Grammar::SYMBOL_EXPR] == expected_follow_expr);
-      assert(follow[Grammar::SYMBOL_EXPR_PRIME] == expected_follow_expr_prime);
-      assert(follow[Grammar::SYMBOL_TERM] == expected_follow_term);
-      assert(follow[Grammar::SYMBOL_TERM_PRIME] == expected_follow_term_prime);
-      assert(follow[Grammar::SYMBOL_FACTOR] == expected_follow_factor);
-    }
-
-    // Test the FIRST sets for rules (not just for individual symbols):
-    auto first_for_rules = build_first_sets_for_rules<Grammar>(first);
-    {
-      // From the table on page 107:
-      const SymbolSet expected_expr_prime_to_empty = {Grammar::SYMBOL_EMPTY};
-      const SymbolSet expected_term_prime_to_empty = {Grammar::SYMBOL_EMPTY};
-
-      const auto key_expr_prime_to_empty = std::make_pair(
-        Grammar::SYMBOL_EXPR_PRIME, Symbols({Grammar::SYMBOL_EMPTY}));
-      assert(first_for_rules[key_expr_prime_to_empty] ==
-             expected_expr_prime_to_empty);
-
-      const auto key_term_prime_to_empty = std::make_pair(
-        Grammar::SYMBOL_TERM_PRIME, Symbols({Grammar::SYMBOL_EMPTY}));
-      assert(first_for_rules[key_term_prime_to_empty] ==
-             expected_term_prime_to_empty);
-    }
-
-    // Test the FIRST+ sets:
-    auto first_plus = build_first_plus_sets<Grammar>(first_for_rules, follow);
-    {
-      // From the table on page 107:
-      const SymbolSet expected_expr_prime_to_empty = {Grammar::SYMBOL_EMPTY,
-        Grammar::SYMBOL_EOF, Grammar::SYMBOL_CLOSE_PAREN};
-      const SymbolSet expected_term_prime_to_empty = {Grammar::SYMBOL_EMPTY,
-        Grammar::SYMBOL_EOF, Grammar::SYMBOL_PLUS, Grammar::SYMBOL_MINUS,
-        Grammar::SYMBOL_CLOSE_PAREN};
-
-      const auto key_expr_prime_to_empty = std::make_pair(
-        Grammar::SYMBOL_EXPR_PRIME, Symbols({Grammar::SYMBOL_EMPTY}));
-      assert(
-        first_plus[key_expr_prime_to_empty] == expected_expr_prime_to_empty);
-
-      const auto key_term_prime_to_empty = std::make_pair(
-        Grammar::SYMBOL_TERM_PRIME, Symbols({Grammar::SYMBOL_EMPTY}));
-      assert(
-        first_plus[key_term_prime_to_empty] == expected_term_prime_to_empty);
-    }
-
-    {
-      assert(check_grammar_is_backtrack_free<Grammar>() == true);
     }
 
     {
