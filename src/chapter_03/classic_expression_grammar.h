@@ -26,9 +26,7 @@ public:
   // Non-terminals:
   static constexpr Symbol SYMBOL_GOAL = {"Goal"};
   static constexpr Symbol SYMBOL_EXPR = {"Expr"};
-  static constexpr Symbol SYMBOL_EXPR_PRIME = {"Expr'"};
   static constexpr Symbol SYMBOL_TERM = {"Term"};
-  static constexpr Symbol SYMBOL_TERM_PRIME = {"Term'"};
   static constexpr Symbol SYMBOL_FACTOR = {"Factor"};
 
   // Terminals:
@@ -45,8 +43,8 @@ public:
   static constexpr Symbol SYMBOL_EOF = {"eof", true};
 
   // Not including SYMBOL_EMPTY.
-  static constexpr std::array<Symbol, 15> symbols = {{
-    SYMBOL_GOAL, SYMBOL_EXPR, SYMBOL_EXPR_PRIME, SYMBOL_TERM, SYMBOL_TERM_PRIME, SYMBOL_FACTOR,
+  static constexpr std::array<Symbol, 13> symbols = {{
+    SYMBOL_GOAL, SYMBOL_EXPR, SYMBOL_TERM, SYMBOL_FACTOR,
     SYMBOL_PLUS, SYMBOL_MINUS, SYMBOL_MULTIPLY, SYMBOL_DIVIDE, SYMBOL_OPEN_PAREN, SYMBOL_CLOSE_PAREN, SYMBOL_NUM, SYMBOL_NAME, SYMBOL_EOF}};
 
   static const GrammarRules rules;
