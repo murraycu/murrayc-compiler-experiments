@@ -269,7 +269,7 @@ using FirstSetsForRules = std::map<GrammarRule, SymbolSet>;
 
 /** Compute the FIRST sets for rules in a grammar.
  * (FIRST sets are usually for individual symbols.)
- * See build_first_sets_for_symbols().
+ * See build_first_set_for_symbols().
  *
  * Based on the definition in section 3.3.1, on page 105
  * of "Engineering a Compiler".
