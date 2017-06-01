@@ -157,11 +157,11 @@ closure(CCSet& s, const FirstSets& first) {
 
   bool changing = true;
   while (changing) {
+    changing = false;
+
     // For each item [A -> B.Cd , a]:
     // (d could be empty)
     for (const auto& item : s) {
-      changing = false;
-
       // Get the C symbol, after the placeholder:
       const auto [b, cd] = split_rule(item.production.second, item.placeholder);
       if (cd.empty()) {
