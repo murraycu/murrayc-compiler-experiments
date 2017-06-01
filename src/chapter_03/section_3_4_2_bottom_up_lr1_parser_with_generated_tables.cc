@@ -21,6 +21,7 @@
 #include "if_then_else_ambiguous_grammar.h"
 #include "right_recursive_expression_grammar.h"
 #include "signed_binary_numbers_grammar.h"
+#include "classic_expression_grammar.h"
 #include "symbol.h"
 
 #include <algorithm>
@@ -538,6 +539,25 @@ test_if_then_else_grammar() {
 }
 
 static void
+test_classic_expression_grammar() {
+  using Grammar = ClassicExpressionGrammar;
+
+  ActionTable action_table;
+  GotoTable goto_table;
+  const auto built = build_action_and_goto_tables<Grammar>(action_table, goto_table);
+  assert(built);
+
+  // This seems to work, even though there are conflicts while calling
+  // build_action_and_goto_tables().
+  {
+    const std::vector<std::string> input = {"a", "+", "b", "x", "c"};
+    const Symbols expected = {Grammar::SYMBOL_NAME, Grammar::SYMBOL_PLUS,
+      Grammar::SYMBOL_NAME, Grammar::SYMBOL_MULTIPLY, Grammar::SYMBOL_NAME};
+    assert(bottom_up_lr1_parse<Grammar>(input) == expected);
+  }
+}
+
+static void
 test_right_recursive_expression_grammar() {
   /*
   using Grammar = RightRecursiveExpressionGrammar;
@@ -611,6 +631,7 @@ main() {
 
   test_parentheses_grammar();
   test_if_then_else_grammar();
+  test_classic_expression_grammar();
   test_right_recursive_expression_grammar();
   test_signed_binary_numbers_grammar();
 
