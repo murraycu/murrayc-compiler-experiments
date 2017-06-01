@@ -341,6 +341,25 @@ test_follow_sets() {
 }
 
 static void
+test_first_sets_for_symbols() {
+  using Grammar = RightRecursiveExpressionGrammar;
+
+  // Test the FIRST sets for sets of symbols (not just for individual symbols):
+  const auto first = build_first_sets<Grammar>();
+
+  {
+    // The second-from-last paragraph on page 105 of "Engineering a compiler"
+    // mentions some possible elements in the resul, but does not specify a
+    // full result.
+    const Symbols test = {Grammar::SYMBOL_PLUS, Grammar::SYMBOL_TERM, Grammar::SYMBOL_EXPR_PRIME};
+    const SymbolSet expected = {Grammar::SYMBOL_PLUS};
+    const auto result = build_first_set_for_symbols<Grammar>(first, test);
+    assert(!result.empty());
+    assert(result == expected);
+  }
+}
+
+static void
 test_first_sets_for_rules() {
   using Grammar = RightRecursiveExpressionGrammar;
 
@@ -409,6 +428,7 @@ main() {
   {
     test_first_sets();
     test_follow_sets();
+    test_first_sets_for_symbols();
     test_first_sets_for_rules();
     test_first_plus_sets();
     test_backtrack_free();
