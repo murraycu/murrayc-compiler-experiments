@@ -62,22 +62,31 @@ using FirstSets = std::map<Symbol, SymbolSet>;
 template <typename T_Grammar>
 static FirstSets
 build_first_sets() {
-  const auto& symbols = T_Grammar::symbols;
-  const auto& rules = T_Grammar::rules;
 
   FirstSets first;
 
-  for (const auto& symbol : symbols) {
-    if (symbol.terminal) {
-      const SymbolSet temp = {symbol};
-      first[symbol] = temp;
-      assert(first[symbol] == temp);
-      assert(first[symbol].size() == 1);
-    } else {
-      first[symbol] = {};
+  {
+    // The pseudo code in Figure 3.7,
+    // says we should do this on the union of the terminals, eof, and E.
+    SymbolSet symbols(std::begin(T_Grammar::symbols), std::end(T_Grammar::symbols));
+    symbols.emplace(T_Grammar::SYMBOL_EMPTY);
+    assert(contains(symbols, T_Grammar::SYMBOL_EOF));
+
+    for (const auto& symbol : symbols) {
+      if (symbol.terminal) {
+        const SymbolSet temp = {symbol};
+        first[symbol] = temp;
+        assert(first[symbol] == temp);
+        assert(first[symbol].size() == 1);
+      } else {
+        first[symbol] = {};
+      }
     }
   }
 
+  const auto symbols = T_Grammar::symbols;
+  const auto& rules = T_Grammar::rules;
+  assert(!contains(symbols, T_Grammar::SYMBOL_EMPTY));
 
   for (const auto& symbol : symbols) {
     if (symbol.terminal) {
