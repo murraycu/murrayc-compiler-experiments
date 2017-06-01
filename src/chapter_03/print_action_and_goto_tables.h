@@ -25,13 +25,13 @@ void
 print_action(const Action& action, const GrammarRulesByNumber& rules) {
   std::string str;
   switch (action.type) {
-    case ActionType::SHIFT:
+    case Action::Type::SHIFT:
       str = "s";
       break;
-    case ActionType::REDUCE:
+    case Action::Type::REDUCE:
       str = "r";
       break;
-    case ActionType::ACCEPT:
+    case Action::Type::ACCEPT:
       str = "a";
       break;
     default:
@@ -41,7 +41,7 @@ print_action(const Action& action, const GrammarRulesByNumber& rules) {
 
   std::cout << str << action.arg;
 
-  if (action.type == ActionType::REDUCE) {
+  if (action.type == Action::Type::REDUCE) {
     std::cout << " (";
     print_rule(rules.at(action.arg));
     std::cout << ")";

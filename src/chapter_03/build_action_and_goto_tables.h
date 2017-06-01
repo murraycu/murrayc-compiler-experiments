@@ -392,15 +392,16 @@ build_cc(CC& cc, CCSetIDs& cc_ids, const FirstSets& first) {
   }
 }
 
-enum class ActionType {
-  NONE,
-  SHIFT,
-  REDUCE,
-  ACCEPT
-};
 
 class Action {
 public:
+  enum class Type {
+    NONE,
+    SHIFT,
+    REDUCE,
+    ACCEPT
+  };
+
   bool
   operator ==(const Action& other) const {
     return type == other.type &&
@@ -412,7 +413,7 @@ public:
     return !operator==(other);
   }
 
-  ActionType type = ActionType::NONE;
+  Type type = Type::NONE;
   std::size_t arg = 0;
 };
 
@@ -467,7 +468,7 @@ build_action_and_goto_tables(ActionTable& action_table, GotoTable& goto_table) {
         const auto ccj = do_goto<T_Grammar>(cci, c, first);
         assert(cc_ids.count(ccj));
         const auto j = cc_ids[ccj];
-        const Action action = {ActionType::SHIFT, j};
+        const Action action = {Action::Type::SHIFT, j};
 
         if (const auto iter = action_table_i.find(c); iter != std::end(action_table_i) &&
             action != iter->second) {
@@ -485,7 +486,7 @@ build_action_and_goto_tables(ActionTable& action_table, GotoTable& goto_table) {
         // that the parser has recognized the whole expansion.  And because the
         // left-hand side the goal symbol, and the lookahead symbol is eof,
         // this is the accepting state.
-        const Action action = {ActionType::ACCEPT, 0};
+        const Action action = {Action::Type::ACCEPT, 0};
 
         if (const auto iter = action_table_i.find(a); iter != std::end(action_table_i) &&
             action != iter->second) {
@@ -503,7 +504,7 @@ build_action_and_goto_tables(ActionTable& action_table, GotoTable& goto_table) {
         // handle, on lookahead symbol a.
         assert(rule_numbers.count(rule));
         const auto rule_number = rule_numbers[rule];
-        const Action action = {ActionType::REDUCE, rule_number};
+        const Action action = {Action::Type::REDUCE, rule_number};
 
         if (const auto iter = action_table_i.find(a); iter != std::end(action_table_i) &&
             action != iter->second) {

@@ -82,7 +82,7 @@ bottom_up_lr1_parse(const std::vector<std::string>& words) {
     const auto action =
       get_action_from_table(action_table, state, symbol_for_word);
 
-    if (action.type == ActionType::REDUCE) {
+    if (action.type == Action::Type::REDUCE) {
       // Get the A -> B rule:
       assert(action.arg < rules.size());
       const auto& rule = rules[action.arg];
@@ -104,7 +104,7 @@ bottom_up_lr1_parse(const std::vector<std::string>& words) {
       st.emplace(a, next_state);
 
       // std::cout << "  Moving from previous state " << prev_state << " to next state " << next_state << std::endl;
-    } else if (action.type == ActionType::SHIFT) {
+    } else if (action.type == Action::Type::SHIFT) {
       const auto next_state = action.arg;
       // std::cout << "  Shift: Moving to state " << next_state << std::endl;
 
@@ -116,7 +116,7 @@ bottom_up_lr1_parse(const std::vector<std::string>& words) {
 
       ++input_focus;
       word = input_focus >= n_words ? WORD_EOF : words[input_focus];
-    } else if (action.type == ActionType::ACCEPT) {
+    } else if (action.type == Action::Type::ACCEPT) {
       // std::cout << "  Accept." << std::endl;
       break;
     } else {
@@ -409,58 +409,58 @@ test_action_and_goto() {
   // (The rule numbers here are 0-indexed, but they are 1-indexed in the book.)
   const ActionTable expected_action_table = {
     {0, {
-      {Grammar::SYMBOL_OPEN_PAREN, {ActionType::SHIFT, 3}}
+      {Grammar::SYMBOL_OPEN_PAREN, {Action::Type::SHIFT, 3}}
       }
     },
     {1, {
-      {Grammar::SYMBOL_EOF, {ActionType::ACCEPT, 0}},
-      {Grammar::SYMBOL_OPEN_PAREN, {ActionType::SHIFT, 3}}
+      {Grammar::SYMBOL_EOF, {Action::Type::ACCEPT, 0}},
+      {Grammar::SYMBOL_OPEN_PAREN, {Action::Type::SHIFT, 3}}
       }
     },
     {2, {
-      {Grammar::SYMBOL_EOF, {ActionType::REDUCE, 2}},
-      {Grammar::SYMBOL_OPEN_PAREN, {ActionType::REDUCE, 2}}
+      {Grammar::SYMBOL_EOF, {Action::Type::REDUCE, 2}},
+      {Grammar::SYMBOL_OPEN_PAREN, {Action::Type::REDUCE, 2}}
       }
     },
     {3, {
-      {Grammar::SYMBOL_OPEN_PAREN, {ActionType::SHIFT, 6}},
-      {Grammar::SYMBOL_CLOSE_PAREN, {ActionType::SHIFT, 7}}
+      {Grammar::SYMBOL_OPEN_PAREN, {Action::Type::SHIFT, 6}},
+      {Grammar::SYMBOL_CLOSE_PAREN, {Action::Type::SHIFT, 7}}
       }
     },
     {4, {
-      {Grammar::SYMBOL_EOF, {ActionType::REDUCE, 1}},
-      {Grammar::SYMBOL_OPEN_PAREN, {ActionType::REDUCE, 1}}
+      {Grammar::SYMBOL_EOF, {Action::Type::REDUCE, 1}},
+      {Grammar::SYMBOL_OPEN_PAREN, {Action::Type::REDUCE, 1}}
       }
     },
     {5, {
-      {Grammar::SYMBOL_CLOSE_PAREN, {ActionType::SHIFT, 8}}
+      {Grammar::SYMBOL_CLOSE_PAREN, {Action::Type::SHIFT, 8}}
       }
     },
     {6, {
-      {Grammar::SYMBOL_OPEN_PAREN, {ActionType::SHIFT, 6}},
-      {Grammar::SYMBOL_CLOSE_PAREN, {ActionType::SHIFT, 10}}
+      {Grammar::SYMBOL_OPEN_PAREN, {Action::Type::SHIFT, 6}},
+      {Grammar::SYMBOL_CLOSE_PAREN, {Action::Type::SHIFT, 10}}
       }
     },
     {7, {
-      {Grammar::SYMBOL_EOF, {ActionType::REDUCE, 4}},
-      {Grammar::SYMBOL_OPEN_PAREN, {ActionType::REDUCE, 4}}
+      {Grammar::SYMBOL_EOF, {Action::Type::REDUCE, 4}},
+      {Grammar::SYMBOL_OPEN_PAREN, {Action::Type::REDUCE, 4}}
       }
     },
     {8, {
-      {Grammar::SYMBOL_EOF, {ActionType::REDUCE, 3}},
-      {Grammar::SYMBOL_OPEN_PAREN, {ActionType::REDUCE, 3}}
+      {Grammar::SYMBOL_EOF, {Action::Type::REDUCE, 3}},
+      {Grammar::SYMBOL_OPEN_PAREN, {Action::Type::REDUCE, 3}}
       }
     },
     {9, {
-      {Grammar::SYMBOL_CLOSE_PAREN, {ActionType::SHIFT, 11}}
+      {Grammar::SYMBOL_CLOSE_PAREN, {Action::Type::SHIFT, 11}}
       }
     },
     {10, {
-      {Grammar::SYMBOL_CLOSE_PAREN, {ActionType::REDUCE, 4}}
+      {Grammar::SYMBOL_CLOSE_PAREN, {Action::Type::REDUCE, 4}}
       }
     },
     {11, {
-      {Grammar::SYMBOL_CLOSE_PAREN, {ActionType::REDUCE, 3}}
+      {Grammar::SYMBOL_CLOSE_PAREN, {Action::Type::REDUCE, 3}}
       }
     }
   };
