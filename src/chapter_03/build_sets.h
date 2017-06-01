@@ -258,16 +258,37 @@ build_first_set_for_symbols(const FirstSets& first, const Symbols& symbols) {
   // and E".
 
   for (const auto bi : symbols) {
-    const auto iter = first.find(bi);
-    if (iter != std::end(first)) {
-      const auto& firstbi = iter->second;
+    assert(first.count(bi));
+    const auto& firstbi = first.at(bi);
 
-      result.insert(std::begin(firstbi), std::end(firstbi));
+    result.insert(std::begin(firstbi), std::end(firstbi));
 
-      // Stop after the first symbols whose FIRST set does not contain E
-      if (!contains(firstbi, T_Grammar::SYMBOL_EMPTY)) {
-        break;
-      }
+    // Stop after the first symbols whose FIRST set does not contain E
+    if (!contains(firstbi, T_Grammar::SYMBOL_EMPTY)) {
+      break;
+    }
+  }
+
+  // Make sure that the result contains E if, and only if, every FIRST(symbol) contains E,
+  // as per the description on page 105 of "Engineering a Compiler".
+  bool every_first_has_e = true;
+  for (const auto bi : symbols) {
+    assert(first.count(bi));
+    const auto& firstbi = first.at(bi);
+    if (!contains(firstbi, T_Grammar::SYMBOL_EMPTY)) {
+      every_first_has_e = false;
+      break;
+    }
+  }
+
+  if (every_first_has_e) {
+    // Add it:
+    result.emplace(T_Grammar::SYMBOL_EMPTY);
+  } else {
+    // Remove it:
+    const auto iter = result.find(T_Grammar::SYMBOL_EMPTY);
+    if (iter != std::end(result)) {
+      result.erase(iter);
     }
   }
 
