@@ -583,7 +583,6 @@ test_signed_binary_numbers_grammar() {
     assert(bottom_up_lr1_parse<Grammar>(input) == expected);
   }
 
-  /* TODO: Why doesn't this work?
   {
     // Valid input:
     const std::vector<std::string> input = {"+", "1", "1"};
@@ -599,7 +598,6 @@ test_signed_binary_numbers_grammar() {
       Grammar::SYMBOL_PLUS, Grammar::SYMBOL_1, Grammar::SYMBOL_0, Grammar::SYMBOL_1};
     assert(bottom_up_lr1_parse<Grammar>(input) == expected);
   }
-  */
 }
 
 int
