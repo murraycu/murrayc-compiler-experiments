@@ -543,6 +543,7 @@ test_right_recursive_expression_grammar() {
   using Grammar = RightRecursiveExpressionGrammar;
 
   // TODO: Why doesn't this work?
+  // Uncomment this to see error messages about the conflicts while building the tables.
   // Page 144 of "Engineering a Compiler" says "Bottom up parsers can accomodate either left or right recursion."
   ActionTable action_table;
   GotoTable goto_table;

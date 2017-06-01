@@ -21,35 +21,6 @@
 #include "build_action_and_goto_tables.h"
 #include <iostream>
 
-template <typename T_Value>
-void
-print_action(const Action& action, const GrammarRulesByNumber<T_Value>& rules) {
-  std::string str;
-  switch (action.type) {
-    case Action::Type::SHIFT:
-      str = "s";
-      break;
-    case Action::Type::REDUCE:
-      str = "r";
-      break;
-    case Action::Type::ACCEPT:
-      str = "a";
-      break;
-    default:
-      str = "?";
-      break;
-  }
-
-  std::cout << str << action.arg;
-
-  if (action.type == Action::Type::REDUCE) {
-    std::cout << " (";
-    const auto& item = rules.at(action.arg);
-    print_rule(rules.at(item.first));
-    std::cout << ")";
-  }
-}
-
 template <typename T_Grammar>
 void
 print_action_and_goto_tables(const ActionTable& action_table, const GotoTable& goto_table) {

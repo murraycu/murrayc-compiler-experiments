@@ -417,8 +417,49 @@ public:
   std::size_t arg = 0;
 };
 
+void
+print_action(const Action& action, const GrammarRulesByNumber& rules) {
+  std::string str;
+  switch (action.type) {
+    case Action::Type::SHIFT:
+      str = "s";
+      break;
+    case Action::Type::REDUCE:
+      str = "r";
+      break;
+    case Action::Type::ACCEPT:
+      str = "a";
+      break;
+    default:
+      str = "?";
+      break;
+  }
+
+  std::cout << str << action.arg;
+
+  if (action.type == Action::Type::REDUCE) {
+    std::cout << " (";
+    print_rule(rules.at(action.arg));
+    std::cout << ")";
+  }
+}
+
 using ActionTable = std::map<State, std::map<Symbol, Action>>;
 using GotoTable = std::map<State, std::map<Symbol, std::size_t>>;
+
+static void
+print_conflict(State state, const Symbol& symbol, const Action& old_action, const Action& action,  const GrammarRulesByNumber& rules) {
+  std::cout << "Tables build failed: Cannot add new action for state: " << state << " for symbol: ";
+  print_symbol(symbol);
+  std::cout << ": " << std::endl;
+  std::cout << "  ";
+  print_action(action, rules);
+  std::cout << std::endl;
+  std::cout << "because there is already an action:" << std::endl;;
+  std::cout << "  ";
+  print_action(old_action, rules);
+  std::cout << std::endl << std::endl;
+}
 
 /** Build the action table and goto table needed for the table-driven
  * bottom-up LR(1) parser.
@@ -473,6 +514,7 @@ build_action_and_goto_tables(ActionTable& action_table, GotoTable& goto_table) {
         if (const auto iter = action_table_i.find(c); iter != std::end(action_table_i) &&
             action != iter->second) {
           // Conflict: We cannot have 2 actions in the same place.
+          print_conflict(i, c, iter->second, action, rules);
           return false;
         }
 
@@ -491,6 +533,7 @@ build_action_and_goto_tables(ActionTable& action_table, GotoTable& goto_table) {
         if (const auto iter = action_table_i.find(a); iter != std::end(action_table_i) &&
             action != iter->second) {
           // Conflict: We cannot have 2 actions in the same place.
+          print_conflict(i, a, iter->second, action, rules);
           return false;
         }
 
@@ -509,6 +552,7 @@ build_action_and_goto_tables(ActionTable& action_table, GotoTable& goto_table) {
         if (const auto iter = action_table_i.find(a); iter != std::end(action_table_i) &&
             action != iter->second) {
           // Conflict: We cannot have 2 actions in the same place.
+          print_conflict(i, c, iter->second, action, rules);
           return false;
         }
 
