@@ -186,7 +186,29 @@ test_goto() {
   const auto first = build_first_sets<Grammar>();
   closure<Grammar>(cc0, first);
 
-  const CCSet expected = {
+  // From page 131 of "Engineering a Compiler":
+  const CCSet expected_cc1 = {
+    {{Grammar::SYMBOL_GOAL, {Grammar::SYMBOL_LIST}}, 1, Grammar::SYMBOL_EOF},
+    {{Grammar::SYMBOL_LIST, {Grammar::SYMBOL_LIST, Grammar::SYMBOL_PAIR}}, 1, Grammar::SYMBOL_EOF},
+    {{Grammar::SYMBOL_LIST, {Grammar::SYMBOL_LIST, Grammar::SYMBOL_PAIR}}, 1, Grammar::SYMBOL_OPEN_PAREN},
+    {{Grammar::SYMBOL_PAIR, {Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_PAIR, Grammar::SYMBOL_CLOSE_PAREN}}, 0, Grammar::SYMBOL_EOF},
+    {{Grammar::SYMBOL_PAIR, {Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_PAIR, Grammar::SYMBOL_CLOSE_PAREN}}, 0, Grammar::SYMBOL_OPEN_PAREN},
+    {{Grammar::SYMBOL_PAIR, {Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_CLOSE_PAREN}}, 0, Grammar::SYMBOL_EOF},
+    {{Grammar::SYMBOL_PAIR, {Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_CLOSE_PAREN}}, 0, Grammar::SYMBOL_OPEN_PAREN}
+  };
+  const auto cc1 = do_goto<Grammar>(cc0, Grammar::SYMBOL_LIST, first);
+  assert(cc1 == expected_cc1);
+
+  // From page 131 of "Engineering a Compiler":
+  const CCSet expected_cc2 = {
+    {{Grammar::SYMBOL_LIST, {Grammar::SYMBOL_PAIR}}, 1, Grammar::SYMBOL_EOF},
+    {{Grammar::SYMBOL_LIST, {Grammar::SYMBOL_PAIR}}, 1, Grammar::SYMBOL_OPEN_PAREN}
+  };
+  const auto cc2 = do_goto<Grammar>(cc0, Grammar::SYMBOL_PAIR, first);
+  assert(cc2 == expected_cc2);
+
+  // From page 132 of "Engineering a Compiler":
+  const CCSet expected_cc3 = {
     {{Grammar::SYMBOL_PAIR, {Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_PAIR, Grammar::SYMBOL_CLOSE_PAREN}}, 1, Grammar::SYMBOL_EOF},
     {{Grammar::SYMBOL_PAIR, {Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_PAIR, Grammar::SYMBOL_CLOSE_PAREN}}, 1, Grammar::SYMBOL_OPEN_PAREN},
     {{Grammar::SYMBOL_PAIR, {Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_CLOSE_PAREN}}, 1, Grammar::SYMBOL_EOF},
@@ -194,10 +216,71 @@ test_goto() {
     {{Grammar::SYMBOL_PAIR, {Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_PAIR, Grammar::SYMBOL_CLOSE_PAREN}}, 0, Grammar::SYMBOL_CLOSE_PAREN},
     {{Grammar::SYMBOL_PAIR, {Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_CLOSE_PAREN}}, 0, Grammar::SYMBOL_CLOSE_PAREN}
   };
+  const auto cc3 = do_goto<Grammar>(cc0, Grammar::SYMBOL_OPEN_PAREN, first);
+  assert(cc3 == expected_cc3);
 
-  const auto result = do_goto<Grammar>(cc0, Grammar::SYMBOL_OPEN_PAREN, first);
-  assert(result == expected);
+  // From page 132 of "Engineering a Compiler":
+  const CCSet expected_cc4 = {
+    {{Grammar::SYMBOL_LIST, {Grammar::SYMBOL_LIST, Grammar::SYMBOL_PAIR}}, 2, Grammar::SYMBOL_EOF},
+    {{Grammar::SYMBOL_LIST, {Grammar::SYMBOL_LIST, Grammar::SYMBOL_PAIR}}, 2, Grammar::SYMBOL_OPEN_PAREN}
+  };
+  const auto cc4 = do_goto<Grammar>(cc1, Grammar::SYMBOL_PAIR, first);
+  assert(cc4 == expected_cc4);
 
+  // From page 132 of "Engineering a Compiler":
+  const CCSet expected_cc5 = {
+    {{Grammar::SYMBOL_PAIR, {Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_PAIR, Grammar::SYMBOL_CLOSE_PAREN}}, 2, Grammar::SYMBOL_EOF},
+    {{Grammar::SYMBOL_PAIR, {Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_PAIR, Grammar::SYMBOL_CLOSE_PAREN}}, 2, Grammar::SYMBOL_OPEN_PAREN}
+  };
+  const auto cc5 = do_goto<Grammar>(cc3, Grammar::SYMBOL_PAIR, first);
+  assert(cc5 == expected_cc5);
+
+  // From page 132 of "Engineering a Compiler":
+  const CCSet expected_cc6 = {
+    {{Grammar::SYMBOL_PAIR, {Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_PAIR, Grammar::SYMBOL_CLOSE_PAREN}}, 0, Grammar::SYMBOL_CLOSE_PAREN},
+    {{Grammar::SYMBOL_PAIR, {Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_PAIR, Grammar::SYMBOL_CLOSE_PAREN}}, 1, Grammar::SYMBOL_CLOSE_PAREN},
+    {{Grammar::SYMBOL_PAIR, {Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_CLOSE_PAREN}}, 0, Grammar::SYMBOL_CLOSE_PAREN},
+    {{Grammar::SYMBOL_PAIR, {Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_CLOSE_PAREN}}, 1, Grammar::SYMBOL_CLOSE_PAREN}
+  };
+  const auto cc6 = do_goto<Grammar>(cc3, Grammar::SYMBOL_OPEN_PAREN, first);
+  assert(cc6 == expected_cc6);
+
+  // From page 132 of "Engineering a Compiler":
+  const CCSet expected_cc7 = {
+    {{Grammar::SYMBOL_PAIR, {Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_CLOSE_PAREN}}, 2, Grammar::SYMBOL_EOF},
+    {{Grammar::SYMBOL_PAIR, {Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_CLOSE_PAREN}}, 2, Grammar::SYMBOL_OPEN_PAREN}
+  };
+  const auto cc7 = do_goto<Grammar>(cc3, Grammar::SYMBOL_CLOSE_PAREN, first);
+  assert(cc7 == expected_cc7);
+
+  // From page 133 of "Engineering a Compiler":
+  const CCSet expected_cc8 = {
+    {{Grammar::SYMBOL_PAIR, {Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_PAIR, Grammar::SYMBOL_CLOSE_PAREN}}, 3, Grammar::SYMBOL_EOF},
+    {{Grammar::SYMBOL_PAIR, {Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_PAIR, Grammar::SYMBOL_CLOSE_PAREN}}, 3, Grammar::SYMBOL_OPEN_PAREN}
+  };
+  const auto cc8 = do_goto<Grammar>(cc5, Grammar::SYMBOL_CLOSE_PAREN, first);
+  assert(cc8 == expected_cc8);
+
+  // From page 133 of "Engineering a Compiler":
+  const CCSet expected_cc9 = {
+    {{Grammar::SYMBOL_PAIR, {Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_PAIR, Grammar::SYMBOL_CLOSE_PAREN}}, 2, Grammar::SYMBOL_CLOSE_PAREN},
+  };
+  const auto cc9 = do_goto<Grammar>(cc6, Grammar::SYMBOL_PAIR, first);
+  assert(cc9 == expected_cc9);
+
+  // From page 133 of "Engineering a Compiler":
+  const CCSet expected_cc10 = {
+    {{Grammar::SYMBOL_PAIR, {Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_CLOSE_PAREN}}, 2, Grammar::SYMBOL_CLOSE_PAREN},
+  };
+  const auto cc10 = do_goto<Grammar>(cc6, Grammar::SYMBOL_CLOSE_PAREN, first);
+  assert(cc10 == expected_cc10);
+
+  // From page 133 of "Engineering a Compiler":
+  const CCSet expected_cc11 = {
+    {{Grammar::SYMBOL_PAIR, {Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_PAIR, Grammar::SYMBOL_CLOSE_PAREN}}, 3, Grammar::SYMBOL_CLOSE_PAREN},
+  };
+  const auto cc11 = do_goto<Grammar>(cc9, Grammar::SYMBOL_CLOSE_PAREN, first);
+  assert(cc11 == expected_cc11);
 }
 
 static void
@@ -212,14 +295,78 @@ test_cc() {
   assert(cc_ids.size() == 12);
 
   // Check that there are no duplicates:
-  std::unordered_set<State> ids;
+  std::unordered_map<State, CCSet> ids;
   for (const auto& p : cc_ids) {
     const auto i = p.second;
     assert(ids.count(i) == 0);
 
-    ids.emplace(i);
+    ids[i] = p.first;
     // std::cout << i << std::endl;
   }
+
+  /* We cannot do this because we don't generate the sets in
+   * exactly the same order as in the walkthrough starting on page 131
+   * of Engineering a Compiler. It would complicate the code unncessarily
+   * to enforce that order.
+  // From page 129 of "Engineering a Compiler":
+  const CCSet expected_cc0 = {
+    {{Grammar::SYMBOL_GOAL, {Grammar::SYMBOL_LIST}}, 0, Grammar::SYMBOL_EOF},
+    {{Grammar::SYMBOL_LIST, {Grammar::SYMBOL_LIST, Grammar::SYMBOL_PAIR}}, 0, Grammar::SYMBOL_EOF},
+    {{Grammar::SYMBOL_LIST, {Grammar::SYMBOL_LIST, Grammar::SYMBOL_PAIR}}, 0, Grammar::SYMBOL_OPEN_PAREN},
+    {{Grammar::SYMBOL_LIST, {Grammar::SYMBOL_PAIR}}, 0, Grammar::SYMBOL_EOF},
+    {{Grammar::SYMBOL_LIST, {Grammar::SYMBOL_PAIR}}, 0, Grammar::SYMBOL_OPEN_PAREN},
+    {{Grammar::SYMBOL_PAIR, {Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_PAIR, Grammar::SYMBOL_CLOSE_PAREN}}, 0, Grammar::SYMBOL_EOF},
+    {{Grammar::SYMBOL_PAIR, {Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_PAIR, Grammar::SYMBOL_CLOSE_PAREN}}, 0, Grammar::SYMBOL_OPEN_PAREN},
+    {{Grammar::SYMBOL_PAIR, {Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_CLOSE_PAREN}}, 0, Grammar::SYMBOL_EOF},
+    {{Grammar::SYMBOL_PAIR, {Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_CLOSE_PAREN}}, 0, Grammar::SYMBOL_OPEN_PAREN}
+  };
+  assert(ids[0] == expected_cc0);
+
+  // From page 131 of "Engineering a Compiler":
+  const CCSet expected_cc1 = {
+    {{Grammar::SYMBOL_GOAL, {Grammar::SYMBOL_LIST}}, 1, Grammar::SYMBOL_EOF},
+    {{Grammar::SYMBOL_LIST, {Grammar::SYMBOL_LIST, Grammar::SYMBOL_PAIR}}, 1, Grammar::SYMBOL_EOF},
+    {{Grammar::SYMBOL_LIST, {Grammar::SYMBOL_LIST, Grammar::SYMBOL_PAIR}}, 1, Grammar::SYMBOL_OPEN_PAREN},
+    {{Grammar::SYMBOL_PAIR, {Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_PAIR, Grammar::SYMBOL_CLOSE_PAREN}}, 0, Grammar::SYMBOL_EOF},
+    {{Grammar::SYMBOL_PAIR, {Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_PAIR, Grammar::SYMBOL_CLOSE_PAREN}}, 0, Grammar::SYMBOL_OPEN_PAREN},
+    {{Grammar::SYMBOL_PAIR, {Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_CLOSE_PAREN}}, 0, Grammar::SYMBOL_EOF},
+    {{Grammar::SYMBOL_PAIR, {Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_CLOSE_PAREN}}, 0, Grammar::SYMBOL_OPEN_PAREN}
+  };
+  assert(ids[1] == expected_cc1);
+
+  // From page 131 of "Engineering a Compiler":
+  const CCSet expected_cc2 = {
+    {{Grammar::SYMBOL_LIST, {Grammar::SYMBOL_PAIR}}, 1, Grammar::SYMBOL_EOF},
+    {{Grammar::SYMBOL_LIST, {Grammar::SYMBOL_PAIR}}, 1, Grammar::SYMBOL_OPEN_PAREN}
+  };
+  assert(ids[2] == expected_cc2);
+
+  // From page 132 of "Engineering a Compiler":
+  const CCSet expected_cc3 = {
+    {{Grammar::SYMBOL_PAIR, {Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_PAIR, Grammar::SYMBOL_CLOSE_PAREN}}, 0, Grammar::SYMBOL_CLOSE_PAREN},
+    {{Grammar::SYMBOL_PAIR, {Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_PAIR, Grammar::SYMBOL_CLOSE_PAREN}}, 1, Grammar::SYMBOL_EOF},
+    {{Grammar::SYMBOL_PAIR, {Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_PAIR, Grammar::SYMBOL_CLOSE_PAREN}}, 1, Grammar::SYMBOL_OPEN_PAREN},
+    {{Grammar::SYMBOL_PAIR, {Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_CLOSE_PAREN}}, 0, Grammar::SYMBOL_CLOSE_PAREN},
+    {{Grammar::SYMBOL_PAIR, {Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_CLOSE_PAREN}}, 1, Grammar::SYMBOL_EOF},
+    {{Grammar::SYMBOL_PAIR, {Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_CLOSE_PAREN}}, 1, Grammar::SYMBOL_OPEN_PAREN}
+  };
+  assert(ids[3] == expected_cc3);
+
+  // From page 132 of "Engineering a Compiler":
+  const CCSet expected_cc4 = {
+    {{Grammar::SYMBOL_LIST, {Grammar::SYMBOL_LIST, Grammar::SYMBOL_PAIR}}, 2, Grammar::SYMBOL_EOF},
+    {{Grammar::SYMBOL_LIST, {Grammar::SYMBOL_LIST, Grammar::SYMBOL_PAIR}}, 2, Grammar::SYMBOL_OPEN_PAREN}
+  };
+  assert(ids[4] == expected_cc4);
+
+  // From page 132 of "Engineering a Compiler":
+  const CCSet expected_cc5 = {
+    {{Grammar::SYMBOL_PAIR, {Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_PAIR, Grammar::SYMBOL_CLOSE_PAREN}}, 2, Grammar::SYMBOL_EOF},
+    {{Grammar::SYMBOL_PAIR, {Grammar::SYMBOL_OPEN_PAREN, Grammar::SYMBOL_PAIR, Grammar::SYMBOL_CLOSE_PAREN}}, 2, Grammar::SYMBOL_OPEN_PAREN}
+  };
+  print_cc_set(ids[5]);
+  assert(ids[5] == expected_cc5);
+  */
 }
 
 static void
@@ -251,7 +398,74 @@ test_action_and_goto() {
     }
   }
 
-  // print_action_and_goto_tables();
+  // print_action_and_goto_tables<Grammar>(action_table, goto_table);
+
+  /* We cannot do this because we don't generate the sets in
+   * exactly the same order as in the walkthrough starting on page 131
+   * of Engineering a Compiler. It would complicate the code unncessarily
+   * to enforce that order.
+  // Check that we have the same tables as in Figure 3.16, on page 120,
+  // of Engineering a compiler:
+  // (The rule numbers here are 0-indexed, but they are 1-indexed in the book.)
+  const ActionTable expected_action_table = {
+    {0, {
+      {Grammar::SYMBOL_OPEN_PAREN, {ActionType::SHIFT, 3}}
+      }
+    },
+    {1, {
+      {Grammar::SYMBOL_EOF, {ActionType::ACCEPT, 0}},
+      {Grammar::SYMBOL_OPEN_PAREN, {ActionType::SHIFT, 3}}
+      }
+    },
+    {2, {
+      {Grammar::SYMBOL_EOF, {ActionType::REDUCE, 2}},
+      {Grammar::SYMBOL_OPEN_PAREN, {ActionType::REDUCE, 2}}
+      }
+    },
+    {3, {
+      {Grammar::SYMBOL_OPEN_PAREN, {ActionType::SHIFT, 6}},
+      {Grammar::SYMBOL_CLOSE_PAREN, {ActionType::SHIFT, 7}}
+      }
+    },
+    {4, {
+      {Grammar::SYMBOL_EOF, {ActionType::REDUCE, 1}},
+      {Grammar::SYMBOL_OPEN_PAREN, {ActionType::REDUCE, 1}}
+      }
+    },
+    {5, {
+      {Grammar::SYMBOL_CLOSE_PAREN, {ActionType::SHIFT, 8}}
+      }
+    },
+    {6, {
+      {Grammar::SYMBOL_OPEN_PAREN, {ActionType::SHIFT, 6}},
+      {Grammar::SYMBOL_CLOSE_PAREN, {ActionType::SHIFT, 10}}
+      }
+    },
+    {7, {
+      {Grammar::SYMBOL_EOF, {ActionType::REDUCE, 4}},
+      {Grammar::SYMBOL_OPEN_PAREN, {ActionType::REDUCE, 4}}
+      }
+    },
+    {8, {
+      {Grammar::SYMBOL_EOF, {ActionType::REDUCE, 3}},
+      {Grammar::SYMBOL_OPEN_PAREN, {ActionType::REDUCE, 3}}
+      }
+    },
+    {9, {
+      {Grammar::SYMBOL_CLOSE_PAREN, {ActionType::SHIFT, 11}}
+      }
+    },
+    {10, {
+      {Grammar::SYMBOL_CLOSE_PAREN, {ActionType::REDUCE, 4}}
+      }
+    },
+    {11, {
+      {Grammar::SYMBOL_CLOSE_PAREN, {ActionType::REDUCE, 3}}
+      }
+    }
+  };
+  assert(action_table == expected_action_table);
+  */
 }
 
 static void
