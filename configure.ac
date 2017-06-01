@@ -16,6 +16,8 @@ AC_PROG_CXX
 
 AX_CXX_COMPILE_STDCXX([17], [noext], [mandatory])
 
+PKG_CHECK_MODULES([PROJECT], [sigc++-3.0])
+
 # See http://www.gnu.org/software/autoconf-archive/ax_boost_base.html
 # Boost System is needed by Boost Timer
 AX_BOOST_BASE

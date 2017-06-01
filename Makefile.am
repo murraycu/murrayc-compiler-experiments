@@ -30,7 +30,8 @@ check_PROGRAMS = \
   section_3_3_1_top_down_parser_leftmost_backtrack_free \
   section_3_3_3_top_down_table_driven_ll1_parser \
   section_3_4_1_bottom_up_lr1_parser \
-  section_3_4_2_bottom_up_lr1_parser_with_generated_tables
+  section_3_4_2_bottom_up_lr1_parser_with_generated_tables \
+  section_4_4_1_attribute_grammar
 
 TESTS = $(check_PROGRAMS)
 
@@ -122,4 +123,17 @@ section_3_4_2_bottom_up_lr1_parser_with_generated_tables_SOURCES = \
 section_3_4_2_bottom_up_lr1_parser_with_generated_tables_CXXFLAGS = \
 	$(COMMON_CXXFLAGS)
 section_3_4_2_bottom_up_lr1_parser_with_generated_tables_LDADD = \
+	$(COMMON_LIBS)
+
+section_4_4_1_attribute_grammar_SOURCES = \
+	src/chapter_04/grammar.h \
+	src/chapter_04/symbol.h \
+	src/chapter_04/build_sets.h \
+	src/chapter_04/build_action_and_goto_tables.h \
+	src/chapter_04/print_action_and_goto_tables.h \
+	src/chapter_04/signed_binary_numbers_grammar.h \
+	src/chapter_04/section_4_4_1_attribute_grammar.cc
+section_4_4_1_attribute_grammar_CXXFLAGS = \
+	$(COMMON_CXXFLAGS)
+section_4_4_1_attribute_grammar_LDADD = \
 	$(COMMON_LIBS)

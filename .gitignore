@@ -64,3 +64,4 @@ Makefile.in
 /section_3_3_3_top_down_table_driven_ll1_parser
 /section_3_4_1_bottom_up_lr1_parser
 /section_3_4_2_bottom_up_lr1_parser_with_generated_tables
+/section_4_4_1_attribute_grammar
