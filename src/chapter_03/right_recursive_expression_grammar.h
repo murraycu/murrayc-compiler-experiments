@@ -61,6 +61,16 @@ public:
       return iter->second;
     }
 
+    if (word.empty()) {
+      return SYMBOL_EMPTY;
+    }
+
+    // Check the first character:
+    const auto ch = word[0];
+    if (ch >= '0' && ch <= '9') {
+      return SYMBOL_NUM;
+    }
+
     return SYMBOL_NAME;
   }
 
