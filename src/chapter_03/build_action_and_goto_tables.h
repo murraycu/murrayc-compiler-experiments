@@ -161,7 +161,8 @@ closure(CCSet& s, const FirstSets& first) {
 
     // For each item [A -> B.Cd , a]:
     // (d could be empty)
-    for (const auto& item : s) {
+    const auto scopy = s;
+    for (const auto& item : scopy) {
       // Get the C symbol, after the placeholder:
       const auto [b, cd] = split_rule(item.production.second, item.placeholder);
       if (cd.empty()) {
@@ -343,7 +344,8 @@ build_cc(CC& cc, CCSetIDs& cc_ids, const FirstSets& first) {
   while (changing) {
     changing = false;
 
-    for (const auto& cci : cc) {
+    const auto cc_copy = cc;
+    for (const auto& cci : cc_copy) {
       // Only examine sets that we have not yet processed:
       if (processed.count(cci)) {
         continue;
