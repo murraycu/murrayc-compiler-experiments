@@ -19,13 +19,13 @@
 #define MURRAYC_COMPILER_EXPERIMENTS_GRAMMARS_H
 
 #include "symbol.h"
+#include <functional>
 #include <map>
 #include <unordered_map>
 #include <vector>
-#include <sigc++/slot.h>
 
 template <typename T_Value>
-using CodeSnippet = sigc::slot<T_Value(const std::vector<T_Value>&)>; 
+using CodeSnippet = std::function<T_Value(const std::vector<T_Value>&)>;
 
 template <typename T_Value>
 class ExpansionItem {
