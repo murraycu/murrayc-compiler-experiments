@@ -16,6 +16,8 @@
  */
 
 #include "right_recursive_expression_grammar.h"
+#include "parentheses_grammar.h"
+#include "signed_binary_numbers_grammar.h"
 #include "build_sets.h"
 #include "tree.h"
 
@@ -392,6 +394,14 @@ test_first_plus_sets() {
 static void
 test_backtrack_free() {
   assert(check_grammar_is_backtrack_free<RightRecursiveExpressionGrammar>() == true);
+
+  // This is actually from a later section, 3.4.1
+  // TODO: Should this be recognized as backtrack-free?
+  assert(check_grammar_is_backtrack_free<ParenthesesGrammar>() == false);
+
+  // This is actually from chapter 4:
+  // TODO: Should this be recognized as backtrack-free?
+  assert(check_grammar_is_backtrack_free<SignedBinaryNumbersGrammar>() == false);
 }
 
 int
