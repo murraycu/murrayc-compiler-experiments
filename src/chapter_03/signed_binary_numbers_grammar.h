@@ -20,7 +20,7 @@
 
 #include "grammar.h"
 
-/// The "Parentheses Grammar" from page 120, in section 3.4.1.
+/// The "Signed Binary Numbers Grammar" from page 199, in section 4.4.
 class SignedBinaryNumbersGrammar {
 public:
   // Non-terminals:
@@ -79,10 +79,10 @@ public:
   }
 };
 
-// Based on Figure 4.7, from section 4.3.3, on page 189,
+// Based on Figure 4.11, from section 4.4, on page 199,
 // of "Engineering a Compiler".
 // But without the subscripts, and with an extra rule for the goal symbol,
-// for consistency with the other grammars..
+// for consistency with the other grammars.
 const GrammarRules SignedBinaryNumbersGrammar::rules = {
   {SYMBOL_GOAL, {
     {SYMBOL_NUMBER}}},
