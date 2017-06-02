@@ -624,7 +624,7 @@ get_action_from_table(
 
 // Just to hide the use of find() that is nececessary with
 // a const std::map.
-static std::size_t
+static State
 get_goto_from_table(const GotoTable& table, State state, const Symbol& symbol) {
   const auto iteras = table.find(state);
   if (iteras == std::end(table)) {

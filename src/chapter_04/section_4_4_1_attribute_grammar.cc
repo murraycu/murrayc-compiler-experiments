@@ -39,6 +39,15 @@ public:
   typename T_Grammar::ValueType value = typename T_Grammar::ValueType();
 };
 
+template <typename T_Grammar>
+class StackElement {
+public:
+  Symbol symbol;
+  State state;
+  typename T_Grammar::ValueType value;
+  WordType word;
+};
+
 /** Based on the description in section 4.4.1,
  * and the end of section 4.4's introduction,
  * on page 199 of Engineering a Compiler.
@@ -68,10 +77,9 @@ bottom_up_lr1_parse(const std::vector<WordType>& words, typename T_Grammar::Stor
     return {{SYMBOL_ERROR}, 0};
   }
 
-  using StackElement = std::tuple<Symbol, State, typename T_Grammar::ValueType, WordType>;
-  std::stack<StackElement> st;
+  std::stack<StackElement<T_Grammar>> st;
 
-  st.emplace(T_Grammar::SYMBOL_GOAL, 0, typename T_Grammar::ValueType(), WordType());
+  st.emplace(StackElement<T_Grammar>{T_Grammar::SYMBOL_GOAL, 0, typename T_Grammar::ValueType(), WordType()});
 
   const auto words_map = T_Grammar::build_words_map();
 
@@ -82,7 +90,7 @@ bottom_up_lr1_parse(const std::vector<WordType>& words, typename T_Grammar::Stor
 
   Symbols result;
   while (true) {
-    const auto state = std::get<1>(st.top());
+    const auto state = st.top().state;
 
     const auto symbol_for_word = T_Grammar::recognise_word(words_map, word);
 
@@ -102,20 +110,20 @@ bottom_up_lr1_parse(const std::vector<WordType>& words, typename T_Grammar::Stor
       std::vector<WordType> rhs_words;
       for (auto i = 0u; i < b.size(); ++i) {
         const auto& sitem = st.top();
-        const auto& v = std::get<2>(sitem);
+        const auto& v = sitem.value;
         values.emplace_back(v);
 
         // Get the underlying word for a recognized terminal symbol,
         // for use by the code snippet.
-        const auto& rhs_symbol = std::get<0>(sitem);
+        const auto& rhs_symbol = sitem.symbol;
         if (rhs_symbol.terminal) {
-          rhs_words.emplace_back(std::get<3>(sitem));
+          rhs_words.emplace_back(sitem.word);
         }
 
         st.pop();
       }
 
-      const auto prev_state = std::get<1>(st.top());
+      const auto prev_state = st.top().state;
       const auto next_state = get_goto_from_table(goto_table, prev_state, a);
 
       // Reverse the values so they are in the natural left-to-right order
@@ -124,11 +132,11 @@ bottom_up_lr1_parse(const std::vector<WordType>& words, typename T_Grammar::Stor
 
       const auto code = item.code;
       const auto value = code(store, values, rhs_words);
-      st.emplace(a, next_state, value, WordType());
+      st.emplace(StackElement<T_Grammar>{a, next_state, value, WordType()});
     } else if (action.type == Action::Type::SHIFT) {
-      const auto next_state = action.arg;
+      const State next_state = static_cast<State>(action.arg);
 
-      st.emplace(symbol_for_word, next_state, 0, word);
+      st.emplace(StackElement<T_Grammar>{symbol_for_word, next_state, 0, word});
 
       if (symbol_for_word.terminal) {
         result.emplace_back(symbol_for_word);
@@ -144,7 +152,7 @@ bottom_up_lr1_parse(const std::vector<WordType>& words, typename T_Grammar::Stor
   }
 
   const auto& item = st.top();
-  const auto& value = std::get<2>(item);
+  const auto& value = item.value;
   return {result, value};
 }
 
