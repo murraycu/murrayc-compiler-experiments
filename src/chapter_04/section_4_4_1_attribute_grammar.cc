@@ -52,7 +52,7 @@ public:
  */
 template <typename T_Grammar>
 static ParseResult<T_Grammar>
-bottom_up_lr1_parse(const std::vector<std::string>& words) {
+bottom_up_lr1_parse(const std::vector<WordType>& words, typename T_Grammar::StoreType& store) {
   const auto n_words = words.size();
   if (n_words == 0) {
     return {};

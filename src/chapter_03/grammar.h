@@ -32,7 +32,8 @@ using Expansions = std::vector<Symbols>;
 // might be what the pseudo code in Figure 3.2 is meant to use.
 using GrammarRules = std::map<Symbol, Expansions>;
 
-using WordsMap = std::map<std::string, Symbol>;
+using WordType = std::string;
+using WordsMap = std::map<WordType, Symbol>;
 
 using Production = std::pair<Symbol, Symbols>;
 
@@ -78,7 +79,7 @@ GrammarRulesByNumber rules_by_number() {
 //  static const Symbol SYMBOL_EMPTY;
 //
 //  static Symbol
-//  recognise_word(const WordsMap& words_map, const std::string& word);
+//  recognise_word(const WordsMap& words_map, const WordType& word);
 //
 //  static WordsMap
 //  build_words_map();

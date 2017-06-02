@@ -42,7 +42,7 @@ public:
   static const GrammarRules rules;
 
   static Symbol
-  recognise_word(const WordsMap& words_map, const std::string& word) {
+  recognise_word(const WordsMap& words_map, const WordType& word) {
     // A rather dumb implementation just to get things working:
 
     const auto iter = words_map.find(word);

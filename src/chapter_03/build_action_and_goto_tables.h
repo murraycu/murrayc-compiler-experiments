@@ -587,7 +587,7 @@ build_action_and_goto_tables(ActionTable& action_table, GotoTable& goto_table) {
 template <typename T_Grammar>
 static bool
 match(
-  const WordsMap& words_map, const Symbol& symbol, const std::string& word) {
+  const WordsMap& words_map, const Symbol& symbol, const WordType& word) {
   const auto word_symbol = T_Grammar::recognise_word(words_map, word);
   return word_symbol == symbol;
 }

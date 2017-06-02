@@ -121,7 +121,7 @@ build_table() {
 template <typename T_Grammar>
 static bool
 match(
-  const WordsMap& words_map, const Symbol& symbol, const std::string& word) {
+  const WordsMap& words_map, const Symbol& symbol, const WordType& word) {
   const auto word_symbol = T_Grammar::recognise_word(words_map, word);
   return word_symbol == symbol;
 }
@@ -131,7 +131,7 @@ match(
  */
 template <typename T_Grammar>
 static Symbols
-top_down_parse(const std::vector<std::string>& words) {
+top_down_parse(const std::vector<WordType>& words) {
   const auto n_words = words.size();
   if (n_words == 0) {
     return {};
@@ -148,7 +148,7 @@ top_down_parse(const std::vector<std::string>& words) {
   constexpr const char* WORD_EOF = "eof";
 
   std::size_t input_focus = 0;
-  std::string word = words[input_focus];
+  auto word = words[input_focus];
 
   Symbols result;
   while (true) {
