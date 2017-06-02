@@ -131,6 +131,7 @@ section_4_4_1_attribute_grammar_SOURCES = \
 	src/chapter_04/build_sets.h \
 	src/chapter_04/build_action_and_goto_tables.h \
 	src/chapter_04/print_action_and_goto_tables.h \
+	src/chapter_04/bottom_up_lr1_parse.h \
 	src/chapter_04/signed_binary_numbers_grammar.h \
 	src/chapter_04/expression_grammar_with_load_tracking.h \
 	src/chapter_04/section_4_4_1_attribute_grammar.cc
