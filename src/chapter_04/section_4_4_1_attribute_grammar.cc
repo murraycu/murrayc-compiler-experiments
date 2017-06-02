@@ -256,13 +256,15 @@ test_expression_grammar_with_load_tracking() {
   using Grammar = ExpressionGrammarWithLoadTracking;
 
   {
+    Grammar::StoreType store;
+
     const std::vector<std::string> input = {"foo", "=", "a", "+", "b", "x", "c"};
     const Symbols expected = {Grammar::SYMBOL_NAME, Grammar::SYMBOL_EQUALS,
       Grammar::SYMBOL_NAME, Grammar::SYMBOL_PLUS, Grammar::SYMBOL_NAME,
       Grammar::SYMBOL_MULTIPLY, Grammar::SYMBOL_NAME};
-    const auto result = bottom_up_lr1_parse<Grammar>(input);
+    const auto result = bottom_up_lr1_parse<Grammar>(input, store);
     assert(result.symbols == expected);
-    assert(result.value == 0);
+    assert(store.cost == 12);
   }
 }
 

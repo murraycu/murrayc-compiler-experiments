@@ -19,12 +19,30 @@
 #define MURRAYC_COMPILER_EXPERIMENTS_EXPRESSION_GRAMMAR_WITH_LOAD_TRACKING_H
 
 #include "grammar.h"
+#include <unordered_set>
 
 /// The "Tracking Loads" expression grammar from page 203, in section 4.4.2.
 class ExpressionGrammarWithLoadTracking {
 public:
   using ValueType = int;
-  using StoreType = int; // Not used.
+
+  class Store {
+  public:
+    /// These are the costs of these operations.
+    enum class Cost {
+      STORE = 1,
+      ADD = 1,
+      SUBTRACT = 1,
+      MULTIPLY = 1,
+      DIVIDE = 1,
+      LOAD = 3
+    };
+
+    std::unordered_set<WordType> loaded;
+    int cost = 0;
+  };
+
+  using StoreType = Store;
 
   // Non-terminals:
   static constexpr Symbol SYMBOL_GOAL = {"Goal"};
@@ -97,7 +115,64 @@ public:
   }
 
   static int
-  on_rule_1(StoreType& /* store */, const std::vector<int>& /* values */, const std::vector<WordType>& /* words */) {
+  on_rule_empty(StoreType& /* store */, const std::vector<int>& /* values */, const std::vector<WordType>& /* words */) {
+    return 0;
+  }
+
+  static int
+  on_rule_assign(StoreType& store, const std::vector<int>& /* values */, const std::vector<WordType>& /* words */) {
+    store.cost += static_cast<int>(StoreType::Cost::STORE);
+
+    return 0;
+  }
+
+  static int
+  on_rule_plus(StoreType& store, const std::vector<int>& /* values */, const std::vector<WordType>& /* words */) {
+    store.cost += static_cast<int>(StoreType::Cost::ADD);
+
+    return 0;
+  }
+
+  static int
+  on_rule_minus(StoreType& store, const std::vector<int>& /* values */, const std::vector<WordType>& /* words */) {
+    store.cost += static_cast<int>(StoreType::Cost::SUBTRACT);
+
+    return 0;
+  }
+
+  static int
+  on_rule_multiply(StoreType& store, const std::vector<int>& /* values */, const std::vector<WordType>& /* words */) {
+    store.cost += static_cast<int>(StoreType::Cost::MULTIPLY);
+
+    return 0;
+  }
+
+  static int
+  on_rule_divide(StoreType& store, const std::vector<int>& /* values */, const std::vector<WordType>& /* words */) {
+    store.cost += static_cast<int>(StoreType::Cost::DIVIDE);
+
+    return 0;
+  }
+
+  static int
+  on_rule_load(StoreType& store, const std::vector<int>& /* values */, const std::vector<WordType>& /* words */) {
+    store.cost += static_cast<int>(StoreType::Cost::LOAD);
+
+    return 0;
+  }
+
+  static int
+  on_rule_name(StoreType& store, const std::vector<int>& /* values */, const std::vector<WordType>& words) {
+    assert(!words.empty());
+    const WordType name = words[0];
+    assert(!name.empty());
+    std::cout << "name: " << name << std::endl;
+
+    if (!store.loaded.count(name)) {
+      store.cost += static_cast<int>(StoreType::Cost::LOAD);
+      store.loaded.emplace(name);
+    }
+
     return 0;
   }
 };
@@ -107,24 +182,24 @@ public:
 // With an extra rule for the goal symbol, for consistency with the other grammars.
 const GrammarRules<ExpressionGrammarWithLoadTracking::ValueType, ExpressionGrammarWithLoadTracking::StoreType> ExpressionGrammarWithLoadTracking::rules = {
   {SYMBOL_GOAL, {
-    {{SYMBOL_BLOCK}, &on_rule_1}}},
+    {{SYMBOL_BLOCK}, &on_rule_empty}}},
   {SYMBOL_BLOCK, {
-    {{SYMBOL_BLOCK, SYMBOL_ASSIGN}, &on_rule_1},
-    {{SYMBOL_ASSIGN}, &on_rule_1}}},
+    {{SYMBOL_BLOCK, SYMBOL_ASSIGN}, &on_rule_empty},
+    {{SYMBOL_ASSIGN}, &on_rule_empty}}},
   {SYMBOL_ASSIGN, {
-    {{SYMBOL_NAME, SYMBOL_EQUALS, SYMBOL_EXPR}, &on_rule_1}}},
+    {{SYMBOL_NAME, SYMBOL_EQUALS, SYMBOL_EXPR}, &on_rule_assign}}},
   {SYMBOL_EXPR, {
-    {{SYMBOL_EXPR, SYMBOL_PLUS, SYMBOL_TERM}, &on_rule_1},
-    {{SYMBOL_EXPR, SYMBOL_MINUS, SYMBOL_TERM}, &on_rule_1},
-    {{SYMBOL_TERM}, &on_rule_1}}},
+    {{SYMBOL_EXPR, SYMBOL_PLUS, SYMBOL_TERM}, &on_rule_plus},
+    {{SYMBOL_EXPR, SYMBOL_MINUS, SYMBOL_TERM}, &on_rule_minus},
+    {{SYMBOL_TERM}, &on_rule_empty}}},
   {SYMBOL_TERM, {
-    {{SYMBOL_TERM, SYMBOL_MULTIPLY, SYMBOL_FACTOR}, &on_rule_1},
-    {{SYMBOL_TERM, SYMBOL_DIVIDE, SYMBOL_FACTOR}, &on_rule_1},
-    {{SYMBOL_FACTOR}, &on_rule_1}}},
+    {{SYMBOL_TERM, SYMBOL_MULTIPLY, SYMBOL_FACTOR}, &on_rule_multiply},
+    {{SYMBOL_TERM, SYMBOL_DIVIDE, SYMBOL_FACTOR}, &on_rule_divide},
+    {{SYMBOL_FACTOR}, &on_rule_empty}}},
   {SYMBOL_FACTOR, {
-    {{SYMBOL_OPEN_PAREN, SYMBOL_EXPR, SYMBOL_CLOSE_PAREN}, &on_rule_1},
-    {{SYMBOL_NUM}, &on_rule_1},
-    {{SYMBOL_NAME}, &on_rule_1}}}
+    {{SYMBOL_OPEN_PAREN, SYMBOL_EXPR, SYMBOL_CLOSE_PAREN}, &on_rule_empty},
+    {{SYMBOL_NUM}, &on_rule_load},
+    {{SYMBOL_NAME}, &on_rule_name}}}
   };
 
 #endif // MURRAYC_COMPILER_EXPERIMENTS_EXPRESSION_GRAMMAR_WITH_LOAD_TRACKING_H
