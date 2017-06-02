@@ -68,10 +68,10 @@ bottom_up_lr1_parse(const std::vector<WordType>& words, typename T_Grammar::Stor
     return {{SYMBOL_ERROR}, 0};
   }
 
-  using StackElement = std::tuple<Symbol, State, typename T_Grammar::ValueType>;
+  using StackElement = std::tuple<Symbol, State, typename T_Grammar::ValueType, WordType>;
   std::stack<StackElement> st;
 
-  st.emplace(T_Grammar::SYMBOL_GOAL, 0, typename T_Grammar::ValueType());
+  st.emplace(T_Grammar::SYMBOL_GOAL, 0, typename T_Grammar::ValueType(), WordType());
 
   const auto words_map = T_Grammar::build_words_map();
 
@@ -99,10 +99,18 @@ bottom_up_lr1_parse(const std::vector<WordType>& words, typename T_Grammar::Stor
 
       // Pop the items from the stack, getting the values:
       std::vector<typename T_Grammar::ValueType> values;
+      std::vector<WordType> rhs_words;
       for (auto i = 0u; i < b.size(); ++i) {
         const auto& sitem = st.top();
         const auto& v = std::get<2>(sitem);
         values.emplace_back(v);
+
+        // Get the underlying word for a recognized terminal symbol,
+        // for use by the code snippet.
+        const auto& rhs_symbol = std::get<0>(sitem);
+        if (rhs_symbol.terminal) {
+          rhs_words.emplace_back(std::get<3>(sitem));
+        }
 
         st.pop();
       }
@@ -115,12 +123,12 @@ bottom_up_lr1_parse(const std::vector<WordType>& words, typename T_Grammar::Stor
       std::reverse(std::begin(values), std::end(values));
 
       const auto code = item.code;
-      const auto value = code(store, values);
-      st.emplace(a, next_state, value);
+      const auto value = code(store, values, rhs_words);
+      st.emplace(a, next_state, value, WordType());
     } else if (action.type == Action::Type::SHIFT) {
       const auto next_state = action.arg;
 
-      st.emplace(symbol_for_word, next_state, 0);
+      st.emplace(symbol_for_word, next_state, 0, word);
 
       if (symbol_for_word.terminal) {
         result.emplace_back(symbol_for_word);

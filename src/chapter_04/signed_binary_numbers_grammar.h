@@ -82,7 +82,7 @@ public:
   }
 
   static int
-  on_rule_1(const int& /* store */, const std::vector<int>& values) {
+  on_rule_1(const int& /* store */, const std::vector<int>& values, const std::vector<WordType>& /* words */) {
     assert(!values.empty());
 
     // Just pass it up:
@@ -90,7 +90,7 @@ public:
   }
 
   static int
-  on_rule_2(const int& /* store */, const std::vector<int>& values) {
+  on_rule_2(const int& /* store */, const std::vector<int>& values, const std::vector<WordType>& /* words */) {
     assert(values.size() == 2);
 
     const auto& sign_val = values[0]; 
@@ -100,17 +100,17 @@ public:
   }
 
   static int
-  on_rule_3(const int& /* store */, const std::vector<int>& /* values */) {
+  on_rule_3(const int& /* store */, const std::vector<int>& /* values */, const std::vector<WordType>& /* words */) {
     return 1;
   }
 
   static int
-  on_rule_4(const int& /* store */, const std::vector<int>& /* values */) {
+  on_rule_4(const int& /* store */, const std::vector<int>& /* values */, const std::vector<WordType>& /* words */) {
     return -1;
   }
 
   static int
-  on_rule_5(const int& /* store */, const std::vector<int>& values) {
+  on_rule_5(const int& /* store */, const std::vector<int>& values, const std::vector<WordType>& /* words */) {
     assert(values.size() == 1);
 
     const auto& bit_val = values[0];
@@ -118,7 +118,7 @@ public:
   }
 
   static int
-  on_rule_6(const int& /* store */, const std::vector<int>& values) {
+  on_rule_6(const int& /* store */, const std::vector<int>& values, const std::vector<WordType>& /* words */) {
     assert(values.size() == 2);
 
     const auto& list_val = values[0]; 
@@ -127,12 +127,12 @@ public:
   }
 
   static int
-  on_rule_7(const int& /* store */, const std::vector<int>& /* values */) {
+  on_rule_7(const int& /* store */, const std::vector<int>& /* values */, const std::vector<WordType>& /* words */) {
     return 0;
   }
 
   static int
-  on_rule_8(const int& /* store */, const std::vector<int>& /* values */) {
+  on_rule_8(const int& /* store */, const std::vector<int>& /* values */, const std::vector<WordType>& /* words */) {
     return 1;
   }
 };

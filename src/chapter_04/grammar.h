@@ -24,8 +24,20 @@
 #include <unordered_map>
 #include <vector>
 
+using WordType = std::string;
+using WordsMap = std::map<WordType, Symbol>;
+
+/** For instance,
+ * int
+ * on_rule_something(TheStore& store, const std::vector<int>& values, const std::vector<std::string>& words) {
+ * }
+ *
+ * The values are the values associated with the symbols on the right-hand sides of the rule being reduced, and this callback
+ * will return a value for the symbol on left-hand side of the rule.
+ * The words are the words used to recognise each terminal symbol on the right-hand side, if any.
+ */
 template <typename T_Value, typename T_Store>
-using CodeSnippet = std::function<T_Value(T_Store&, const std::vector<T_Value>&)>;
+using CodeSnippet = std::function<T_Value(T_Store&, const std::vector<T_Value>&, const std::vector<WordType>& words)>;
 
 template <typename T_Value, typename T_Store>
 class ExpansionItem {
@@ -47,9 +59,6 @@ using Expansions = std::vector<ExpansionItem<T_Value, T_Store>>;
 // might be what the pseudo code in Figure 3.2 is meant to use.
 template <typename T_Value, typename T_Store>
 using GrammarRules = std::map<Symbol, Expansions<T_Value, T_Store>>;
-
-using WordType = std::string;
-using WordsMap = std::map<WordType, Symbol>;
 
 using Production = std::pair<Symbol, Symbols>;
 

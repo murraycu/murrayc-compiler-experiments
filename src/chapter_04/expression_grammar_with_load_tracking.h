@@ -97,7 +97,7 @@ public:
   }
 
   static int
-  on_rule_1(StoreType& /* store */, const std::vector<int>& /* values */) {
+  on_rule_1(StoreType& /* store */, const std::vector<int>& /* values */, const std::vector<WordType>& /* words */) {
     return 0;
   }
 };
