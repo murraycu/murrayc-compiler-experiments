@@ -18,7 +18,6 @@
 #include "bottom_up_lr1_parse.h"
 #include "print_action_and_goto_tables.h"
 #include "signed_binary_numbers_grammar.h"
-#include "expression_grammar_with_load_tracking.h"
 
 #include <cassert>
 #include <iostream>
@@ -108,28 +107,9 @@ test_signed_binary_numbers_grammar() {
   }
 }
 
-// This is actually from section 4.4.1.
-static void
-test_expression_grammar_with_load_tracking() {
-  using Grammar = ExpressionGrammarWithLoadTracking;
-
-  {
-    Grammar::StoreType store;
-
-    const std::vector<std::string> input = {"foo", "=", "a", "+", "b", "x", "c"};
-    const Symbols expected = {Grammar::SYMBOL_NAME, Grammar::SYMBOL_EQUALS,
-      Grammar::SYMBOL_NAME, Grammar::SYMBOL_PLUS, Grammar::SYMBOL_NAME,
-      Grammar::SYMBOL_MULTIPLY, Grammar::SYMBOL_NAME};
-    const auto result = bottom_up_lr1_parse<Grammar>(input, store);
-    assert(result.symbols == expected);
-    assert(store.cost == 12);
-  }
-}
-
 int
 main() {
   test_signed_binary_numbers_grammar();
-  test_expression_grammar_with_load_tracking();
 
   return 0;
 }
