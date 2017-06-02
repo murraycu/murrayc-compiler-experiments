@@ -115,11 +115,6 @@ public:
   }
 
   static int
-  on_rule_empty(StoreType& /* store */, const std::vector<int>& /* values */, const std::vector<Grammars::WordType>& /* words */) {
-    return 0;
-  }
-
-  static int
   on_rule_assign(StoreType& store, const std::vector<int>& /* values */, const std::vector<Grammars::WordType>& /* words */) {
     store.cost += static_cast<int>(StoreType::Cost::STORE);
 
@@ -175,6 +170,8 @@ public:
 
     return 0;
   }
+
+  using EmptyCode = Grammars::CodeSnippet<ValueType, StoreType>;
 };
 
 // Based on Figure 4.12 (based on Figure 4.8), from section 4.4.2, on page 203,
@@ -182,22 +179,22 @@ public:
 // With an extra rule for the goal symbol, for consistency with the other grammars.
 const Grammars::Rules<ExpressionGrammarWithLoadTracking::ValueType, ExpressionGrammarWithLoadTracking::StoreType> ExpressionGrammarWithLoadTracking::rules = {
   {SYMBOL_GOAL, {
-    {{SYMBOL_BLOCK}, &on_rule_empty}}},
+    {{SYMBOL_BLOCK}, EmptyCode()}}},
   {SYMBOL_BLOCK, {
-    {{SYMBOL_BLOCK, SYMBOL_ASSIGN}, &on_rule_empty},
-    {{SYMBOL_ASSIGN}, &on_rule_empty}}},
+    {{SYMBOL_BLOCK, SYMBOL_ASSIGN}, EmptyCode()},
+    {{SYMBOL_ASSIGN}, EmptyCode()}}},
   {SYMBOL_ASSIGN, {
     {{SYMBOL_NAME, SYMBOL_EQUALS, SYMBOL_EXPR}, &on_rule_assign}}},
   {SYMBOL_EXPR, {
     {{SYMBOL_EXPR, SYMBOL_PLUS, SYMBOL_TERM}, &on_rule_plus},
     {{SYMBOL_EXPR, SYMBOL_MINUS, SYMBOL_TERM}, &on_rule_minus},
-    {{SYMBOL_TERM}, &on_rule_empty}}},
+    {{SYMBOL_TERM}, EmptyCode()}}},
   {SYMBOL_TERM, {
     {{SYMBOL_TERM, SYMBOL_MULTIPLY, SYMBOL_FACTOR}, &on_rule_multiply},
     {{SYMBOL_TERM, SYMBOL_DIVIDE, SYMBOL_FACTOR}, &on_rule_divide},
-    {{SYMBOL_FACTOR}, &on_rule_empty}}},
+    {{SYMBOL_FACTOR}, EmptyCode()}}},
   {SYMBOL_FACTOR, {
-    {{SYMBOL_OPEN_PAREN, SYMBOL_EXPR, SYMBOL_CLOSE_PAREN}, &on_rule_empty},
+    {{SYMBOL_OPEN_PAREN, SYMBOL_EXPR, SYMBOL_CLOSE_PAREN}, EmptyCode()},
     {{SYMBOL_NUM}, &on_rule_load},
     {{SYMBOL_NAME}, &on_rule_name}}}
   };

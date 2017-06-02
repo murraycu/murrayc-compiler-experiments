@@ -130,8 +130,12 @@ bottom_up_lr1_parse(const std::vector<Grammars::WordType>& words, typename T_Gra
       // for the callback:
       std::reverse(std::begin(values), std::end(values));
 
-      const auto code = item.code;
-      const auto value = code(store, values, rhs_words);
+      const auto& code = item.code;
+      typename T_Grammar::ValueType value = {};
+      if (code) {
+        value = code(store, values, rhs_words);
+      }
+
       st.emplace(StackElement<T_Grammar>{a, next_state, value, Grammars::WordType()});
     } else if (action.type == Action::Type::SHIFT) {
       const State next_state = static_cast<State>(action.arg);
