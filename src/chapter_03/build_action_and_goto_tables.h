@@ -418,7 +418,7 @@ public:
 };
 
 void
-print_action(const Action& action, const GrammarRulesByNumber& rules) {
+print_action(const Action& action, const Grammars::RulesByNumber& rules) {
   std::string str;
   switch (action.type) {
     case Action::Type::SHIFT:
@@ -439,7 +439,7 @@ print_action(const Action& action, const GrammarRulesByNumber& rules) {
 
   if (action.type == Action::Type::REDUCE) {
     std::cout << " (";
-    print_rule(rules.at(action.arg));
+    Grammars::print_rule(rules.at(action.arg));
     std::cout << ")";
   }
 }
@@ -448,7 +448,7 @@ using ActionTable = std::map<State, std::map<Symbol, Action>>;
 using GotoTable = std::map<State, std::map<Symbol, std::size_t>>;
 
 static void
-print_conflict(State state, const Symbol& symbol, const Action& old_action, const Action& action,  const GrammarRulesByNumber& rules) {
+print_conflict(State state, const Symbol& symbol, const Action& old_action, const Action& action,  const Grammars::RulesByNumber& rules) {
   std::cout << "Tables build failed: Cannot add new action for state: " << state << " for symbol: ";
   print_symbol(symbol);
   std::cout << ": " << std::endl;
@@ -473,7 +473,7 @@ print_conflict(State state, const Symbol& symbol, const Action& old_action, cons
 template <typename T_Grammar>
 static bool
 build_action_and_goto_tables(ActionTable& action_table, GotoTable& goto_table) {
-  const auto rules = rules_by_number<T_Grammar>();
+  const auto rules = Grammars::rules_by_number<T_Grammar>();
 
   // Get the rule numbers for each rule:
   std::map<Rule, std::size_t> rule_numbers;
@@ -587,7 +587,7 @@ build_action_and_goto_tables(ActionTable& action_table, GotoTable& goto_table) {
 template <typename T_Grammar>
 static bool
 match(
-  const WordsMap& words_map, const Symbol& symbol, const WordType& word) {
+  const Grammars::WordsMap& words_map, const Symbol& symbol, const Grammars::WordType& word) {
   const auto word_symbol = T_Grammar::recognise_word(words_map, word);
   return word_symbol == symbol;
 }

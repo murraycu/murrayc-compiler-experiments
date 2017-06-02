@@ -47,10 +47,10 @@ public:
     SYMBOL_GOAL, SYMBOL_EXPR, SYMBOL_TERM, SYMBOL_FACTOR,
     SYMBOL_PLUS, SYMBOL_MINUS, SYMBOL_MULTIPLY, SYMBOL_DIVIDE, SYMBOL_OPEN_PAREN, SYMBOL_CLOSE_PAREN, SYMBOL_NUM, SYMBOL_NAME, SYMBOL_EOF}};
 
-  static const GrammarRules rules;
+  static const Grammars::Rules rules;
 
   static Symbol
-  recognise_word(const WordsMap& words_map, const WordType& word) {
+  recognise_word(const Grammars::WordsMap& words_map, const Grammars::WordType& word) {
     // A rather dumb implementation just to get things working:
 
     const auto iter = words_map.find(word);
@@ -71,9 +71,9 @@ public:
     return SYMBOL_NAME;
   }
 
-  static WordsMap
+  static Grammars::WordsMap
   build_words_map() {
-    WordsMap result;
+    Grammars::WordsMap result;
 
     const std::vector<Symbol> simple = {{SYMBOL_PLUS, SYMBOL_MINUS,
       SYMBOL_MULTIPLY, SYMBOL_DIVIDE, SYMBOL_OPEN_PAREN, SYMBOL_CLOSE_PAREN}};
@@ -89,7 +89,7 @@ public:
   }
 };
 
-const GrammarRules ClassicExpressionGrammar::rules = {
+const Grammars::Rules ClassicExpressionGrammar::rules = {
   {SYMBOL_GOAL,
     {{SYMBOL_EXPR}}},
   {SYMBOL_EXPR, {

@@ -23,6 +23,8 @@
 #include <unordered_map>
 #include <vector>
 
+namespace Grammars {
+
 // A set of possible expansions.
 using Expansions = std::vector<Symbols>;
 
@@ -30,7 +32,7 @@ using Expansions = std::vector<Symbols>;
 // symbol to its possible expansions.  We could instead just have a flat set of
 // rules (in a multimap), with more than one with the same left symbol.  That
 // might be what the pseudo code in Figure 3.2 is meant to use.
-using GrammarRules = std::map<Symbol, Expansions>;
+using Rules = std::map<Symbol, Expansions>;
 
 using WordType = std::string;
 using WordsMap = std::map<WordType, Symbol>;
@@ -44,16 +46,16 @@ print_rule(const Production& rule) {
   print_symbols(rule.second);
 }
 
-using GrammarRulesByNumber = std::vector<Production>;
+using RulesByNumber = std::vector<Production>;
 
 /** Get a vector of rules, not necessarily grouped by the left-hand symbol,
  * letting us refer to a rule by a number (its position in the vector).
  */
 template <typename T_Grammar>
-GrammarRulesByNumber rules_by_number() {
+RulesByNumber rules_by_number() {
   // TODO: It would be nice to do this at compile time somehow.
 
-  static GrammarRulesByNumber result;
+  static RulesByNumber result;
   if (!result.empty()) {
     return result;
   }
@@ -69,10 +71,12 @@ GrammarRulesByNumber rules_by_number() {
   return result;
 }
 
+} // namespace Grammars
+
 // The "concept" for grammar classes:
 // Grammar {
 //  static const Symbols symbols;
-//  static const GrammarRules rules;
+//  static const Rules rules;
 //
 //  static const Symbol SYMBOL_GOAL;
 //  static const Symbol SYMBOL_EOF;

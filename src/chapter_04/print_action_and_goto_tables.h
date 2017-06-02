@@ -25,7 +25,7 @@ template <typename T_Grammar>
 void
 print_action_and_goto_tables(const ActionTable& action_table, const GotoTable& goto_table) {
   std::cout << "Rules:" << std::endl;
-  const auto& rules = rules_by_number<T_Grammar>();
+  const auto& rules = Grammars::rules_by_number<T_Grammar>();
   std::size_t i = 0;
   for (const auto& rule : rules) {
     std::cout << i << ": ";

@@ -39,10 +39,10 @@ public:
   static constexpr std::array<Symbol, 6> symbols = {{
     SYMBOL_GOAL, SYMBOL_LIST, SYMBOL_PAIR, SYMBOL_OPEN_PAREN, SYMBOL_CLOSE_PAREN, SYMBOL_EOF}};
 
-  static const GrammarRules rules;
+  static const Grammars::Rules rules;
 
   static Symbol
-  recognise_word(const WordsMap& words_map, const WordType& word) {
+  recognise_word(const Grammars::WordsMap& words_map, const Grammars::WordType& word) {
     // A rather dumb implementation just to get things working:
 
     const auto iter = words_map.find(word);
@@ -53,9 +53,9 @@ public:
     return SYMBOL_EMPTY;
   }
 
-  static WordsMap
+  static Grammars::WordsMap
   build_words_map() {
-    WordsMap result;
+    Grammars::WordsMap result;
 
     const std::vector<Symbol> simple = {{SYMBOL_OPEN_PAREN, SYMBOL_CLOSE_PAREN}};
     for (const auto& symbol : simple) {
@@ -70,7 +70,7 @@ public:
   }
 };
 
-const GrammarRules ParenthesesGrammar::rules = {
+const Grammars::Rules ParenthesesGrammar::rules = {
   {SYMBOL_GOAL,
     {{SYMBOL_LIST}}},
   {SYMBOL_LIST, {

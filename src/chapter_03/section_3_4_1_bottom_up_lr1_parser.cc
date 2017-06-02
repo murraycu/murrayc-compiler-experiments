@@ -171,7 +171,7 @@ const GotoTable goto_table = {
 template <typename T_Grammar>
 static bool
 match(
-  const WordsMap& words_map, const Symbol& symbol, const WordType& word) {
+  const Grammars::WordsMap& words_map, const Symbol& symbol, const Grammars::WordType& word) {
   const auto word_symbol = T_Grammar::recognise_word(words_map, word);
   return word_symbol == symbol;
 }
@@ -222,13 +222,13 @@ get_goto_from_table(const GotoTable& table, State state, const Symbol& symbol) {
  */
 template <typename T_Grammar>
 static Symbols
-bottom_up_lr1_parse(const std::vector<WordType>& words) {
+bottom_up_lr1_parse(const std::vector<Grammars::WordType>& words) {
   const auto n_words = words.size();
   if (n_words == 0) {
     return {};
   }
 
-  const auto rules = rules_by_number<T_Grammar>();
+  const auto rules = Grammars::rules_by_number<T_Grammar>();
 
   // The pseudo code puts both the symbol and the state (number) on the same
   // stack,

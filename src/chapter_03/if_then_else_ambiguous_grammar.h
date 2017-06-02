@@ -41,10 +41,10 @@ public:
   static constexpr std::array<Symbol, 8> symbols = {{
     SYMBOL_GOAL, SYMBOL_STMT, SYMBOL_IF, SYMBOL_EXPR, SYMBOL_THEN, SYMBOL_ELSE, SYMBOL_ASSIGN, SYMBOL_EOF}};
 
-  static const GrammarRules rules;
+  static const Grammars::Rules rules;
 
   static Symbol
-  recognise_word(const WordsMap& words_map, const WordType& word) {
+  recognise_word(const Grammars::WordsMap& words_map, const Grammars::WordType& word) {
     // A rather dumb implementation just to get things working:
 
     const auto iter = words_map.find(word);
@@ -55,9 +55,9 @@ public:
     return SYMBOL_EMPTY;
   }
 
-  static WordsMap
+  static Grammars::WordsMap
   build_words_map() {
-    WordsMap result;
+    Grammars::WordsMap result;
 
     for (const auto& symbol : symbols) {
       if (!symbol.terminal) {
@@ -75,7 +75,7 @@ public:
   }
 };
 
-const GrammarRules IfThenElseGrammar::rules = {
+const Grammars::Rules IfThenElseGrammar::rules = {
   {SYMBOL_GOAL,
     {{SYMBOL_STMT}}},
   {SYMBOL_STMT, {

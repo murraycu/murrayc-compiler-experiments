@@ -39,13 +39,13 @@
  */
 template <typename T_Grammar>
 static Symbols
-bottom_up_lr1_parse(const std::vector<WordType>& words) {
+bottom_up_lr1_parse(const std::vector<Grammars::WordType>& words) {
   const auto n_words = words.size();
   if (n_words == 0) {
     return {};
   }
 
-  const auto rules = rules_by_number<T_Grammar>();
+  const auto rules = Grammars::rules_by_number<T_Grammar>();
 
   ActionTable action_table;
   GotoTable goto_table;

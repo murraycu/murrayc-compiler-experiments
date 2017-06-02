@@ -33,7 +33,7 @@
 template <typename T_Grammar>
 static bool
 match(
-  const WordsMap& words_map, const Symbol& symbol, const WordType& word) {
+  const Grammars::WordsMap& words_map, const Symbol& symbol, const Grammars::WordType& word) {
   const auto word_symbol = T_Grammar::recognise_word(words_map, word);
   return word_symbol == symbol;
 }
@@ -90,7 +90,7 @@ check_grammar_is_backtrack_free() {
 
 template <typename T_Grammar>
 static Symbols
-top_down_parse(const std::vector<WordType>& words) {
+top_down_parse(const std::vector<Grammars::WordType>& words) {
   const auto& rules = T_Grammar::rules;
 
   // We gradually build up the answer in this stack:

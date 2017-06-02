@@ -45,10 +45,10 @@ public:
     SYMBOL_0, SYMBOL_1, SYMBOL_PLUS, SYMBOL_MINUS, SYMBOL_EOF}};
 
 
-  static const GrammarRules rules;
+  static const Grammars::Rules rules;
 
   static Symbol
-  recognise_word(const WordsMap& words_map, const WordType& word) {
+  recognise_word(const Grammars::WordsMap& words_map, const Grammars::WordType& word) {
     // A rather dumb implementation just to get things working:
 
     const auto iter = words_map.find(word);
@@ -59,9 +59,9 @@ public:
     return SYMBOL_EMPTY;
   }
 
-  static WordsMap
+  static Grammars::WordsMap
   build_words_map() {
-    WordsMap result;
+    Grammars::WordsMap result;
 
     for (const auto& symbol : symbols) {
       if (!symbol.terminal) {
@@ -83,7 +83,7 @@ public:
 // of "Engineering a Compiler".
 // But without the subscripts, and with an extra rule for the goal symbol,
 // for consistency with the other grammars.
-const GrammarRules SignedBinaryNumbersGrammar::rules = {
+const Grammars::Rules SignedBinaryNumbersGrammar::rules = {
   {SYMBOL_GOAL, {
     {SYMBOL_NUMBER}}},
   {SYMBOL_NUMBER, {

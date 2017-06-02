@@ -48,10 +48,10 @@ public:
     SYMBOL_0, SYMBOL_1, SYMBOL_PLUS, SYMBOL_MINUS, SYMBOL_EOF}};
 
 
-  static const GrammarRules<ValueType, StoreType> rules;
+  static const Grammars::Rules<ValueType, StoreType> rules;
 
   static Symbol
-  recognise_word(const WordsMap& words_map, const WordType& word) {
+  recognise_word(const Grammars::WordsMap& words_map, const Grammars::WordType& word) {
     // A rather dumb implementation just to get things working:
 
     const auto iter = words_map.find(word);
@@ -62,9 +62,9 @@ public:
     return SYMBOL_EMPTY;
   }
 
-  static WordsMap
+  static Grammars::WordsMap
   build_words_map() {
-    WordsMap result;
+    Grammars::WordsMap result;
 
     for (const auto& symbol : symbols) {
       if (!symbol.terminal) {
@@ -82,7 +82,7 @@ public:
   }
 
   static int
-  on_rule_1(const int& /* store */, const std::vector<int>& values, const std::vector<WordType>& /* words */) {
+  on_rule_1(const int& /* store */, const std::vector<int>& values, const std::vector<Grammars::WordType>& /* words */) {
     assert(!values.empty());
 
     // Just pass it up:
@@ -90,7 +90,7 @@ public:
   }
 
   static int
-  on_rule_2(const int& /* store */, const std::vector<int>& values, const std::vector<WordType>& /* words */) {
+  on_rule_2(const int& /* store */, const std::vector<int>& values, const std::vector<Grammars::WordType>& /* words */) {
     assert(values.size() == 2);
 
     const auto& sign_val = values[0]; 
@@ -100,17 +100,17 @@ public:
   }
 
   static int
-  on_rule_3(const int& /* store */, const std::vector<int>& /* values */, const std::vector<WordType>& /* words */) {
+  on_rule_3(const int& /* store */, const std::vector<int>& /* values */, const std::vector<Grammars::WordType>& /* words */) {
     return 1;
   }
 
   static int
-  on_rule_4(const int& /* store */, const std::vector<int>& /* values */, const std::vector<WordType>& /* words */) {
+  on_rule_4(const int& /* store */, const std::vector<int>& /* values */, const std::vector<Grammars::WordType>& /* words */) {
     return -1;
   }
 
   static int
-  on_rule_5(const int& /* store */, const std::vector<int>& values, const std::vector<WordType>& /* words */) {
+  on_rule_5(const int& /* store */, const std::vector<int>& values, const std::vector<Grammars::WordType>& /* words */) {
     assert(values.size() == 1);
 
     const auto& bit_val = values[0];
@@ -118,7 +118,7 @@ public:
   }
 
   static int
-  on_rule_6(const int& /* store */, const std::vector<int>& values, const std::vector<WordType>& /* words */) {
+  on_rule_6(const int& /* store */, const std::vector<int>& values, const std::vector<Grammars::WordType>& /* words */) {
     assert(values.size() == 2);
 
     const auto& list_val = values[0]; 
@@ -127,12 +127,12 @@ public:
   }
 
   static int
-  on_rule_7(const int& /* store */, const std::vector<int>& /* values */, const std::vector<WordType>& /* words */) {
+  on_rule_7(const int& /* store */, const std::vector<int>& /* values */, const std::vector<Grammars::WordType>& /* words */) {
     return 0;
   }
 
   static int
-  on_rule_8(const int& /* store */, const std::vector<int>& /* values */, const std::vector<WordType>& /* words */) {
+  on_rule_8(const int& /* store */, const std::vector<int>& /* values */, const std::vector<Grammars::WordType>& /* words */) {
     return 1;
   }
 };
@@ -141,7 +141,7 @@ public:
 // of "Engineering a Compiler".
 // But without the subscripts, and with an extra rule for the goal symbol,
 // for consistency with the other grammars.
-const GrammarRules<SignedBinaryNumbersGrammar::ValueType, SignedBinaryNumbersGrammar::StoreType> SignedBinaryNumbersGrammar::rules = {
+const Grammars::Rules<SignedBinaryNumbersGrammar::ValueType, SignedBinaryNumbersGrammar::StoreType> SignedBinaryNumbersGrammar::rules = {
   {SYMBOL_GOAL, {
     {{SYMBOL_NUMBER}, &on_rule_1}}},
   {SYMBOL_NUMBER, {

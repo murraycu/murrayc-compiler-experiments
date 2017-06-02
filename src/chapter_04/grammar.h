@@ -24,6 +24,9 @@
 #include <unordered_map>
 #include <vector>
 
+namespace Grammars
+{
+
 using WordType = std::string;
 using WordsMap = std::map<WordType, Symbol>;
 
@@ -58,7 +61,7 @@ using Expansions = std::vector<ExpansionItem<T_Value, T_Store>>;
 // rules (in a multimap), with more than one with the same left symbol.  That
 // might be what the pseudo code in Figure 3.2 is meant to use.
 template <typename T_Value, typename T_Store>
-using GrammarRules = std::map<Symbol, Expansions<T_Value, T_Store>>;
+using Rules = std::map<Symbol, Expansions<T_Value, T_Store>>;
 
 using Production = std::pair<Symbol, Symbols>;
 
@@ -71,24 +74,24 @@ print_rule(const Production& rule) {
 
 
 template <typename T_Value, typename T_Store>
-class GrammarRulesByNumberElement {
+class RulesByNumberElement {
 public:
   Production production;
   CodeSnippet<T_Value, T_Store> code;
 };
 
 template <typename T_Value, typename T_Store>
-using GrammarRulesByNumber = std::vector<GrammarRulesByNumberElement<T_Value, T_Store>>;
+using RulesByNumber = std::vector<RulesByNumberElement<T_Value, T_Store>>;
 
 /** Get a vector of rules, not necessarily grouped by the left-hand symbol,
  * letting us refer to a rule by a number (its position in the vector).
  */
 template <typename T_Grammar>
-GrammarRulesByNumber<typename T_Grammar::ValueType, typename T_Grammar::StoreType>
+RulesByNumber<typename T_Grammar::ValueType, typename T_Grammar::StoreType>
 rules_by_number() {
   // TODO: It would be nice to do this at compile time somehow.
 
-  static GrammarRulesByNumber<typename T_Grammar::ValueType, typename T_Grammar::StoreType> result;
+  static RulesByNumber<typename T_Grammar::ValueType, typename T_Grammar::StoreType> result;
   if (!result.empty()) {
     return result;
   }
@@ -100,7 +103,7 @@ rules_by_number() {
       const auto& b = item.expansion;
       const auto& code = item.code;
 
-      using Element = GrammarRulesByNumberElement<typename T_Grammar::ValueType, typename T_Grammar::StoreType>;
+      using Element = RulesByNumberElement<typename T_Grammar::ValueType, typename T_Grammar::StoreType>;
       const Element ritem = {{a, b}, code};
       result.emplace_back(ritem);
     }
@@ -108,6 +111,8 @@ rules_by_number() {
 
   return result;
 }
+
+} // namespace Grammars
 
 // The "concept" for grammar classes:
 // Grammar {

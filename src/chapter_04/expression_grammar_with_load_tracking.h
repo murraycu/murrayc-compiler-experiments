@@ -38,7 +38,7 @@ public:
       LOAD = 3
     };
 
-    std::unordered_set<WordType> loaded;
+    std::unordered_set<Grammars::WordType> loaded;
     int cost = 0;
   };
 
@@ -71,10 +71,10 @@ public:
     SYMBOL_GOAL, SYMBOL_BLOCK, SYMBOL_ASSIGN, SYMBOL_EXPR, SYMBOL_TERM, SYMBOL_FACTOR,
     SYMBOL_EQUALS, SYMBOL_PLUS, SYMBOL_MINUS, SYMBOL_MULTIPLY, SYMBOL_DIVIDE, SYMBOL_OPEN_PAREN, SYMBOL_CLOSE_PAREN, SYMBOL_NUM, SYMBOL_NAME, SYMBOL_EOF}};
 
-  static const GrammarRules<ValueType, StoreType> rules;
+  static const Grammars::Rules<ValueType, StoreType> rules;
 
   static Symbol
-  recognise_word(const WordsMap& words_map, const WordType& word) {
+  recognise_word(const Grammars::WordsMap& words_map, const Grammars::WordType& word) {
     // A rather dumb implementation just to get things working:
 
     const auto iter = words_map.find(word);
@@ -95,9 +95,9 @@ public:
     return SYMBOL_NAME;
   }
 
-  static WordsMap
+  static Grammars::WordsMap
   build_words_map() {
-    WordsMap result;
+    Grammars::WordsMap result;
 
     for (const auto& symbol : symbols) {
       if (!symbol.terminal) {
@@ -115,56 +115,56 @@ public:
   }
 
   static int
-  on_rule_empty(StoreType& /* store */, const std::vector<int>& /* values */, const std::vector<WordType>& /* words */) {
+  on_rule_empty(StoreType& /* store */, const std::vector<int>& /* values */, const std::vector<Grammars::WordType>& /* words */) {
     return 0;
   }
 
   static int
-  on_rule_assign(StoreType& store, const std::vector<int>& /* values */, const std::vector<WordType>& /* words */) {
+  on_rule_assign(StoreType& store, const std::vector<int>& /* values */, const std::vector<Grammars::WordType>& /* words */) {
     store.cost += static_cast<int>(StoreType::Cost::STORE);
 
     return 0;
   }
 
   static int
-  on_rule_plus(StoreType& store, const std::vector<int>& /* values */, const std::vector<WordType>& /* words */) {
+  on_rule_plus(StoreType& store, const std::vector<int>& /* values */, const std::vector<Grammars::WordType>& /* words */) {
     store.cost += static_cast<int>(StoreType::Cost::ADD);
 
     return 0;
   }
 
   static int
-  on_rule_minus(StoreType& store, const std::vector<int>& /* values */, const std::vector<WordType>& /* words */) {
+  on_rule_minus(StoreType& store, const std::vector<int>& /* values */, const std::vector<Grammars::WordType>& /* words */) {
     store.cost += static_cast<int>(StoreType::Cost::SUBTRACT);
 
     return 0;
   }
 
   static int
-  on_rule_multiply(StoreType& store, const std::vector<int>& /* values */, const std::vector<WordType>& /* words */) {
+  on_rule_multiply(StoreType& store, const std::vector<int>& /* values */, const std::vector<Grammars::WordType>& /* words */) {
     store.cost += static_cast<int>(StoreType::Cost::MULTIPLY);
 
     return 0;
   }
 
   static int
-  on_rule_divide(StoreType& store, const std::vector<int>& /* values */, const std::vector<WordType>& /* words */) {
+  on_rule_divide(StoreType& store, const std::vector<int>& /* values */, const std::vector<Grammars::WordType>& /* words */) {
     store.cost += static_cast<int>(StoreType::Cost::DIVIDE);
 
     return 0;
   }
 
   static int
-  on_rule_load(StoreType& store, const std::vector<int>& /* values */, const std::vector<WordType>& /* words */) {
+  on_rule_load(StoreType& store, const std::vector<int>& /* values */, const std::vector<Grammars::WordType>& /* words */) {
     store.cost += static_cast<int>(StoreType::Cost::LOAD);
 
     return 0;
   }
 
   static int
-  on_rule_name(StoreType& store, const std::vector<int>& /* values */, const std::vector<WordType>& words) {
+  on_rule_name(StoreType& store, const std::vector<int>& /* values */, const std::vector<Grammars::WordType>& words) {
     assert(!words.empty());
-    const WordType name = words[0];
+    const Grammars::WordType name = words[0];
     assert(!name.empty());
     std::cout << "name: " << name << std::endl;
 
@@ -180,7 +180,7 @@ public:
 // Based on Figure 4.12 (based on Figure 4.8), from section 4.4.2, on page 203,
 // of "Engineering a Compiler".
 // With an extra rule for the goal symbol, for consistency with the other grammars.
-const GrammarRules<ExpressionGrammarWithLoadTracking::ValueType, ExpressionGrammarWithLoadTracking::StoreType> ExpressionGrammarWithLoadTracking::rules = {
+const Grammars::Rules<ExpressionGrammarWithLoadTracking::ValueType, ExpressionGrammarWithLoadTracking::StoreType> ExpressionGrammarWithLoadTracking::rules = {
   {SYMBOL_GOAL, {
     {{SYMBOL_BLOCK}, &on_rule_empty}}},
   {SYMBOL_BLOCK, {

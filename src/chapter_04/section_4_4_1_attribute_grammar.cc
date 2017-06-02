@@ -45,7 +45,7 @@ public:
   Symbol symbol;
   State state;
   typename T_Grammar::ValueType value;
-  WordType word;
+  Grammars::WordType word;
 };
 
 /** Based on the description in section 4.4.1,
@@ -61,13 +61,13 @@ public:
  */
 template <typename T_Grammar>
 static ParseResult<T_Grammar>
-bottom_up_lr1_parse(const std::vector<WordType>& words, typename T_Grammar::StoreType& store) {
+bottom_up_lr1_parse(const std::vector<Grammars::WordType>& words, typename T_Grammar::StoreType& store) {
   const auto n_words = words.size();
   if (n_words == 0) {
     return {};
   }
 
-  const auto rules = rules_by_number<T_Grammar>();
+  const auto rules = Grammars::rules_by_number<T_Grammar>();
 
   ActionTable action_table;
   GotoTable goto_table;
@@ -79,7 +79,7 @@ bottom_up_lr1_parse(const std::vector<WordType>& words, typename T_Grammar::Stor
 
   std::stack<StackElement<T_Grammar>> st;
 
-  st.emplace(StackElement<T_Grammar>{T_Grammar::SYMBOL_GOAL, 0, typename T_Grammar::ValueType(), WordType()});
+  st.emplace(StackElement<T_Grammar>{T_Grammar::SYMBOL_GOAL, 0, typename T_Grammar::ValueType(), Grammars::WordType()});
 
   const auto words_map = T_Grammar::build_words_map();
 
@@ -107,7 +107,7 @@ bottom_up_lr1_parse(const std::vector<WordType>& words, typename T_Grammar::Stor
 
       // Pop the items from the stack, getting the values:
       std::vector<typename T_Grammar::ValueType> values;
-      std::vector<WordType> rhs_words;
+      std::vector<Grammars::WordType> rhs_words;
       for (auto i = 0u; i < b.size(); ++i) {
         const auto& sitem = st.top();
         const auto& v = sitem.value;
@@ -132,7 +132,7 @@ bottom_up_lr1_parse(const std::vector<WordType>& words, typename T_Grammar::Stor
 
       const auto code = item.code;
       const auto value = code(store, values, rhs_words);
-      st.emplace(StackElement<T_Grammar>{a, next_state, value, WordType()});
+      st.emplace(StackElement<T_Grammar>{a, next_state, value, Grammars::WordType()});
     } else if (action.type == Action::Type::SHIFT) {
       const State next_state = static_cast<State>(action.arg);
 
@@ -158,7 +158,7 @@ bottom_up_lr1_parse(const std::vector<WordType>& words, typename T_Grammar::Stor
 
 template <typename T_Grammar>
 static ParseResult<T_Grammar>
-bottom_up_lr1_parse(const std::vector<WordType>& words) {
+bottom_up_lr1_parse(const std::vector<Grammars::WordType>& words) {
   // The single store instance that is passed to all code snippets.
   typename T_Grammar::StoreType store = typename T_Grammar::StoreType();
 

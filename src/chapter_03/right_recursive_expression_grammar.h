@@ -50,10 +50,10 @@ public:
     SYMBOL_PLUS, SYMBOL_MINUS, SYMBOL_MULTIPLY, SYMBOL_DIVIDE, SYMBOL_OPEN_PAREN, SYMBOL_CLOSE_PAREN, SYMBOL_NUM, SYMBOL_NAME, SYMBOL_EOF}};
 
   /// The "right-recursive variant of the classic expression grammar" from page 101, in section 3.3.1.
-  static const GrammarRules rules;
+  static const Grammars::Rules rules;
 
   static Symbol
-  recognise_word(const WordsMap& words_map, const WordType& word) {
+  recognise_word(const Grammars::WordsMap& words_map, const Grammars::WordType& word) {
     // A rather dumb implementation just to get things working:
 
     const auto iter = words_map.find(word);
@@ -74,9 +74,9 @@ public:
     return SYMBOL_NAME;
   }
 
-  static WordsMap
+  static Grammars::WordsMap
   build_words_map() {
-    WordsMap result;
+    Grammars::WordsMap result;
 
     const std::vector<Symbol> simple = {{SYMBOL_PLUS, SYMBOL_MINUS,
       SYMBOL_MULTIPLY, SYMBOL_DIVIDE, SYMBOL_OPEN_PAREN, SYMBOL_CLOSE_PAREN}};
@@ -92,7 +92,7 @@ public:
   }
 };
 
-const GrammarRules RightRecursiveExpressionGrammar::rules = {
+const Grammars::Rules RightRecursiveExpressionGrammar::rules = {
   {SYMBOL_GOAL,
     {{SYMBOL_EXPR}}},
   {SYMBOL_EXPR, {
