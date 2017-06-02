@@ -24,6 +24,7 @@
 class SignedBinaryNumbersGrammar {
 public:
   using ValueType = int;
+  using StoreType = int; // Not used.
 
   // Non-terminals:
   static constexpr Symbol SYMBOL_GOAL = {"Goal"};
@@ -47,7 +48,7 @@ public:
     SYMBOL_0, SYMBOL_1, SYMBOL_PLUS, SYMBOL_MINUS, SYMBOL_EOF}};
 
 
-  static const GrammarRules<ValueType> rules;
+  static const GrammarRules<ValueType, StoreType> rules;
 
   static Symbol
   recognise_word(const WordsMap& words_map, const std::string& word) {
@@ -81,7 +82,7 @@ public:
   }
 
   static int
-  on_rule_1(const std::vector<int>& values) {
+  on_rule_1(const int& /* store */, const std::vector<int>& values) {
     assert(!values.empty());
 
     // Just pass it up:
@@ -89,7 +90,7 @@ public:
   }
 
   static int
-  on_rule_2(const std::vector<int>& values) {
+  on_rule_2(const int& /* store */, const std::vector<int>& values) {
     assert(values.size() == 2);
 
     const auto& sign_val = values[0]; 
@@ -99,17 +100,17 @@ public:
   }
 
   static int
-  on_rule_3(const std::vector<int>& /* values */) {
+  on_rule_3(const int& /* store */, const std::vector<int>& /* values */) {
     return 1;
   }
 
   static int
-  on_rule_4(const std::vector<int>& /* values */) {
+  on_rule_4(const int& /* store */, const std::vector<int>& /* values */) {
     return -1;
   }
 
   static int
-  on_rule_5(const std::vector<int>& values) {
+  on_rule_5(const int& /* store */, const std::vector<int>& values) {
     assert(values.size() == 1);
 
     const auto& bit_val = values[0];
@@ -117,7 +118,7 @@ public:
   }
 
   static int
-  on_rule_6(const std::vector<int>& values) {
+  on_rule_6(const int& /* store */, const std::vector<int>& values) {
     assert(values.size() == 2);
 
     const auto& list_val = values[0]; 
@@ -126,12 +127,12 @@ public:
   }
 
   static int
-  on_rule_7(const std::vector<int>& /* values */) {
+  on_rule_7(const int& /* store */, const std::vector<int>& /* values */) {
     return 0;
   }
 
   static int
-  on_rule_8(const std::vector<int>& /* values */) {
+  on_rule_8(const int& /* store */, const std::vector<int>& /* values */) {
     return 1;
   }
 };
@@ -140,7 +141,7 @@ public:
 // of "Engineering a Compiler".
 // But without the subscripts, and with an extra rule for the goal symbol,
 // for consistency with the other grammars.
-const GrammarRules<SignedBinaryNumbersGrammar::ValueType> SignedBinaryNumbersGrammar::rules = {
+const GrammarRules<SignedBinaryNumbersGrammar::ValueType, SignedBinaryNumbersGrammar::StoreType> SignedBinaryNumbersGrammar::rules = {
   {SYMBOL_GOAL, {
     {{SYMBOL_NUMBER}, &on_rule_1}}},
   {SYMBOL_NUMBER, {

@@ -24,6 +24,7 @@
 class ExpressionGrammarWithLoadTracking {
 public:
   using ValueType = int;
+  using StoreType = int; // Not used.
 
   // Non-terminals:
   static constexpr Symbol SYMBOL_GOAL = {"Goal"};
@@ -52,7 +53,7 @@ public:
     SYMBOL_GOAL, SYMBOL_BLOCK, SYMBOL_ASSIGN, SYMBOL_EXPR, SYMBOL_TERM, SYMBOL_FACTOR,
     SYMBOL_EQUALS, SYMBOL_PLUS, SYMBOL_MINUS, SYMBOL_MULTIPLY, SYMBOL_DIVIDE, SYMBOL_OPEN_PAREN, SYMBOL_CLOSE_PAREN, SYMBOL_NUM, SYMBOL_NAME, SYMBOL_EOF}};
 
-  static const GrammarRules<ValueType> rules;
+  static const GrammarRules<ValueType, StoreType> rules;
 
   static Symbol
   recognise_word(const WordsMap& words_map, const std::string& word) {
@@ -96,7 +97,7 @@ public:
   }
 
   static int
-  on_rule_1(const std::vector<int>& /* values */) {
+  on_rule_1(StoreType& /* store */, const std::vector<int>& /* values */) {
     return 0;
   }
 };
@@ -104,7 +105,7 @@ public:
 // Based on Figure 4.12 (based on Figure 4.8), from section 4.4.2, on page 203,
 // of "Engineering a Compiler".
 // With an extra rule for the goal symbol, for consistency with the other grammars.
-const GrammarRules<ExpressionGrammarWithLoadTracking::ValueType> ExpressionGrammarWithLoadTracking::rules = {
+const GrammarRules<ExpressionGrammarWithLoadTracking::ValueType, ExpressionGrammarWithLoadTracking::StoreType> ExpressionGrammarWithLoadTracking::rules = {
   {SYMBOL_GOAL, {
     {{SYMBOL_BLOCK}, &on_rule_1}}},
   {SYMBOL_BLOCK, {

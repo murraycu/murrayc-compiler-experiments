@@ -421,9 +421,9 @@ public:
   std::size_t arg = 0;
 };
 
-template <typename T_Value>
+template <typename T_Value, typename T_Store>
 void
-print_action(const Action& action, const GrammarRulesByNumber<T_Value>& rules) {
+print_action(const Action& action, const GrammarRulesByNumber<T_Value, T_Store>& rules) {
   std::string str;
   switch (action.type) {
     case Action::Type::SHIFT:
@@ -435,6 +435,7 @@ print_action(const Action& action, const GrammarRulesByNumber<T_Value>& rules) {
     case Action::Type::ACCEPT:
       str = "a";
       break;
+
     default:
       str = "?";
       break;
@@ -453,9 +454,9 @@ print_action(const Action& action, const GrammarRulesByNumber<T_Value>& rules) {
 using ActionTable = std::map<State, std::map<Symbol, Action>>;
 using GotoTable = std::map<State, std::map<Symbol, std::size_t>>;
 
-template <typename T_Value>
+template <typename T_Value, typename T_Store>
 static void
-print_conflict(State state, const Symbol& symbol, const Action& old_action, const Action& action,  const GrammarRulesByNumber<T_Value>& rules) {
+print_conflict(State state, const Symbol& symbol, const Action& old_action, const Action& action,  const GrammarRulesByNumber<T_Value, T_Store>& rules) {
   std::cout << "Tables build failed: Cannot add new action for state: " << state << " for symbol: ";
   print_symbol(symbol);
   std::cout << ": " << std::endl;

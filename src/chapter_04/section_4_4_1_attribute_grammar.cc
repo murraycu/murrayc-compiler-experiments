@@ -115,7 +115,7 @@ bottom_up_lr1_parse(const std::vector<std::string>& words) {
       std::reverse(std::begin(values), std::end(values));
 
       const auto code = item.code;
-      const auto value = code(values);
+      const auto value = code(store, values);
       st.emplace(a, next_state, value);
     } else if (action.type == Action::Type::SHIFT) {
       const auto next_state = action.arg;
@@ -138,6 +138,15 @@ bottom_up_lr1_parse(const std::vector<std::string>& words) {
   const auto& item = st.top();
   const auto& value = std::get<2>(item);
   return {result, value};
+}
+
+template <typename T_Grammar>
+static ParseResult<T_Grammar>
+bottom_up_lr1_parse(const std::vector<WordType>& words) {
+  // The single store instance that is passed to all code snippets.
+  typename T_Grammar::StoreType store = typename T_Grammar::StoreType();
+
+  return bottom_up_lr1_parse<T_Grammar>(words, store);
 }
 
 static void
