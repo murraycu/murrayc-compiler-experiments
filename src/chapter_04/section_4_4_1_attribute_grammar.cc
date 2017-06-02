@@ -164,7 +164,7 @@ template <typename T_Grammar>
 static ParseResult<T_Grammar>
 bottom_up_lr1_parse(const std::vector<Grammars::WordType>& words) {
   // The single store instance that is passed to all code snippets.
-  typename T_Grammar::StoreType store = typename T_Grammar::StoreType();
+  typename T_Grammar::StoreType store = {};
 
   return bottom_up_lr1_parse<T_Grammar>(words, store);
 }
