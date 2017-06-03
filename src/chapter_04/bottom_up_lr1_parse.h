@@ -63,18 +63,19 @@ bottom_up_lr1_parse(const std::vector<Grammars::WordType>& words, typename T_Gra
   }
 
   const auto rules = Grammars::rules_by_number<T_Grammar>();
+  using Value = typename T_Grammar::ValueType;
 
   ActionTable action_table;
   GotoTable goto_table;
   const auto built = build_action_and_goto_tables<T_Grammar>(action_table, goto_table);
   if (!built) {
     // A real parser would return some real clues.
-    return {{SYMBOL_ERROR}, 0};
+    return {{SYMBOL_ERROR}, Value()};
   }
 
   std::stack<StackElement<T_Grammar>> st;
 
-  st.emplace(StackElement<T_Grammar>{T_Grammar::SYMBOL_GOAL, 0, typename T_Grammar::ValueType(), Grammars::WordType()});
+  st.emplace(StackElement<T_Grammar>{T_Grammar::SYMBOL_GOAL, 0, Value(), Grammars::WordType()});
 
   const auto words_map = T_Grammar::build_words_map();
 
@@ -101,7 +102,7 @@ bottom_up_lr1_parse(const std::vector<Grammars::WordType>& words, typename T_Gra
       const auto& b = rule.second;
 
       // Pop the items from the stack, getting the values:
-      std::vector<typename T_Grammar::ValueType> values;
+      std::vector<Value> values;
       std::vector<Grammars::WordType> rhs_words;
       for (auto i = 0u; i < b.size(); ++i) {
         const auto& sitem = st.top();
@@ -126,7 +127,7 @@ bottom_up_lr1_parse(const std::vector<Grammars::WordType>& words, typename T_Gra
       std::reverse(std::begin(values), std::end(values));
 
       const auto& code = item.code;
-      typename T_Grammar::ValueType value = {};
+      Value value = {};
       if (code) {
         value = code(store, values, rhs_words);
       }
@@ -135,7 +136,7 @@ bottom_up_lr1_parse(const std::vector<Grammars::WordType>& words, typename T_Gra
     } else if (action.type == Action::Type::SHIFT) {
       const State next_state = static_cast<State>(action.arg);
 
-      st.emplace(StackElement<T_Grammar>{symbol_for_word, next_state, 0, word});
+      st.emplace(StackElement<T_Grammar>{symbol_for_word, next_state, Value(), word});
 
       if (symbol_for_word.terminal) {
         result.emplace_back(symbol_for_word);
@@ -146,7 +147,7 @@ bottom_up_lr1_parse(const std::vector<Grammars::WordType>& words, typename T_Gra
     } else if (action.type == Action::Type::ACCEPT) {
       break;
     } else {
-      return {{SYMBOL_ERROR}, 0};
+      return {{SYMBOL_ERROR}, Value()};
     }
   }
 
