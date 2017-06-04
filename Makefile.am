@@ -32,7 +32,8 @@ check_PROGRAMS = \
   section_3_4_1_bottom_up_lr1_parser \
   section_3_4_2_bottom_up_lr1_parser_with_generated_tables \
   section_4_4_1_ad_hoc_syntax_directed_translation_signed_binary_numbers \
-  section_4_4_2_ad_hoc_syntax_directed_translation_tracking_loads
+  section_4_4_2_ad_hoc_syntax_directed_translation_tracking_loads \
+  section_4_4_2_ad_hoc_syntax_directed_translation_build_ast
 
 TESTS = $(check_PROGRAMS)
 
@@ -152,4 +153,18 @@ section_4_4_2_ad_hoc_syntax_directed_translation_tracking_loads_SOURCES = \
 section_4_4_2_ad_hoc_syntax_directed_translation_tracking_loads_CXXFLAGS = \
 	$(COMMON_CXXFLAGS)
 section_4_4_2_ad_hoc_syntax_directed_translation_tracking_loads_LDADD = \
+	$(COMMON_LIBS)
+
+section_4_4_2_ad_hoc_syntax_directed_translation_build_ast_SOURCES = \
+	src/chapter_04/grammar.h \
+	src/chapter_04/symbol.h \
+	src/chapter_04/build_sets.h \
+	src/chapter_04/build_action_and_goto_tables.h \
+	src/chapter_04/print_action_and_goto_tables.h \
+	src/chapter_04/bottom_up_lr1_parse.h \
+	src/chapter_04/expression_grammar_with_load_tracking.h \
+	src/chapter_04/section_4_4_2_ad_hoc_syntax_directed_translation_build_ast.cc
+section_4_4_2_ad_hoc_syntax_directed_translation_build_ast_CXXFLAGS = \
+	$(COMMON_CXXFLAGS)
+section_4_4_2_ad_hoc_syntax_directed_translation_build_ast_LDADD = \
 	$(COMMON_LIBS)
