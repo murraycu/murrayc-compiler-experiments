@@ -52,6 +52,8 @@ public:
   public:
     // The root of the AST,
     // just so we can delete the whole tree later.
+    // TODO: This only works if we parse successfully, all the way up to a root.
+    // Otherwise there will be separate unconnected sub-trees which will leak.
     Node* root = nullptr;
   };
 
