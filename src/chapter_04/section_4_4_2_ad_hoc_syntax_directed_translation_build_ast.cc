@@ -41,7 +41,7 @@ test_expression_grammar_with_load_tracking() {
     assert(node);
     assert(node->value().type == Grammar::Type::REAL);
 
-    // TODO: Print AST.
+    node->print();
   }
 }
 

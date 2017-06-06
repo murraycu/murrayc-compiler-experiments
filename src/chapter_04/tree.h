@@ -19,6 +19,7 @@
 #define MURRAYC_COMPILER_EXPERIMENTS_TREE_H
 
 #include <vector>
+#include <cmath>
 
 template <typename T_Value>
 class TreeNode {
@@ -86,13 +87,82 @@ public:
     return parent;
   }
 
+  void print() {
+    const auto max_depth = get_max_depth();
+
+    for (std::size_t i = 0; i <= max_depth; ++i) {
+      // The spacing should be 1, 3, 7, 15, etc, starting from the bottom.
+      const auto indent = std::pow(2, max_depth - i + 1) - 1;
+      print_indent(indent / 2);
+      const auto printed = print_level(i, indent);
+      std::cout << std::endl;
+      if (!printed) {
+        break;
+      }
+    }
+  }
+
 private:
+  static void
+  print_indent(std::size_t indent) {
+    for (std::size_t i = 0; i < indent; ++i) {
+      std::cout << ' ';
+    }
+  }
+
+  /** Prints only the items at this exact @a depth.
+   * @result Whether there were any nodes at that @a depth.
+   */
+  bool
+  print_level(std::size_t depth, std::size_t indent) const {
+    if (depth == 0) {
+      std::cout << value_;
+      print_indent(indent);
+      return true;
+    }
+
+    bool result = false;
+    for (const auto& child_node : children_) {
+      if (!child_node) {
+        // Print a space to keep the other ites aligned.
+        // TODO: This assume that all items are a single character.
+        std::cout << " ";
+        print_indent(indent);
+        continue;
+      }
+
+      if (child_node->print_level(depth - 1, indent)) {
+        result = true;
+      }
+    }
+
+    return result;
+  }
+
   void remove_all_children() {
     for (auto child : children_) {
       delete child;
     }
 
     children_.clear();
+  }
+
+  std::size_t
+  get_max_depth() const {
+    std::size_t result = 0;
+
+    for (const auto& child_node : children_) {
+      if (!child_node) {
+        continue;
+      }
+
+      const auto depth = child_node->get_max_depth();
+      if (depth > result) {
+        result = depth;
+      }
+    }
+
+    return result + 1;
   }
 
   T_Value value_;

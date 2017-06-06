@@ -292,4 +292,15 @@ const Grammars::Rules<ExpressionGrammarWithAst::ValueType, ExpressionGrammarWith
     {{SYMBOL_NAME}, &on_rule_name}}}
   };
 
+std::ostream&
+operator <<(std::ostream& stream, const ExpressionGrammarWithAst::Details& details) {
+  stream << details.symbol.name;
+  if (details.symbol == ExpressionGrammarWithAst::SYMBOL_NAME ||
+      details.symbol == ExpressionGrammarWithAst::SYMBOL_NUM) {
+    stream << " (" << details.text << ")";
+  }
+
+  return stream;
+}
+
 #endif // MURRAYC_COMPILER_EXPERIMENTS_EXPRESSION_GRAMMAR_WITH_AST_H
