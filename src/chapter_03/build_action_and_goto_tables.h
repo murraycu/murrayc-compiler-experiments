@@ -164,7 +164,7 @@ closure(CCSet& s, const FirstSets& first) {
     const auto scopy = s;
     for (const auto& item : scopy) {
       // Get the C symbol, after the placeholder:
-      const auto [b, cd] = split_rule(item.production.second, item.placeholder);
+      const auto [b_ignored, cd] = split_rule(item.production.second, item.placeholder);
       if (cd.empty()) {
         continue;
       }
