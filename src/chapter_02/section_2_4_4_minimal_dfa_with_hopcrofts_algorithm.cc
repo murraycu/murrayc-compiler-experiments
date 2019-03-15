@@ -81,7 +81,9 @@ split(const States& states, const Partitions& partitions) {
       // DFAs, by definition, have at most 1 transition per character per state:
       assert(next_states.size() <= 1);
 
-      const auto next = *(next_states.begin());
+      const auto next = next_states.empty() ?
+        std::shared_ptr<State>{} : // A state with no transition.
+        *(next_states.begin());
       const auto next_partition =
         get_partition_containing_state(partitions, next);
       states_by_next_partition[next_partition].emplace(s);
