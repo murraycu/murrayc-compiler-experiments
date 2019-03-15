@@ -299,8 +299,6 @@ bottom_up_lr1_parse(const std::vector<Grammars::WordType>& words) {
 int
 main() {
   {
-    using Grammar = ParenthesesGrammar;
-
     {
       // Valid input:
       const std::vector<std::string> input = {"(", ")"};
